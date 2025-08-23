@@ -1,4 +1,3 @@
-// my-app/middleware.ts
 import { withAuth, type NextRequestWithAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
@@ -15,9 +14,9 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
-        // Allow unauthenticated access to /signin (so users can log in)
+        // allow unauthenticated access to /signin (so users can log in)
         if (pathname.startsWith("/signin")) return true;
-        // Require auth for protected routes
+        // require auth for protected routes
         return !!token;
       },
     },
