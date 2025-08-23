@@ -52,7 +52,7 @@ export default function McpPage() {
                 {s.url && <div><span className="text-neutral-500">URL:</span> {s.url}</div>}
                 {s.command && <div><span className="text-neutral-500">Cmd:</span> {s.command}</div>}
                 {s.argsJson && <div className="col-span-2"><span className="text-neutral-500">Args:</span> <code className="text-xs">{s.argsJson}</code></div>}
-                {s.updatedAt && <div><span className="text-neutral-500">Updated:</span> {new Date(s.updatedAt * 1000).toLocaleString()}</div>}
+                {s.updatedAt && <div><span className="text-neutral-500">Last updated:</span> {new Date(s.updatedAt).toLocaleString()}</div>}
               </div>
               {s.tools?.length ? (
                 <div className="mt-4">

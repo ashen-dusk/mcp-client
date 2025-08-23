@@ -20,10 +20,10 @@ export default async function Home() {
               <div className="flex gap-3">
                 <Link href="/api/auth/signout" className="rounded-lg border px-4 py-2">Sign out</Link>
                 <Link href="/protected" className="rounded-lg border px-4 py-2">Protected page</Link>
+                <Link href="/mcp" className="rounded-lg border px-4 py-2">MCP page</Link>
               </div>
             </div>
           )}
-          <Link href="/mcp" className="rounded-lg border px-4 py-2">MCP page</Link>
         </div>
       </div>
     </main>

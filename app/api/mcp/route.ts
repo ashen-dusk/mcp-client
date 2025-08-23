@@ -5,13 +5,12 @@ import { MCP_SERVERS_QUERY } from "@/lib/graphql";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  console.log("session in mcp route", session);
+  // console.log("session in mcp route", session);
   const token = session?.googleAccessToken ?? session?.googleIdToken;
   if (!token) return NextResponse.json({ errors: [{ message: "Unauthorized" }] }, { status: 401 });
 
   const origin = (process.env.DJANGO_API_URL || process.env.BACKEND_URL)?.replace(/\/$/, "");
   if (!origin) return NextResponse.json({ errors: [{ message: "Server misconfigured" }] }, { status: 500 });
-  console.log("origin", origin);
   const resp = await fetch(`${origin}/api/graphql`, {
     method: "POST",
     headers: {
