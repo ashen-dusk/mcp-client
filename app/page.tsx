@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { CopilotSidebar } from "@copilotkit/react-ui";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -20,12 +21,19 @@ export default async function Home() {
               <div className="flex gap-3">
                 <Link href="/api/auth/signout" className="rounded-lg border px-4 py-2">Sign out</Link>
                 <Link href="/protected" className="rounded-lg border px-4 py-2">Protected page</Link>
-                <Link href="/mcp" className="rounded-lg border px-4 py-2">MCP page</Link>
+                <Link href="/mcp" className="rounded-lg border px-4 py-2">MCP Client</Link>
               </div>
             </div>
           )}
         </div>
       </div>
+      <CopilotSidebar
+        defaultOpen={true}
+        labels={{
+          title: "Popup Assistant",
+          initial: "Hello! I'm here and ready to help.",
+        }}
+      />
     </main>
   );
 }
