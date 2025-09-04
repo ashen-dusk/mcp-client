@@ -81,6 +81,56 @@ export default function McpPage() {
     }
   };
 
+  const handleServerAdd = async (data: any) => {
+    const response = await fetch('/api/mcp/servers', {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      throw new Error(result.error || 'Failed to add server');
+    }
+
+    // Refresh servers list
+    await fetchServers();
+  };
+
+  const handleServerUpdate = async (data: any) => {
+    const response = await fetch('/api/mcp/servers', {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      throw new Error(result.error || 'Failed to update server');
+    }
+
+    // Refresh servers list
+    await fetchServers();
+  };
+
+  const handleServerDelete = async (serverName: string) => {
+    const response = await fetch(`/api/mcp/servers?name=${encodeURIComponent(serverName)}`, {
+      method: "DELETE",
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      throw new Error(result.error || 'Failed to delete server');
+    }
+
+    // Refresh servers list
+    await fetchServers();
+  };
+
   useEffect(() => {
     fetchServers();
   }, []);
@@ -92,6 +142,9 @@ export default function McpPage() {
       error={error}
       onRefresh={fetchServers}
       onServerAction={handleServerAction}
+      onServerAdd={handleServerAdd}
+      onServerUpdate={handleServerUpdate}
+      onServerDelete={handleServerDelete}
     />
   );
 }

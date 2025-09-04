@@ -83,4 +83,45 @@ export const SET_MCP_SERVER_ENABLED_MUTATION = `
   ${TOOL_INFO_FRAGMENT}
 `;
 
+export const SAVE_MCP_SERVER_MUTATION = `
+  mutation SaveMcpServer(
+    $name: String!
+    $transport: String!
+    $url: String
+    $command: String
+    $argsJson: String
+    $headersJson: String
+    $queryParamsJson: String
+    $requiresOauth: Boolean
+  ) {
+    saveMcpServer(
+      name: $name
+      transport: $transport
+      url: $url
+      command: $command
+      argsJson: $argsJson
+      headersJson: $headersJson
+      queryParamsJson: $queryParamsJson
+      requiresOauth: $requiresOauth
+    ) {
+      id
+      name
+      transport
+      url
+      command
+      args
+      enabled
+      requiresOauth2
+      connectionStatus
+      updatedAt
+    }
+  }
+`;
+
+export const REMOVE_MCP_SERVER_MUTATION = `
+  mutation RemoveMcpServer($serverName: String!) {
+    removeMcpServer(name: $serverName)
+  }
+`;
+
 
