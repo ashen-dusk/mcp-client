@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity } from "lucide-react";
+import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Toaster, toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +29,22 @@ export default function McpClientLayout({
   onServerAction 
 }: McpClientLayoutProps) {
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Update selected server when servers list changes
+  useEffect(() => {
+    if (selectedServer && servers) {
+      const updatedServer = servers.find(server => server.name === selectedServer.name);
+      if (updatedServer) {
+        setSelectedServer(updatedServer);
+      }
+    }
+  }, [servers, selectedServer]);
 
   const sidebarVariants = {
-    hidden: { x: -300, opacity: 0 },
+    hidden: { x: -320, opacity: 0 },
     visible: { x: 0, opacity: 1 },
-    exit: { x: -300, opacity: 0 }
+    exit: { x: -320, opacity: 0 }
   };
 
   const mainVariants = {
@@ -91,19 +103,43 @@ export default function McpClientLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: 'hsl(var(--background))',
+            color: 'hsl(var(--foreground))',
+            border: '1px solid hsl(var(--border))',
+          },
+        }}
+      />
       <div className="flex h-screen">
         {/* Left Sidebar */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={sidebarVariants}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="w-80 border-r border-border bg-card flex flex-col"
-        >
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={sidebarVariants}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="w-80 border-r border-border bg-card flex flex-col"
+            >
           <div className="p-6 border-b border-border">
-            <div className="flex items-center gap-2 mb-2">
-              <Wrench className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-semibold">MCP Client</h1>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold">MCP Client</h1>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(false)}
+                className="flex items-center gap-1"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </Button>
             </div>
             <p className="text-sm text-muted-foreground">
               Manage your MCP servers and explore tools
@@ -115,7 +151,10 @@ export default function McpClientLayout({
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-medium text-muted-foreground">Servers</h2>
                 <Button
-                  onClick={onRefresh}
+                  onClick={() => {
+                    onRefresh();
+                    toast.success("Refreshing servers...");
+                  }}
                   variant="ghost"
                   size="sm"
                   disabled={loading}
@@ -203,7 +242,9 @@ export default function McpClientLayout({
               )}
             </div>
           </div>
-        </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Main Content Area */}
         <motion.div
@@ -213,6 +254,20 @@ export default function McpClientLayout({
           transition={{ duration: 0.3, ease: "easeOut", delay: 0.1 }}
           className="flex-1 flex flex-col"
         >
+          {/* Show Sidebar Button - Only when sidebar is closed */}
+          {!sidebarOpen && (
+            <div className="p-4 border-b border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <PanelLeftOpen className="h-4 w-4" />
+                Show Sidebar
+              </Button>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             {selectedServer ? (
               <motion.div
@@ -223,13 +278,35 @@ export default function McpClientLayout({
                 transition={{ duration: 0.3 }}
                 className="flex-1 flex flex-col"
               >
-                <div className="p-6 border-b border-border">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-semibold">{selectedServer.name}</h2>
-                      <p className="text-muted-foreground">
+                <div className="p-4 sm:p-6 border-b border-border">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex-1">
+                      <h2 className="text-xl sm:text-2xl font-semibold">{selectedServer.name}</h2>
+                      <p className="text-sm text-muted-foreground mb-2">
                         {selectedServer.transport} • {selectedServer.connectionStatus || "Unknown"}
                       </p>
+                      
+                      {/* Compact Server Details */}
+                      <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
+                        {selectedServer.id && (
+                          <span className="flex items-center">
+                            <span className="font-medium">ID</span> 
+                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs">{selectedServer.id}</code>
+                          </span>
+                        )}
+                        {selectedServer.url && (
+                          <span className="flex items-center">
+                            <span className="font-medium">URL</span> 
+                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs max-w-48 truncate">{selectedServer.url}</code>
+                          </span>
+                        )}
+                        {selectedServer.command && (
+                          <span className="flex items-center">
+                            <span className="font-medium">CMD:</span> 
+                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs">{selectedServer.command}</code>
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <ServerManagement
                       server={selectedServer}

@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
       throw new Error(result.errors?.[0]?.message || 'Action failed');
     }
 
+    // Return the result with the updated server data
     return NextResponse.json(result);
   } catch (error) {
     console.error("MCP action error:", error);

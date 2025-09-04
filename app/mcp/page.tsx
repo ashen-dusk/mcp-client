@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
 import { McpServer } from "@/types/mcp";
 
@@ -19,8 +20,11 @@ export default function McpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
       setServers(json?.data?.mcpServers ?? []);
+      toast.success("Servers loaded successfully");
     } catch (e: any) {
-      setError(e?.message ?? "Failed to load servers");
+      const errorMessage = e?.message ?? "Failed to load servers";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -51,8 +55,26 @@ export default function McpPage() {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
       }
 
-      // Refresh servers after successful action
-      await fetchServers();
+      // Update local state instead of refetching all data
+      setServers(prevServers => {
+        if (!prevServers) return prevServers;
+        return prevServers.map(server => {
+          if (server.name === serverName) {
+            // Get updated data from response if available
+            const updatedServer = result.data?.connectMcpServer || result.data?.disconnectMcpServer;
+            
+            return {
+              ...server,
+              connectionStatus: updatedServer?.connectionStatus || 
+                (action === 'activate' ? 'connected' : 'disconnected'),
+              tools: updatedServer?.tools || server.tools,
+              // Update timestamp to reflect the change
+              updated_at: new Date().toISOString()
+            };
+          }
+          return server;
+        });
+      });
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);
       throw error;

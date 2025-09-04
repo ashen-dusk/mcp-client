@@ -11,8 +11,6 @@ export type McpServer = {
   url?: string | null;
   command?: string | null;
   args?: any | null; // JSON type from Strawberry
-  headers?: any | null; // JSON type from Strawberry
-  queryParams?: any | null; // JSON type from Strawberry
   enabled: boolean;
   requiresOauth2: boolean;
   connectionStatus?: string | null;

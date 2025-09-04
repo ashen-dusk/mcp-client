@@ -103,10 +103,10 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
           <div>
             <h3 className="text-lg font-semibold">Tools Explorer</h3>
             <p className="text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {filteredTools.map((tool, index) => {
               const category = getToolCategory(tool.name);
@@ -195,18 +195,18 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
                 >
                   <Card className="h-full hover:shadow-md transition-shadow duration-200">
                     <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          <Wrench className="h-4 w-4 text-primary" />
-                          <CardTitle className="text-base">{tool.name}</CardTitle>
+                          <Wrench className="h-4 w-4 text-primary flex-shrink-0" />
+                          <CardTitle className="text-sm truncate min-w-0 flex-1">{tool.name}</CardTitle>
                         </div>
-                        <Badge variant={getCategoryColor(category)} className="text-xs">
+                        <Badge variant={getCategoryColor(category)} className="text-xs w-fit">
                           {category}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-3">
                         {tool.description}
                       </p>
                       
@@ -313,8 +313,8 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden mt-3"
                           >
-                            <div className="bg-muted rounded-md p-3">
-                              <pre className="text-xs text-muted-foreground overflow-x-auto">
+                            <div className="bg-muted rounded-md p-3 max-w-full overflow-x-auto">
+                              <pre className="text-xs text-muted-foreground whitespace-pre min-w-max">
                                 {JSON.stringify(schema, null, 2)}
                               </pre>
                             </div>

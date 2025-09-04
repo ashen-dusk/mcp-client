@@ -14,8 +14,6 @@ export const MCP_SERVER_FRAGMENT = `
     url
     command
     args
-    headers
-    queryParams
     enabled
     requiresOauth2
     connectionStatus

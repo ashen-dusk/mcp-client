@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 import { 
   Power, 
   RotateCcw, 
@@ -29,19 +30,16 @@ interface ServerManagementProps {
 
 export default function ServerManagement({ server, onAction }: ServerManagementProps) {
   const [loading, setLoading] = useState<string | null>(null);
-  const [lastAction, setLastAction] = useState<string | null>(null);
 
   const handleAction = async (action: 'restart' | 'activate' | 'deactivate') => {
     setLoading(action);
-    setLastAction(null);
     
     try {
       await onAction(server.name, action);
-      setLastAction(action);
-      // Clear success message after 3 seconds
-      setTimeout(() => setLastAction(null), 3000);
+      toast.success(`Server ${action}d successfully`);
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);
+      toast.error(`Failed to ${action} server`);
     } finally {
       setLoading(null);
     }
@@ -118,18 +116,6 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
         </Badge>
       </div>
 
-      {/* Success Message */}
-      {lastAction && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400"
-        >
-          <CheckCircle className="h-4 w-4" />
-          <span>Server {lastAction}d successfully</span>
-        </motion.div>
-      )}
 
       {/* Action Buttons */}
       <div className="flex items-center gap-2">
