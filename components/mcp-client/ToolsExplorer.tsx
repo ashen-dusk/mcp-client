@@ -89,7 +89,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
   if (!server.tools || server.tools.length === 0) {
     return (
       <div className="p-6">
-        <Card>
+        {/* <Card> */}
           <CardContent className="p-12 text-center">
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No Tools Available</h3>
@@ -97,7 +97,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
               This server doesn't have any tools configured or they haven't been loaded yet.
             </p>
           </CardContent>
-        </Card>
+        {/* </Card> */}
       </div>
     );
   }

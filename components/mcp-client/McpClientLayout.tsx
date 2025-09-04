@@ -200,7 +200,7 @@ export default function McpClientLayout({
                         }`}
                         onClick={() => setSelectedServer(server)}
                       >
-                        <CardContent className="px-3 py-2">
+                        <CardContent className="px-3">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <Server className="h-3 w-3 text-muted-foreground" />
