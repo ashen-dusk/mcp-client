@@ -5,6 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2 } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import ServerFormModal from "./ServerFormModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +50,8 @@ export default function McpClientLayout({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [editingServer, setEditingServer] = useState<McpServer | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [serverToDelete, setServerToDelete] = useState<string | null>(null);
 
   // Update selected server when servers list changes
   useEffect(() => {
@@ -63,16 +75,23 @@ export default function McpClientLayout({
     setModalOpen(true);
   };
 
-  const handleDeleteServer = async (serverName: string) => {
-    if (confirm(`Are you sure you want to delete "${serverName}"?`)) {
-      try {
-        await onServerDelete(serverName);
-        if (selectedServer?.name === serverName) {
-          setSelectedServer(null);
-        }
-      } catch (error) {
-        console.error('Failed to delete server:', error);
+  const handleDeleteServer = (serverName: string) => {
+    setServerToDelete(serverName);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteServer = async () => {
+    if (!serverToDelete) return;
+    
+    try {
+      await onServerDelete(serverToDelete);
+      if (selectedServer?.name === serverToDelete) {
+        setSelectedServer(null);
       }
+      setDeleteDialogOpen(false);
+      setServerToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete server:', error);
     }
   };
 
@@ -244,65 +263,67 @@ export default function McpClientLayout({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
+                      className="group relative"
                     >
+                      {/* Action Buttons - Right Side */}
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1 z-10">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditServer(server);
+                          }}
+                          className="h-6 w-6 p-0 bg-background/90 hover:bg-accent shadow-sm cursor-pointer border"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteServer(server.name);
+                          }}
+                          className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-background/90 shadow-sm cursor-pointer border"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+
                       <Card
-                        className={`cursor-pointer transition-all duration-200 hover:shadow-md group relative ${
+                        className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                           selectedServer?.name === server.name
                             ? "ring-2 ring-primary"
                             : ""
                         }`}
                         onClick={() => setSelectedServer(server)}
                       >
-                        <CardContent className="px-3">
+                        <CardContent className="px-3 pr-12">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
+                              <div 
+                                className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${
+                                  !server.enabled 
+                                    ? "bg-gray-400 border-gray-500 hover:bg-gray-500" 
+                                    : server.connectionStatus?.toLowerCase() === "connected"
+                                    ? "bg-green-500 border-green-600 hover:bg-green-600 animate-pulse shadow-green-500/50"
+                                    : server.connectionStatus?.toLowerCase() === "disconnected"
+                                    ? "bg-yellow-500 border-yellow-600 hover:bg-yellow-600 shadow-yellow-500/50"
+                                    : server.connectionStatus?.toLowerCase() === "failed"
+                                    ? "bg-red-500 border-red-600 hover:bg-red-600 animate-pulse shadow-red-500/50"
+                                    : "bg-gray-400 border-gray-500 hover:bg-gray-500"
+                                }`}
+                                title={`Status: ${server.enabled ? (server.connectionStatus || "Unknown") : "Disabled"}`}
+                              />
                               <Server className="h-3 w-3 text-muted-foreground" />
                               <span className="font-medium text-sm">
                                 {server.name}
                               </span>
                             </div>
-                            <div 
-                              className={`w-2 h-2 rounded-full ${
-                                !server.enabled 
-                                  ? "bg-gray-400" 
-                                  : server.connectionStatus?.toLowerCase() === "connected"
-                                  ? "bg-green-500"
-                                  : server.connectionStatus?.toLowerCase() === "disconnected"
-                                  ? "bg-yellow-500"
-                                  : server.connectionStatus?.toLowerCase() === "failed"
-                                  ? "bg-red-500"
-                                  : "bg-gray-400"
-                              }`}
-                            />
                           </div>
                           <div className="text-xs text-muted-foreground">
                             <div>{server.transport} • {server.tools.length} tools</div>
-                          </div>
-                          
-                          {/* Hover Action Buttons - Left Side */}
-                          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditServer(server);
-                              }}
-                              className="h-6 w-6 p-0 bg-background/80 hover:bg-background shadow-sm"
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteServer(server.name);
-                              }}
-                              className="h-6 w-6 p-0 text-destructive hover:text-destructive bg-background/80 hover:bg-background shadow-sm"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -426,6 +447,27 @@ export default function McpClientLayout({
         server={editingServer}
         mode={modalMode}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Server</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{serverToDelete}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteServer}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

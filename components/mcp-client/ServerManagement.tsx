@@ -93,17 +93,18 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
       {/* Status Badge */}
       <div className="flex items-center gap-2">
         <div 
-          className={`w-2 h-2 rounded-full ${
+          className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 ${
             !server.enabled 
-              ? "bg-gray-400" 
+              ? "bg-gray-400 hover:bg-gray-500" 
               : server.connectionStatus?.toLowerCase() === "connected"
-              ? "bg-green-500"
+              ? "bg-green-500 hover:bg-green-600 animate-pulse"
               : server.connectionStatus?.toLowerCase() === "disconnected"
-              ? "bg-yellow-500"
+              ? "bg-yellow-500 hover:bg-yellow-600"
               : server.connectionStatus?.toLowerCase() === "failed"
-              ? "bg-red-500"
-              : "bg-gray-400"
+              ? "bg-red-500 hover:bg-red-600 animate-pulse"
+              : "bg-gray-400 hover:bg-gray-500"
           }`}
+          title={`Status: ${server.enabled ? (server.connectionStatus || "Unknown") : "Disabled"}`}
         />
         <Badge
           variant={getStatusColor(server.connectionStatus, server.enabled)}
