@@ -1,8 +1,17 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Server, Play, User, Home, Code } from "lucide-react";
+import { Server, Play, User, Home, Code, ChevronDown, LogOut } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default async function CommonNavigation() {
   const session = await getServerSession(authOptions);
@@ -34,22 +43,45 @@ export default async function CommonNavigation() {
           
           {/* Profile Section */}
           <div className="flex items-center gap-3">
-            {session?.user?.image ? (
-              <Image
-                src={session.user.image}
-                alt={session.user.name || "Profile"}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
+            <ThemeToggle />
+            
+            {session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 px-2">
+                    {session.user?.image ? (
+                      <Image
+                        src={session.user.image}
+                        alt={session.user.name || "Profile"}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                    )}
+                    <span className="text-sm font-medium">
+                      {session.user?.name?.split(' ')[0] || session.user?.email?.split('@')[0]}
+                    </span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem asChild>
+                    <Link href="/api/auth/signout" className="flex items-center gap-2 text-red-600">
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-primary" />
-              </div>
+              <Link href="/signin" className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                Sign in
+              </Link>
             )}
-            <span className="text-sm font-medium">
-              {session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0] || "Guest"}
-            </span>
           </div>
         </div>
       </div>
