@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
+import CommonNavigation from "@/components/CommonNavigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,13 +30,20 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-        <CopilotKit
-          agent="agenticChatAgent"
-          runtimeUrl="/api/copilotkit"
-          showDevConsole={false}
-        >
-          {children}
-        </CopilotKit>
+          <CopilotKit
+            agent="agenticChatAgent"
+            runtimeUrl="/api/copilotkit"
+            showDevConsole={false}
+          >
+            <div className="min-h-screen bg-background">
+              <div className="max-w-5xl mx-auto">
+                <CommonNavigation />
+                <main>
+                  {children}
+                </main>
+              </div>
+            </div>
+          </CopilotKit>
         </AuthProvider>
       </body>
     </html>

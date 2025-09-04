@@ -231,7 +231,8 @@ export default function McpClientLayout({
           },
         }}
       />
-      <div className="flex h-screen">
+      
+      <div className="flex h-[calc(100vh-80px)]">
         {/* Left Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -253,14 +254,6 @@ export default function McpClientLayout({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={handleAddServer}
-                  className="flex items-center gap-1"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setSidebarOpen(false)}
                   className="flex items-center gap-1"
                 >
@@ -275,8 +268,15 @@ export default function McpClientLayout({
 
           <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-medium text-muted-foreground">Servers</h2>
+              <div className="flex items-center justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAddServer}
+                  className="flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
                 <Button
                   onClick={() => {
                     onRefresh();
@@ -447,8 +447,8 @@ export default function McpClientLayout({
                           {toggleLoading === selectedServer.name && (
                             <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
                           )}
-                          <label htmlFor="server-enabled" className="text-sm text-muted-foreground cursor-pointer">
-                            {toggleLoading === selectedServer.name ? "Updating..." : (selectedServer.enabled ? "Enabled" : "Disabled")}
+                          <label htmlFor="server-enabled" className="text-xs text-muted-foreground cursor-pointer">
+                            {toggleLoading === selectedServer.name ? "Updating..." : (selectedServer.enabled ? "Included in context" : "Excluded from context")}
                           </label>
                         </div>
                       </div>
