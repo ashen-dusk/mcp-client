@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { action, serverName } = body;
+    const { action, serverName, serverId, enabled } = body;
 
     let mutation = '';
     let variables: any = { serverName };
@@ -49,6 +49,21 @@ export async function POST(request: NextRequest) {
             }
           }
         `;
+        break;
+      case 'setEnabled':
+        mutation = `
+          mutation SetServerEnabled($serverName: String!, $enabled: Boolean!) {
+            setMcpServerEnabled(name: $serverName, enabled: $enabled) {
+              name
+              transport
+              url
+              command
+              args
+              enabled
+            }
+          }
+        `;
+        variables = { serverName, enabled };
         break;
       default:
         return NextResponse.json({ errors: [{ message: "Invalid action" }] }, { status: 400 });

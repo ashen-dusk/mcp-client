@@ -45,30 +45,28 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
     }
   };
 
-  const getStatusColor = (status: string | null | undefined, enabled: boolean) => {
-    if (!enabled) return "secondary";
+  const getStatusColor = (status: string | null | undefined) => {
     if (!status) return "outline";
-    switch (status.toLowerCase()) {
-      case "connected":
+    switch (status.toUpperCase()) {
+      case "CONNECTED":
         return "default";
-      case "disconnected":
+      case "DISCONNECTED":
         return "secondary";
-      case "failed":
+      case "FAILED":
         return "destructive";
       default:
         return "outline";
     }
   };
 
-  const getStatusIcon = (status: string | null | undefined, enabled: boolean) => {
-    if (!enabled) return <Pause className="h-3 w-3" />;
+  const getStatusIcon = (status: string | null | undefined) => {
     if (!status) return <Power className="h-3 w-3" />;
-    switch (status.toLowerCase()) {
-      case "connected":
+    switch (status.toUpperCase()) {
+      case "CONNECTED":
         return <CheckCircle className="h-3 w-3" />;
-      case "disconnected":
+      case "DISCONNECTED":
         return <XCircle className="h-3 w-3" />;
-      case "failed":
+      case "FAILED":
         return <XCircle className="h-3 w-3" />;
       default:
         return <Power className="h-3 w-3" />;
@@ -94,25 +92,23 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
       <div className="flex items-center gap-2">
         <div 
           className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 ${
-            !server.enabled 
-              ? "bg-gray-400 hover:bg-gray-500" 
-              : server.connectionStatus?.toLowerCase() === "connected"
+            server.connectionStatus?.toUpperCase() === "CONNECTED"
               ? "bg-green-500 hover:bg-green-600 animate-pulse"
-              : server.connectionStatus?.toLowerCase() === "disconnected"
+              : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
               ? "bg-yellow-500 hover:bg-yellow-600"
-              : server.connectionStatus?.toLowerCase() === "failed"
+              : server.connectionStatus?.toUpperCase() === "FAILED"
               ? "bg-red-500 hover:bg-red-600 animate-pulse"
               : "bg-gray-400 hover:bg-gray-500"
           }`}
-          title={`Status: ${server.enabled ? (server.connectionStatus || "Unknown") : "Disabled"}`}
+          title={`Status: ${server.connectionStatus || "Unknown"}`}
         />
         <Badge
-          variant={getStatusColor(server.connectionStatus, server.enabled)}
+          variant={getStatusColor(server.connectionStatus)}
           className="flex items-center gap-1"
         >
-          {getStatusIcon(server.connectionStatus, server.enabled)}
+          {getStatusIcon(server.connectionStatus)}
           <span>
-            {server.enabled ? (server.connectionStatus || "Unknown") : "Disabled"}
+            {server.connectionStatus || "Unknown"}
           </span>
         </Badge>
       </div>

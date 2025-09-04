@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2 } from "lucide-react";
+import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import ServerFormModal from "./ServerFormModal";
 import {
@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
 import ToolsExplorer from "./ToolsExplorer";
@@ -33,6 +34,7 @@ interface McpClientLayoutProps {
   onServerAdd: (data: any) => Promise<void>;
   onServerUpdate: (data: any) => Promise<void>;
   onServerDelete: (serverName: string) => Promise<void>;
+  onUpdateServer: (serverId: string, updates: Partial<McpServer>) => void;
 }
 
 export default function McpClientLayout({ 
@@ -43,7 +45,8 @@ export default function McpClientLayout({
   onServerAction,
   onServerAdd,
   onServerUpdate,
-  onServerDelete
+  onServerDelete,
+  onUpdateServer
 }: McpClientLayoutProps) {
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -52,6 +55,7 @@ export default function McpClientLayout({
   const [editingServer, setEditingServer] = useState<McpServer | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serverToDelete, setServerToDelete] = useState<string | null>(null);
+  const [toggleLoading, setToggleLoading] = useState<string | null>(null);
 
   // Update selected server when servers list changes
   useEffect(() => {
@@ -103,6 +107,59 @@ export default function McpClientLayout({
     }
   };
 
+  const handleToggleEnabled = async (serverName: string, currentEnabled: boolean) => {
+    // Set loading state
+    setToggleLoading(serverName);
+    
+    // Find the server to get its ID
+    const server = servers?.find(s => s.name === serverName);
+    if (!server) {
+      setToggleLoading(null);
+      toast.error("Server not found");
+      return;
+    }
+
+    // Optimistically update both selected server and servers list
+    if (selectedServer && selectedServer.name === serverName) {
+      setSelectedServer(prev => prev ? { ...prev, enabled: !currentEnabled } : null);
+    }
+    
+    // Update servers list locally
+    onUpdateServer(server.id, { enabled: !currentEnabled });
+
+    try {
+      // Call the server action to toggle enabled status
+      const response = await fetch("/api/mcp/actions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "setEnabled",
+          serverName: serverName,
+          enabled: !currentEnabled,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to toggle server status");
+      }
+
+      const result = await response.json();
+      toast.success(result.message || `Server ${!currentEnabled ? "enabled" : "disabled"} successfully`);
+    } catch (error) {
+      // Revert optimistic updates on error
+      if (selectedServer && selectedServer.name === serverName) {
+        setSelectedServer(prev => prev ? { ...prev, enabled: currentEnabled } : null);
+      }
+      onUpdateServer(server.id, { enabled: currentEnabled });
+      toast.error("Failed to toggle server status");
+    } finally {
+      // Clear loading state
+      setToggleLoading(null);
+    }
+  };
+
   const sidebarVariants = {
     hidden: { x: -320, opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -115,30 +172,28 @@ export default function McpClientLayout({
     exit: { opacity: 0, x: 20 }
   };
 
-  const getStatusColor = (status: string | null | undefined, enabled: boolean) => {
-    if (!enabled) return "secondary";
+  const getStatusColor = (status: string | null | undefined) => {
     if (!status) return "outline";
-    switch (status.toLowerCase()) {
-      case "connected":
+    switch (status.toUpperCase()) {
+      case "CONNECTED":
         return "default";
-      case "disconnected":
+      case "DISCONNECTED":
         return "secondary";
-      case "failed":
+      case "FAILED":
         return "destructive";
       default:
         return "outline";
     }
   };
 
-  const getStatusIcon = (status: string | null | undefined, enabled: boolean) => {
-    if (!enabled) return <Settings className="h-3 w-3" />;
+  const getStatusIcon = (status: string | null | undefined) => {
     if (!status) return <Server className="h-3 w-3" />;
-    switch (status.toLowerCase()) {
-      case "connected":
+    switch (status.toUpperCase()) {
+      case "CONNECTED":
         return <Activity className="h-3 w-3" />;
-      case "disconnected":
+      case "DISCONNECTED":
         return <Settings className="h-3 w-3" />;
-      case "failed":
+      case "FAILED":
         return <Settings className="h-3 w-3" />;
       default:
         return <Server className="h-3 w-3" />;
@@ -304,17 +359,15 @@ export default function McpClientLayout({
                             <div className="flex items-center gap-2">
                               <div 
                                 className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${
-                                  !server.enabled 
-                                    ? "bg-gray-400 border-gray-500 hover:bg-gray-500" 
-                                    : server.connectionStatus?.toLowerCase() === "connected"
+                                  server.connectionStatus?.toUpperCase() === "CONNECTED"
                                     ? "bg-green-500 border-green-600 hover:bg-green-600 animate-pulse shadow-green-500/50"
-                                    : server.connectionStatus?.toLowerCase() === "disconnected"
+                                    : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
                                     ? "bg-yellow-500 border-yellow-600 hover:bg-yellow-600 shadow-yellow-500/50"
-                                    : server.connectionStatus?.toLowerCase() === "failed"
+                                    : server.connectionStatus?.toUpperCase() === "FAILED"
                                     ? "bg-red-500 border-red-600 hover:bg-red-600 animate-pulse shadow-red-500/50"
                                     : "bg-gray-400 border-gray-500 hover:bg-gray-500"
                                 }`}
-                                title={`Status: ${server.enabled ? (server.connectionStatus || "Unknown") : "Disabled"}`}
+                                title={`Status: ${server.connectionStatus || "Unknown"}`}
                               />
                               <Server className="h-3 w-3 text-muted-foreground" />
                               <span className="font-medium text-sm">
@@ -381,7 +434,24 @@ export default function McpClientLayout({
                 <div className="p-4 sm:p-6 border-b border-border">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex-1">
-                      <h2 className="text-xl sm:text-2xl font-semibold">{selectedServer.name}</h2>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-xl sm:text-2xl font-semibold">{selectedServer.name}</h2>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={selectedServer.enabled}
+                            onCheckedChange={() => handleToggleEnabled(selectedServer.name, selectedServer.enabled)}
+                            disabled={toggleLoading === selectedServer.name}
+                            id="server-enabled"
+                            className="cursor-pointer"
+                          />
+                          {toggleLoading === selectedServer.name && (
+                            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                          )}
+                          <label htmlFor="server-enabled" className="text-sm text-muted-foreground cursor-pointer">
+                            {toggleLoading === selectedServer.name ? "Updating..." : (selectedServer.enabled ? "Enabled" : "Disabled")}
+                          </label>
+                        </div>
+                      </div>
                       <p className="text-sm text-muted-foreground mb-2">
                         {selectedServer.transport} • {selectedServer.connectionStatus || "Unknown"}
                       </p>

@@ -131,6 +131,17 @@ export default function McpPage() {
     await fetchServers();
   };
 
+  const handleUpdateServer = (serverId: string, updates: Partial<McpServer>) => {
+    setServers(prevServers => {
+      if (!prevServers) return prevServers;
+      return prevServers.map(server => 
+        server.id === serverId 
+          ? { ...server, ...updates }
+          : server
+      );
+    });
+  };
+
   useEffect(() => {
     fetchServers();
   }, []);
@@ -145,6 +156,7 @@ export default function McpPage() {
       onServerAdd={handleServerAdd}
       onServerUpdate={handleServerUpdate}
       onServerDelete={handleServerDelete}
+      onUpdateServer={handleUpdateServer}
     />
   );
 }
