@@ -63,11 +63,13 @@ export default function McpPage() {
             // Get updated data from response if available
             const updatedServer = result.data?.connectMcpServer || result.data?.disconnectMcpServer;
             
+            const newConnectionStatus = updatedServer?.connectionStatus || 
+              (action === 'activate' ? 'connected' : 'disconnected');
+            
             return {
               ...server,
-              connectionStatus: updatedServer?.connectionStatus || 
-                (action === 'activate' ? 'connected' : 'disconnected'),
-              tools: updatedServer?.tools || server.tools,
+              connectionStatus: newConnectionStatus,
+              tools: (action === 'deactivate' || newConnectionStatus === 'failed') ? [] : (updatedServer?.tools || server.tools),
               // Update timestamp to reflect the change
               updated_at: new Date().toISOString()
             };

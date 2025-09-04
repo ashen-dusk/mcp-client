@@ -78,9 +78,11 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
     
     switch (action) {
       case 'activate':
-        return server.enabled;
+        return server.connectionStatus?.toUpperCase() === "CONNECTED";
       case 'deactivate':
-        return !server.enabled;
+        return server.connectionStatus?.toUpperCase() !== "CONNECTED";
+      case 'restart':
+        return false; // Restart is always available
       default:
         return false;
     }
@@ -117,20 +119,20 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
       {/* Action Buttons */}
       <div className="flex items-center gap-2">
         {/* Primary Action Button */}
-        {server.enabled ? (
+        {server.connectionStatus?.toUpperCase() === "CONNECTED" ? (
           <Button
-            onClick={() => handleAction('restart')}
-            disabled={isActionDisabled('restart')}
+            onClick={() => handleAction('deactivate')}
+            disabled={isActionDisabled('deactivate')}
             variant="outline"
             size="sm"
             className="flex items-center gap-2"
           >
-            {loading === 'restart' ? (
+            {loading === 'deactivate' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <RotateCcw className="h-4 w-4" />
+              <Pause className="h-4 w-4" />
             )}
-            Restart
+            Deactivate
           </Button>
         ) : (
           <Button
@@ -160,16 +162,7 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {server.enabled ? (
-              <DropdownMenuItem
-                onClick={() => handleAction('deactivate')}
-                disabled={isActionDisabled('deactivate')}
-                className="flex items-center gap-2"
-              >
-                <Pause className="h-4 w-4" />
-                Deactivate
-              </DropdownMenuItem>
-            ) : (
+            {server.connectionStatus?.toUpperCase() === "CONNECTED" ? (
               <DropdownMenuItem
                 onClick={() => handleAction('activate')}
                 disabled={isActionDisabled('activate')}
@@ -177,6 +170,15 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
               >
                 <Play className="h-4 w-4" />
                 Activate
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() => handleAction('deactivate')}
+                disabled={isActionDisabled('deactivate')}
+                className="flex items-center gap-2"
+              >
+                <Pause className="h-4 w-4" />
+                Deactivate
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
