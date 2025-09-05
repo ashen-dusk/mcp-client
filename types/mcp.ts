@@ -17,6 +17,7 @@ export type McpServer = {
   connectionStatus?: string | null;
   tools: ToolInfo[];
   updated_at: string; // datetime as ISO string
+  createdAt?: string; // datetime as ISO string
 };
 
 export type ConnectionResult = {

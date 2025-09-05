@@ -5,9 +5,6 @@ import { authOptions } from "@/lib/auth";
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   const token = session?.googleIdToken;
-  if (!token) {
-    return NextResponse.json({ errors: [{ message: "Unauthorized" }] }, { status: 401 });
-  }
 
   const origin = (process.env.DJANGO_API_URL || process.env.BACKEND_URL)?.replace(/\/$/, "");
   if (!origin) {
@@ -16,10 +13,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { action, serverName, serverId, enabled } = body;
+    const { action, serverName, enabled } = body;
 
     let mutation = '';
-    let variables: any = { serverName };
+    let variables: Record<string, unknown> = { serverName };
 
     switch (action) {
       case 'activate':
@@ -64,21 +61,53 @@ export async function POST(request: NextRequest) {
         `;
         variables = { serverName, enabled };
         break;
+      case 'restart':
+        mutation = `
+          mutation RestartMcpServer($name: String!) {
+            restartMcpServer(name: $name) {
+              success
+              message
+              tools {
+                name
+                description
+                schema
+              }
+              serverName
+              connectionStatus
+            }
+          }
+        `;
+        variables = { name: serverName };
+        break;
       default:
         return NextResponse.json({ errors: [{ message: "Invalid action" }] }, { status: 400 });
     }
 
+    const headers: Record<string, string> = {
+      "content-type": "application/json",
+    };
+    
+    // Only add authorization header if token is available
+    if (token) {
+      headers.authorization = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${origin}/api/graphql`, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
+      headers,
       body: JSON.stringify({ 
         query: mutation,
         variables 
       }),
     });
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response from GraphQL endpoint:", text);
+      throw new Error("Backend server returned invalid response");
+    }
 
     const result = await response.json();
     if (!response.ok || result.errors) {

@@ -30,6 +30,7 @@ const serverSchema = z.object({
   command: z.string().optional(),
   args: z.string().optional(),
   requiresOauth: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
   headers: z.array(z.object({
     key: z.string(),
     value: z.string()
@@ -73,6 +74,7 @@ export default function ServerFormModal({
       command: "",
       args: "",
       requiresOauth: false,
+      isPublic: false,
       headers: []
     }
   });
@@ -98,6 +100,7 @@ export default function ServerFormModal({
           command: server.command || "",
           args: server.args ? (typeof server.args === 'string' ? server.args : JSON.stringify(server.args)) : "",
           requiresOauth: server.requiresOauth2 || false,
+          isPublic: server.isPublic || false,
           headers: []
         });
         setTransportType(server.transport as "sse" | "streamable_http" | "stdio");
@@ -109,6 +112,7 @@ export default function ServerFormModal({
           command: "",
           args: "",
           requiresOauth: false,
+          isPublic: false,
           headers: []
         });
         setTransportType("sse");
@@ -198,6 +202,18 @@ export default function ServerFormModal({
             <p className="text-xs pt-1 text-muted-foreground">
               Enable if this server requires OAuth2 authentication
             </p>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="isPublic" 
+                {...register("isPublic")}
+              />
+              <Label htmlFor="isPublic" className="text-xs">
+                Share with other users
+              </Label>
+            </div>
           </div>
 
           {transportType === 'stdio' ? (

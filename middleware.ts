@@ -24,5 +24,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/protected", "/mcp", "/signin"],
+  matcher: ["/protected", "/signin"],
 };

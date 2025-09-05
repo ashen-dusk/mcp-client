@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
@@ -7,38 +7,55 @@ import { McpServer } from "@/types/mcp";
 
 export default function McpPage() {
   const { data: session } = useSession();
-  const [servers, setServers] = useState<McpServer[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [publicServers, setPublicServers] = useState<McpServer[] | null>(null);
+  const [userServers, setUserServers] = useState<McpServer[] | null>(null);
+  const [publicError, setPublicError] = useState<string | null>(null);
+  const [userError, setUserError] = useState<string | null>(null);
+  const [publicLoading, setPublicLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(false);
 
-  const fetchServers = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchPublicServers = async () => {
+    setPublicLoading(true);
+    setPublicError(null);
     
     try {
       const res = await fetch(`/api/mcp`, { method: "GET" });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
-      setServers(json?.data?.mcpServers ?? []);
-      toast.success("Servers loaded successfully");
-    } catch (e: any) {
-      const errorMessage = e?.message ?? "Failed to load servers";
-      setError(errorMessage);
+      setPublicServers(json?.data?.mcpServers ?? []);
+      toast.success("Public servers loaded successfully");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to load public servers";
+      setPublicError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      setLoading(false);
+      setPublicLoading(false);
     }
   };
 
+  const fetchUserServers = useCallback(async () => {
+    if (!session) return;
+    
+    setUserLoading(true);
+    setUserError(null);
+    
+    try {
+      const res = await fetch(`/api/mcp/user`, { method: "GET" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
+      setUserServers(json?.data?.getUserMcpServers ?? []);
+      toast.success("Your servers loaded successfully");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to load your servers";
+      setUserError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setUserLoading(false);
+    }
+  }, [session]);
+
   const handleServerAction = async (serverName: string, action: 'restart' | 'activate' | 'deactivate') => {
     try {
-      if (action === 'restart') {
-        // For restart, we'll disconnect then connect
-        await handleServerAction(serverName, 'deactivate');
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait a bit
-        return handleServerAction(serverName, 'activate');
-      }
-
       const response = await fetch('/api/mcp/actions', {
         method: "POST",
         headers: {
@@ -55,14 +72,21 @@ export default function McpPage() {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
       }
 
-      // Update local state instead of refetching all data
-      setServers(prevServers => {
+      // Get the response data for the specific action
+      const updatedServer = result.data?.connectMcpServer || 
+                           result.data?.disconnectMcpServer || 
+                           result.data?.restartMcpServer;
+
+      // Check if the operation was actually successful
+      if (updatedServer && updatedServer.success === false) {
+        throw new Error(updatedServer.message || `${action} failed`);
+      }
+
+      // Update local state for both public and user servers
+      setPublicServers(prevServers => {
         if (!prevServers) return prevServers;
         return prevServers.map(server => {
           if (server.name === serverName) {
-            // Get updated data from response if available
-            const updatedServer = result.data?.connectMcpServer || result.data?.disconnectMcpServer;
-            
             const newConnectionStatus = updatedServer?.connectionStatus || 
               (action === 'activate' ? 'connected' : 'disconnected');
             
@@ -70,20 +94,40 @@ export default function McpPage() {
               ...server,
               connectionStatus: newConnectionStatus,
               tools: (action === 'deactivate' || newConnectionStatus === 'failed') ? [] : (updatedServer?.tools || server.tools),
-              // Update timestamp to reflect the change
               updated_at: new Date().toISOString()
             };
           }
           return server;
         });
       });
+
+      setUserServers(prevServers => {
+        if (!prevServers) return prevServers;
+        return prevServers.map(server => {
+          if (server.name === serverName) {
+            const newConnectionStatus = updatedServer?.connectionStatus || 
+              (action === 'activate' ? 'connected' : 'disconnected');
+            
+            return {
+              ...server,
+              connectionStatus: newConnectionStatus,
+              tools: (action === 'deactivate' || newConnectionStatus === 'failed') ? [] : (updatedServer?.tools || server.tools),
+              updated_at: new Date().toISOString()
+            };
+          }
+          return server;
+        });
+      });
+
+      // Return the response data so the UI can show the appropriate message
+      return updatedServer;
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);
       throw error;
     }
   };
 
-  const handleServerAdd = async (data: any) => {
+  const handleServerAdd = async (data: Record<string, unknown>) => {
     const response = await fetch('/api/mcp/servers', {
       method: "POST",
       headers: {
@@ -98,10 +142,13 @@ export default function McpPage() {
     }
 
     // Refresh servers list
-    await fetchServers();
+    await fetchPublicServers();
+    if (session) {
+      await fetchUserServers();
+    }
   };
 
-  const handleServerUpdate = async (data: any) => {
+  const handleServerUpdate = async (data: Record<string, unknown>) => {
     const response = await fetch('/api/mcp/servers', {
       method: "POST",
       headers: {
@@ -116,7 +163,10 @@ export default function McpPage() {
     }
 
     // Refresh servers list
-    await fetchServers();
+    await fetchPublicServers();
+    if (session) {
+      await fetchUserServers();
+    }
   };
 
   const handleServerDelete = async (serverName: string) => {
@@ -130,11 +180,25 @@ export default function McpPage() {
     }
 
     // Refresh servers list
-    await fetchServers();
+    await fetchPublicServers();
+    if (session) {
+      await fetchUserServers();
+    }
   };
 
-  const handleUpdateServer = (serverId: string, updates: Partial<McpServer>) => {
-    setServers(prevServers => {
+  const handleUpdatePublicServer = (serverId: string, updates: Partial<McpServer>) => {
+    setPublicServers(prevServers => {
+      if (!prevServers) return prevServers;
+      return prevServers.map(server => 
+        server.id === serverId 
+          ? { ...server, ...updates }
+          : server
+      );
+    });
+  };
+
+  const handleUpdateUserServer = (serverId: string, updates: Partial<McpServer>) => {
+    setUserServers(prevServers => {
       if (!prevServers) return prevServers;
       return prevServers.map(server => 
         server.id === serverId 
@@ -145,20 +209,32 @@ export default function McpPage() {
   };
 
   useEffect(() => {
-    fetchServers();
+    fetchPublicServers();
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      fetchUserServers();
+    }
+  }, [session, fetchUserServers]);
 
   return (
     <McpClientLayout
-      servers={servers}
-      loading={loading}
-      error={error}
-      onRefresh={fetchServers}
+      publicServers={publicServers}
+      userServers={userServers}
+      publicLoading={publicLoading}
+      userLoading={userLoading}
+      publicError={publicError}
+      userError={userError}
+      session={session}
+      onRefreshPublic={fetchPublicServers}
+      onRefreshUser={fetchUserServers}
       onServerAction={handleServerAction}
       onServerAdd={handleServerAdd}
       onServerUpdate={handleServerUpdate}
       onServerDelete={handleServerDelete}
-      onUpdateServer={handleUpdateServer}
+      onUpdatePublicServer={handleUpdatePublicServer}
+      onUpdateUserServer={handleUpdateUserServer}
     />
   );
 }

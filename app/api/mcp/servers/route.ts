@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { SAVE_MCP_SERVER_MUTATION, REMOVE_MCP_SERVER_MUTATION } from "@/lib/graphql";
 
-const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || "http://localhost:8000/graphql";
+const GRAPHQL_ENDPOINT = process.env.BACKEND_URL+"/api/graphql" || "http://localhost:8000/api/graphql";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,12 +13,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, transport, url, command, args, headers, queryParams, requiresOauth } = body;
+    const { name, transport, url, command, args, headers, queryParams, requiresOauth, isPublic } = body;
 
-    // Prepare headers and queryParams as JSON strings
-    const headersJson = headers && Object.keys(headers).length > 0 ? JSON.stringify(headers) : null;
-    const queryParamsJson = queryParams && Object.keys(queryParams).length > 0 ? JSON.stringify(queryParams) : null;
-    const argsJson = args ? (typeof args === 'string' ? args : JSON.stringify(args)) : null;
+    // Prepare headers and queryParams as JSON objects (not strings)
+    const headersObj = headers && Object.keys(headers).length > 0 ? headers : null;
+    const queryParamsObj = queryParams && Object.keys(queryParams).length > 0 ? queryParams : null;
+    const argsObj = args ? (typeof args === 'string' ? JSON.parse(args) : args) : null;
 
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: "POST",
@@ -33,13 +33,25 @@ export async function POST(request: NextRequest) {
           transport,
           url,
           command,
-          argsJson,
-          headersJson,
-          queryParamsJson,
-          requiresOauth
+          args: argsObj,
+          headers: headersObj,
+          queryParams: queryParamsObj,
+          requiresOauth2: requiresOauth,
+          isPublic: isPublic
         },
       }),
     });
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response from GraphQL endpoint:", text);
+      return NextResponse.json(
+        { error: "Backend server returned invalid response" },
+        { status: 500 }
+      );
+    }
 
     const result = await response.json();
     
@@ -85,6 +97,17 @@ export async function DELETE(request: NextRequest) {
         variables: { serverName },
       }),
     });
+
+    // Check if response is JSON
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text();
+      console.error("Non-JSON response from GraphQL endpoint:", text);
+      return NextResponse.json(
+        { error: "Backend server returned invalid response" },
+        { status: 500 }
+      );
+    }
 
     const result = await response.json();
     

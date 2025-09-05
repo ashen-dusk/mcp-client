@@ -11,7 +11,9 @@ import {
   MoreVertical,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
@@ -25,21 +27,27 @@ import { McpServer } from "@/types/mcp";
 
 interface ServerManagementProps {
   server: McpServer;
-  onAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<void>;
+  onAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<unknown>;
+  onEdit?: (server: McpServer) => void;
+  onDelete?: (serverName: string) => void;
 }
 
-export default function ServerManagement({ server, onAction }: ServerManagementProps) {
+export default function ServerManagement({ server, onAction, onEdit, onDelete }: ServerManagementProps) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleAction = async (action: 'restart' | 'activate' | 'deactivate') => {
     setLoading(action);
     
     try {
-      await onAction(server.name, action);
-      toast.success(`Server ${action}d successfully`);
+      const result = await onAction(server.name, action);
+      
+      // Use the actual message from the response data if available
+      const message = result?.message || `Server ${action}d successfully`;
+      toast.success(message);
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);
-      toast.error(`Failed to ${action} server`);
+      const errorMessage = error instanceof Error ? error.message : `Failed to ${action} server`;
+      toast.error(errorMessage);
     } finally {
       setLoading(null);
     }
@@ -125,7 +133,7 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
             disabled={isActionDisabled('deactivate')}
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
           >
             {loading === 'deactivate' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -139,7 +147,7 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
             onClick={() => handleAction('activate')}
             disabled={isActionDisabled('activate')}
             size="sm"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
           >
             {loading === 'activate' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -154,9 +162,10 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
               disabled={loading !== null}
+              className="cursor-pointer"
             >
               <MoreVertical className="h-4 w-4" />
             </Button>
@@ -166,7 +175,7 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
               <DropdownMenuItem
                 onClick={() => handleAction('activate')}
                 disabled={isActionDisabled('activate')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 cursor-pointer"
               >
                 <Play className="h-4 w-4" />
                 Activate
@@ -175,7 +184,7 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
               <DropdownMenuItem
                 onClick={() => handleAction('deactivate')}
                 disabled={isActionDisabled('deactivate')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 cursor-pointer"
               >
                 <Pause className="h-4 w-4" />
                 Deactivate
@@ -184,11 +193,29 @@ export default function ServerManagement({ server, onAction }: ServerManagementP
             <DropdownMenuItem
               onClick={() => handleAction('restart')}
               disabled={isActionDisabled('restart')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               Restart
             </DropdownMenuItem>
+            {onEdit && (
+              <DropdownMenuItem
+                onClick={() => onEdit(server)}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Edit className="h-4 w-4" />
+                Edit Server
+              </DropdownMenuItem>
+            )}
+            {onDelete && (
+              <DropdownMenuItem
+                onClick={() => onDelete(server.name)}
+                className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Server
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

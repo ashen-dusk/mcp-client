@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, User, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
+import { Session } from "next-auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import ServerFormModal from "./ServerFormModal";
 import {
   AlertDialog,
@@ -17,36 +20,53 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
 import ToolsExplorer from "./ToolsExplorer";
 
 interface McpClientLayoutProps {
-  servers: McpServer[] | null;
-  loading: boolean;
-  error: string | null;
-  onRefresh: () => void;
-  onServerAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<void>;
-  onServerAdd: (data: any) => Promise<void>;
-  onServerUpdate: (data: any) => Promise<void>;
+  publicServers: McpServer[] | null;
+  userServers: McpServer[] | null;
+  publicLoading: boolean;
+  userLoading: boolean;
+  publicError: string | null;
+  userError: string | null;
+  session: Session | null;
+  onRefreshPublic: () => void;
+  onRefreshUser: () => void;
+  onServerAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<unknown>;
+  onServerAdd: (data: Record<string, unknown>) => Promise<void>;
+  onServerUpdate: (data: Record<string, unknown>) => Promise<void>;
   onServerDelete: (serverName: string) => Promise<void>;
-  onUpdateServer: (serverId: string, updates: Partial<McpServer>) => void;
+  onUpdatePublicServer: (serverId: string, updates: Partial<McpServer>) => void;
+  onUpdateUserServer: (serverId: string, updates: Partial<McpServer>) => void;
 }
 
 export default function McpClientLayout({
-  servers,
-  loading,
-  error,
-  onRefresh,
+  publicServers,
+  userServers,
+  publicLoading,
+  userLoading,
+  publicError,
+  userError,
+  session,
+  onRefreshPublic,
+  onRefreshUser,
   onServerAction,
   onServerAdd,
   onServerUpdate,
   onServerDelete,
-  onUpdateServer
+  onUpdatePublicServer,
+  onUpdateUserServer
 }: McpClientLayoutProps) {
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -56,16 +76,22 @@ export default function McpClientLayout({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serverToDelete, setServerToDelete] = useState<string | null>(null);
   const [toggleLoading, setToggleLoading] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'public' | 'user'>('public');
+
+  // Get current servers based on active tab
+  const currentServers = activeTab === 'public' ? publicServers : userServers;
+  const currentLoading = activeTab === 'public' ? publicLoading : userLoading;
+  const currentError = activeTab === 'public' ? publicError : userError;
 
   // Update selected server when servers list changes
   useEffect(() => {
-    if (selectedServer && servers) {
-      const updatedServer = servers.find(server => server.name === selectedServer.name);
+    if (selectedServer && currentServers) {
+      const updatedServer = currentServers.find(server => server.name === selectedServer.name);
       if (updatedServer) {
         setSelectedServer(updatedServer);
       }
     }
-  }, [servers, selectedServer]);
+  }, [currentServers, selectedServer]);
 
   const handleAddServer = () => {
     setModalMode('add');
@@ -99,7 +125,7 @@ export default function McpClientLayout({
     }
   };
 
-  const handleModalSubmit = async (data: any) => {
+  const handleModalSubmit = async (data: Record<string, unknown>) => {
     if (modalMode === 'add') {
       await onServerAdd(data);
     } else {
@@ -112,7 +138,7 @@ export default function McpClientLayout({
     setToggleLoading(serverName);
 
     // Find the server to get its ID
-    const server = servers?.find(s => s.name === serverName);
+    const server = currentServers?.find(s => s.name === serverName);
     if (!server) {
       setToggleLoading(null);
       toast.error("Server not found");
@@ -124,8 +150,12 @@ export default function McpClientLayout({
       setSelectedServer(prev => prev ? { ...prev, enabled: !currentEnabled } : null);
     }
 
-    // Update servers list locally
-    onUpdateServer(server.id, { enabled: !currentEnabled });
+    // Update servers list locally based on active tab
+    if (activeTab === 'public') {
+      onUpdatePublicServer(server.id, { enabled: !currentEnabled });
+    } else {
+      onUpdateUserServer(server.id, { enabled: !currentEnabled });
+    }
 
     try {
       // Call the server action to toggle enabled status
@@ -152,7 +182,11 @@ export default function McpClientLayout({
       if (selectedServer && selectedServer.name === serverName) {
         setSelectedServer(prev => prev ? { ...prev, enabled: currentEnabled } : null);
       }
-      onUpdateServer(server.id, { enabled: currentEnabled });
+      if (activeTab === 'public') {
+        onUpdatePublicServer(server.id, { enabled: currentEnabled });
+      } else {
+        onUpdateUserServer(server.id, { enabled: currentEnabled });
+      }
       toast.error("Failed to toggle server status");
     } finally {
       // Clear loading state
@@ -200,7 +234,7 @@ export default function McpClientLayout({
     }
   };
 
-  if (error) {
+  if (currentError) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <Card className="w-full max-w-md">
@@ -208,8 +242,12 @@ export default function McpClientLayout({
             <CardTitle className="text-destructive">Error</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={onRefresh} variant="outline" className="w-full">
+            <p className="text-muted-foreground mb-4">{currentError}</p>
+            <Button 
+              onClick={activeTab === 'public' ? onRefreshPublic : onRefreshUser} 
+              variant="outline" 
+              className="w-full"
+            >
               Try Again
             </Button>
           </CardContent>
@@ -244,9 +282,10 @@ export default function McpClientLayout({
               exit="exit"
               variants={sidebarVariants}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="w-80 border-r border-border flex flex-col fixed h-full z-50"
+              className="w-80 border-r border-border flex flex-col fixed h-screen z-50"
             >
-              <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="p-4 border-b border-border">
+                <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-primary" />
                   <span className="font-medium text-sm">Servers</span>
@@ -260,39 +299,69 @@ export default function McpClientLayout({
                   <PanelLeftClose className="h-4 w-4" />
                 </Button>
               </div>
-
-
-              <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-end">
+                <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={handleAddServer}
-                      className="flex items-center gap-1"
+                    disabled={activeTab === 'user' && !session}
+                    className="flex items-center gap-1 flex-1"
                     >
                       <Plus className="h-4 w-4" />
+                    <span className="text-xs">Add</span>
                     </Button>
                     <Button
                       onClick={() => {
-                        onRefresh();
-                        toast.success("Refreshing servers...");
+                      if (activeTab === 'public') {
+                        onRefreshPublic();
+                        toast.success("Refreshing public servers...");
+                      } else {
+                        onRefreshUser();
+                        toast.success("Refreshing your servers...");
+                      }
                       }}
                       variant="ghost"
                       size="sm"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <Activity className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Settings className="h-4 w-4" />
-                      )}
+                    disabled={activeTab === 'public' ? publicLoading : userLoading}
+                    className="flex items-center gap-1 flex-1"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${(activeTab === 'public' ? publicLoading : userLoading) ? 'animate-spin' : ''}`} />
+                    <span className="text-xs">Refresh</span>
                     </Button>
+                </div>
+              </div>
+
+
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'public' | 'user')} className="h-full flex flex-col">
+                  <div className="p-4 border-b border-border flex-shrink-0">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="public" className="flex items-center gap-2 text-xs">
+                        <Globe className="h-3 w-3" />
+                        Public
+                        <Badge variant="secondary" className="ml-1 text-xs">
+                          {publicServers?.length || 0}
+                        </Badge>
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="user" 
+                        className="flex items-center gap-2 text-xs"
+                        disabled={!session}
+                      >
+                        <Users className="h-3 w-3" />
+                        Your
+                        <Badge variant="secondary" className="ml-1 text-xs">
+                          {userServers?.length || 0}
+                        </Badge>
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
 
-                  <Separator />
+                  <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0">
+                    <TabsContent value="public" className="p-4 m-0">
+                      <div className="space-y-3">
 
-                  {loading ? (
+                      {publicLoading ? (
                     <div className="space-y-3">
                       {[...Array(3)].map((_, i) => (
                         <Card key={i}>
@@ -306,9 +375,97 @@ export default function McpClientLayout({
                         </Card>
                       ))}
                     </div>
-                  ) : servers && servers.length > 0 ? (
+                      ) : publicServers && publicServers.length > 0 ? (
                     <div className="space-y-2">
-                      {servers.map((server) => (
+                          {publicServers.map((server) => (
+                        <motion.div
+                          key={server.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="group relative"
+                        >
+                          <Card
+                            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
+                                ? "ring-2 ring-primary"
+                                : ""
+                              }`}
+                            onClick={() => setSelectedServer(server)}
+                          >
+                            <CardContent className="px-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() === "CONNECTED"
+                                        ? "bg-green-500 border-green-600 hover:bg-green-600 animate-pulse shadow-green-500/50"
+                                        : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
+                                          ? "bg-yellow-500 border-yellow-600 hover:bg-yellow-600 shadow-yellow-500/50"
+                                          : server.connectionStatus?.toUpperCase() === "FAILED"
+                                            ? "bg-red-500 border-red-600 hover:bg-red-600 animate-pulse shadow-red-500/50"
+                                            : "bg-gray-400 border-gray-500 hover:bg-gray-500"
+                                      }`}
+                                    title={`Status: ${server.connectionStatus || "Unknown"}`}
+                                  />
+                                  <Server className="h-3 w-3 text-muted-foreground" />
+                                  <span className="font-medium text-sm">
+                                    {server.name}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                <div>{server.transport} • {server.tools.length} tools</div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                      <CardContent className="p-6 text-center">
+                        <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          No public servers found
+                        </p>
+                      </CardContent>
+                  )}
+                </div>
+                    </TabsContent>
+                  
+                    <TabsContent value="user" className="p-4 m-0">
+                    {!session ? (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <User className="h-8 w-8 text-muted-foreground mb-3" />
+                        <h3 className="text-sm font-semibold mb-2">Sign in required</h3>
+                        <p className="text-xs text-muted-foreground mb-4">
+                          Sign in to view your personal servers
+                        </p>
+                        <a 
+                          href="/signin" 
+                          className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 py-1"
+                        >
+                          Sign In
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+
+                        {userLoading ? (
+                          <div className="space-y-3">
+                            {[...Array(3)].map((_, i) => (
+                              <Card key={i}>
+                                <CardContent className="p-4">
+                                  <div className="space-y-2">
+                                    <Skeleton className="h-4 w-3/4" />
+                                    <Skeleton className="h-3 w-1/2" />
+                                    <Skeleton className="h-3 w-2/3" />
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        ) : userServers && userServers.length > 0 ? (
+                          <div className="space-y-2">
+                            {userServers.map((server) => (
                         <motion.div
                           key={server.id}
                           initial={{ opacity: 0, y: 10 }}
@@ -354,23 +511,23 @@ export default function McpClientLayout({
                                 <div className="flex items-center gap-2">
                                   <div
                                     className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() === "CONNECTED"
-                                        ? "bg-green-500 border-green-600 hover:bg-green-600 animate-pulse shadow-green-500/50"
+                                              ? "bg-green-500 hover:bg-green-600 animate-pulse"
                                         : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
-                                          ? "bg-yellow-500 border-yellow-600 hover:bg-yellow-600 shadow-yellow-500/50"
+                                              ? "bg-yellow-500 hover:bg-yellow-600"
                                           : server.connectionStatus?.toUpperCase() === "FAILED"
-                                            ? "bg-red-500 border-red-600 hover:bg-red-600 animate-pulse shadow-red-500/50"
-                                            : "bg-gray-400 border-gray-500 hover:bg-gray-500"
+                                              ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                                              : "bg-gray-400 hover:bg-gray-500"
                                       }`}
                                     title={`Status: ${server.connectionStatus || "Unknown"}`}
                                   />
                                   <Server className="h-3 w-3 text-muted-foreground" />
-                                  <span className="font-medium text-sm">
-                                    {server.name}
-                                  </span>
+                                        <h3 className="font-medium text-sm truncate">{server.name}</h3>
                                 </div>
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                <div>{server.transport} • {server.tools.length} tools</div>
+                                    <div className="space-y-1">
+                                      <p className="text-xs text-muted-foreground truncate">
+                                        {server.transport} • {server.tools?.length || 0} tools
+                                      </p>
                               </div>
                             </CardContent>
                           </Card>
@@ -382,12 +539,16 @@ export default function McpClientLayout({
                       <CardContent className="p-6 text-center">
                         <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">
-                          No servers found
+                                No personal servers found
                         </p>
                       </CardContent>
                     </Card>
                   )}
                 </div>
+                    )}
+                    </TabsContent>
+                  </div>
+                </Tabs>
               </div>
             </motion.div>
           )}
@@ -426,9 +587,10 @@ export default function McpClientLayout({
                 className="flex-1 flex flex-col"
               >
                 <div className="p-4 sm:p-6 border-b border-border">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-col gap-4">
+                    {/* Header with title and actions */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
                         <h2 className="text-xl sm:text-2xl font-semibold">{selectedServer.name}</h2>
                         <div className="flex items-center gap-2">
                           <Switch
@@ -446,36 +608,99 @@ export default function McpClientLayout({
                           </label>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {selectedServer.transport} • {selectedServer.connectionStatus || "Unknown"}
-                      </p>
+                      
+                      <div className="flex items-center gap-2">
+                                             <ServerManagement
+                           server={selectedServer}
+                           onAction={onServerAction}
+                           onEdit={handleEditServer}
+                           onDelete={handleDeleteServer}
+                         />
+                      </div>
+                    </div>
 
-                      {/* Compact Server Details */}
-                      <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
+                    {/* Server Information Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Basic Info */}
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-muted-foreground">Basic Information</h3>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Server className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">Transport:</span>
+                            <span className="text-muted-foreground">{selectedServer.transport}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Activity className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">Status:</span>
+                            <Badge variant={selectedServer.connectionStatus === "CONNECTED" ? "default" : "secondary"}>
+                              {selectedServer.connectionStatus || "Unknown"}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Wrench className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium">Tools:</span>
+                            <span className="text-muted-foreground">{selectedServer.tools?.length || 0} available</span>
+                          </div>
+                          {selectedServer.requiresOauth2 && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Shield className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">Authentication:</span>
+                              <Badge variant="outline">OAuth2 Required</Badge>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Connection Details */}
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-muted-foreground">Connection Details</h3>
+                        <div className="space-y-2">
                         {selectedServer.id && (
-                          <span className="flex items-center">
-                            <span className="font-medium">ID</span>
-                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs">{selectedServer.id}</code>
-                          </span>
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium">ID:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.id}</code>
+                            </div>
+                          )}
+                          {selectedServer.url && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium">URL:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono max-w-48 truncate">{selectedServer.url}</code>
+                            </div>
+                          )}
+                          {selectedServer.command && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium">Command:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.command}</code>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Metadata */}
+                    <div className="pt-2 border-t border-border">
+                      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                        {selectedServer.createdAt && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>Created: {new Date(selectedServer.createdAt).toLocaleDateString()}</span>
+                          </div>
                         )}
-                        {selectedServer.url && (
-                          <span className="flex items-center">
-                            <span className="font-medium">URL</span>
-                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs max-w-48 truncate">{selectedServer.url}</code>
-                          </span>
+                        {selectedServer.owner && (
+                          <div className="flex items-center gap-1">
+                            <UserIcon className="h-3 w-3" />
+                            <span>Added by: {selectedServer.owner}</span>
+                          </div>
                         )}
-                        {selectedServer.command && (
-                          <span className="flex items-center">
-                            <span className="font-medium">CMD:</span>
-                            <code className="ml-1 bg-muted px-1.5 py-0.5 rounded text-xs">{selectedServer.command}</code>
-                          </span>
+                        {selectedServer.isPublic !== undefined && (
+                          <div className="flex items-center gap-1">
+                            <Globe className="h-3 w-3" />
+                            <span>{selectedServer.isPublic ? "Public Server" : "Private Server"}</span>
+                          </div>
                         )}
                       </div>
                     </div>
-                    <ServerManagement
-                      server={selectedServer}
-                      onAction={onServerAction}
-                    />
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto">
@@ -518,7 +743,7 @@ export default function McpClientLayout({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Server</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{serverToDelete}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{serverToDelete}&quot;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
