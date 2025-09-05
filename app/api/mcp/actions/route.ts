@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { 
+  CONNECT_MCP_SERVER_MUTATION,
+  DISCONNECT_MCP_SERVER_MUTATION,
+  RESTART_MCP_SERVER_MUTATION,
+  SET_MCP_SERVER_ENABLED_MUTATION
+} from "@/lib/graphql";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -20,63 +26,17 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'activate':
-        mutation = `
-          mutation ConnectServer($serverName: String!) {
-            connectMcpServer(name: $serverName) {
-              success
-              message
-              tools {
-                name
-                description
-                schema
-              }
-              serverName
-              connectionStatus
-            }
-          }
-        `;
+        mutation = CONNECT_MCP_SERVER_MUTATION;
         break;
       case 'deactivate':
-        mutation = `
-          mutation DisconnectServer($serverName: String!) {
-            disconnectMcpServer(name: $serverName) {
-              success
-              message
-            }
-          }
-        `;
+        mutation = DISCONNECT_MCP_SERVER_MUTATION;
         break;
       case 'setEnabled':
-        mutation = `
-          mutation SetServerEnabled($serverName: String!, $enabled: Boolean!) {
-            setMcpServerEnabled(name: $serverName, enabled: $enabled) {
-              name
-              transport
-              url
-              command
-              args
-              enabled
-            }
-          }
-        `;
+        mutation = SET_MCP_SERVER_ENABLED_MUTATION;
         variables = { serverName, enabled };
         break;
       case 'restart':
-        mutation = `
-          mutation RestartMcpServer($name: String!) {
-            restartMcpServer(name: $name) {
-              success
-              message
-              tools {
-                name
-                description
-                schema
-              }
-              serverName
-              connectionStatus
-            }
-          }
-        `;
+        mutation = RESTART_MCP_SERVER_MUTATION;
         variables = { name: serverName };
         break;
       default:

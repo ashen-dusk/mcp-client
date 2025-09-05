@@ -35,7 +35,15 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'unavailable'>('all');
 
-  const filteredTools = server.tools.filter(tool => {
+  // Debug logging
+  console.log('ToolsExplorer - server:', server);
+  console.log('ToolsExplorer - server.tools:', server.tools);
+  console.log('ToolsExplorer - server.connectionStatus:', server.connectionStatus);
+
+  // Handle different tools formats
+  const tools = Array.isArray(server.tools) ? server.tools : [];
+  
+  const filteredTools = tools.filter(tool => {
     const matchesSearch = tool.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tool.description.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -86,7 +94,17 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
     }
   };
 
-  if (!server.tools || server.tools.length === 0) {
+  if (!tools || tools.length === 0) {
+    const getNoToolsMessage = () => {
+      if (server.connectionStatus === 'CONNECTED') {
+        return "This server is connected but doesn't have any tools available.";
+      } else if (server.connectionStatus === 'FAILED') {
+        return "Server connection failed. Tools cannot be loaded.";
+      } else {
+        return "Connect to this server to load and view available tools.";
+      }
+    };
+
     return (
       <div className="p-6">
         {/* <Card> */}
@@ -94,7 +112,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
             <Wrench className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">No Tools Available</h3>
             <p className="text-muted-foreground">
-              This server doesn't have any tools configured or they haven't been loaded yet.
+              {getNoToolsMessage()}
             </p>
           </CardContent>
         {/* </Card> */}
@@ -110,7 +128,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
           <div>
             <h3 className="text-lg font-semibold">Tools Explorer</h3>
             <p className="text-sm text-muted-foreground">
-              {filteredTools.length} of {server.tools.length} tools
+              {filteredTools.length} of {tools.length} tools
             </p>
           </div>
           

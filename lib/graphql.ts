@@ -30,20 +30,9 @@ export const MCP_SERVERS_QUERY = `
   query McpServers {
     mcpServers(filters: { 
     isPublic: { exact: true }
-    enabled: { exact: true }
   }) { ...McpServerFields }
   }
   ${MCP_SERVER_FRAGMENT}
-`;
-
-export const MCP_SERVER_HEALTH_QUERY = `
-  query GetServerHealth($serverName: String!) {
-    mcpServerHealth(name: $serverName) {
-      status
-      tools { ...ToolInfoFields }
-    }
-  }
-  ${TOOL_INFO_FRAGMENT}
 `;
 
 export const CONNECT_MCP_SERVER_MUTATION = `
@@ -51,12 +40,11 @@ export const CONNECT_MCP_SERVER_MUTATION = `
     connectMcpServer(name: $serverName) {
       success
       message
-      tools { ...ToolInfoFields }
-      serverName
       connectionStatus
+      server { ...McpServerFields }
     }
   }
-  ${TOOL_INFO_FRAGMENT}
+  ${MCP_SERVER_FRAGMENT}
 `;
 
 export const DISCONNECT_MCP_SERVER_MUTATION = `
@@ -64,29 +52,19 @@ export const DISCONNECT_MCP_SERVER_MUTATION = `
     disconnectMcpServer(name: $serverName) {
       success
       message
+      server { ...McpServerFields }
     }
   }
+  ${MCP_SERVER_FRAGMENT}
 `;
 
 export const SET_MCP_SERVER_ENABLED_MUTATION = `
   mutation SetServerEnabled($serverName: String!, $enabled: Boolean!) {
     setMcpServerEnabled(name: $serverName, enabled: $enabled) {
-      id
-      name
-      transport
-      url
-      command
-      args
-      headers
-      queryParams
-      enabled
-      requiresOauth2
-      connectionStatus
-      tools { ...ToolInfoFields }
-      updatedAt
+     ...McpServerFields
     }
   }
-  ${TOOL_INFO_FRAGMENT}
+  ${MCP_SERVER_FRAGMENT}
 `;
 
 export const SAVE_MCP_SERVER_MUTATION = `
@@ -112,16 +90,7 @@ export const SAVE_MCP_SERVER_MUTATION = `
       requiresOauth2: $requiresOauth2
       isPublic: $isPublic
     ) {
-      id
-      name
-      transport
-      url
-      command
-      args
-      enabled
-      requiresOauth2
-      connectionStatus
-      updatedAt
+      ...McpServerFields
     }
   }
 `;
@@ -137,33 +106,20 @@ export const RESTART_MCP_SERVER_MUTATION = `
     restartMcpServer(name: $name) {
       success
       message
-      tools { ...ToolInfoFields }
-      serverName
       connectionStatus
+      server { ...McpServerFields }
     }
   }
-  ${TOOL_INFO_FRAGMENT}
+  ${MCP_SERVER_FRAGMENT}
 `;
 
 export const USER_MCP_SERVERS_QUERY = `
   query GetUserMcpServers {
     getUserMcpServers {
-      id
-      name
-      transport
-      url
-      command
-      args
-      enabled
-      requiresOauth2
-      connectionStatus
-      tools { ...ToolInfoFields }
-      updatedAt
-      createdAt
-      owner
-      isPublic
+      ...McpServerFields
     }
   }
-  ${TOOL_INFO_FRAGMENT}
+  ${MCP_SERVER_FRAGMENT}
 `;
+
 

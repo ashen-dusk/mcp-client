@@ -73,27 +73,46 @@ export default function McpPage() {
       }
 
       // Get the response data for the specific action
-      const updatedServer = result.data?.connectMcpServer || 
-                           result.data?.disconnectMcpServer || 
-                           result.data?.restartMcpServer;
+      const actionResponse = result.data?.connectMcpServer || 
+                            result.data?.disconnectMcpServer || 
+                            result.data?.restartMcpServer;
+      
+      // Extract the server data from the response
+      const updatedServer = actionResponse?.server;
 
       // Check if the operation was actually successful
-      if (updatedServer && updatedServer.success === false) {
-        throw new Error(updatedServer.message || `${action} failed`);
+      if (actionResponse && actionResponse.success === false) {
+        // For failed operations, we still want to update the UI with the failed status
+        // Don't throw an error, just mark it as failed
+        console.log('Server action failed:', actionResponse.message);
       }
+
+      // Debug logging
+      console.log('Server action response:', { action, serverName, updatedServer, result });
 
       // Update local state for both public and user servers
       setPublicServers(prevServers => {
         if (!prevServers) return prevServers;
         return prevServers.map(server => {
           if (server.name === serverName) {
-            const newConnectionStatus = updatedServer?.connectionStatus || 
-              (action === 'activate' ? 'connected' : 'disconnected');
+            // Handle connection status from backend or set default based on action
+            let newConnectionStatus = updatedServer?.connectionStatus;
+            
+            // If the operation failed, set status to FAILED
+            if (actionResponse && actionResponse.success === false) {
+              newConnectionStatus = 'FAILED';
+            } else if (!newConnectionStatus) {
+              // Set default status based on action
+              newConnectionStatus = action === 'activate' ? 'CONNECTED' : 'DISCONNECTED';
+            } else {
+              // Ensure connection status is uppercase to match UI expectations
+              newConnectionStatus = newConnectionStatus.toUpperCase();
+            }
             
             return {
               ...server,
               connectionStatus: newConnectionStatus,
-              tools: (action === 'deactivate' || newConnectionStatus === 'failed') ? [] : (updatedServer?.tools || server.tools),
+              tools: (action === 'deactivate' || newConnectionStatus === 'FAILED') ? [] : (updatedServer?.tools || server.tools),
               updated_at: new Date().toISOString()
             };
           }
@@ -105,13 +124,24 @@ export default function McpPage() {
         if (!prevServers) return prevServers;
         return prevServers.map(server => {
           if (server.name === serverName) {
-            const newConnectionStatus = updatedServer?.connectionStatus || 
-              (action === 'activate' ? 'connected' : 'disconnected');
+            // Handle connection status from backend or set default based on action
+            let newConnectionStatus = updatedServer?.connectionStatus;
+            
+            // If the operation failed, set status to FAILED
+            if (actionResponse && actionResponse.success === false) {
+              newConnectionStatus = 'FAILED';
+            } else if (!newConnectionStatus) {
+              // Set default status based on action
+              newConnectionStatus = action === 'activate' ? 'CONNECTED' : 'DISCONNECTED';
+            } else {
+              // Ensure connection status is uppercase to match UI expectations
+              newConnectionStatus = newConnectionStatus.toUpperCase();
+            }
             
             return {
               ...server,
               connectionStatus: newConnectionStatus,
-              tools: (action === 'deactivate' || newConnectionStatus === 'failed') ? [] : (updatedServer?.tools || server.tools),
+              tools: (action === 'deactivate' || newConnectionStatus === 'FAILED') ? [] : (updatedServer?.tools || server.tools),
               updated_at: new Date().toISOString()
             };
           }
@@ -120,7 +150,7 @@ export default function McpPage() {
       });
 
       // Return the response data so the UI can show the appropriate message
-      return updatedServer;
+      return actionResponse;
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);
       throw error;
