@@ -74,13 +74,13 @@ export default async function CommonNavigation() {
             <Home className="h-4 w-4" />
             Home
           </Link>
-          <Link href="/playground" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            <Code className="h-4 w-4" />
-            Playground
-          </Link>
           <Link href="/mcp" className="flex items-center gap-2 text-sm font-medium text-foreground">
             <Server className="h-4 w-4" />
             MCP Client
+          </Link>
+          <Link href="/playground" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Code className="h-4 w-4" />
+            Playground
           </Link>
         </div>
       </div>

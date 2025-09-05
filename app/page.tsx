@@ -1,84 +1,116 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { CopilotSidebar } from "@copilotkit/react-ui";
-import { Server, Play, Shield, ArrowRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Server, 
+  Play, 
+  Shield, 
+  ArrowRight, 
+  Zap, 
+  Settings, 
+  MessageSquare, 
+  BarChart3, 
+  Users, 
+  Lock, 
+  Globe, 
+  Code, 
+  Database,
+  CheckCircle,
+  Star
+} from "lucide-react";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
   
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-80px)] p-6">
-      <div className="w-full text-center">
-          <h1 className="text-4xl font-bold mb-6">
-            Model Context Protocol
-            <span className="block text-primary">Management Platform</span>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Zap className="h-6 w-6 text-primary" />
+            </div>
+          </div>
+          
+          <h1 className="text-3xl font-bold mb-4">
+            Ready to Get Started?
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Seamlessly manage, connect, and interact with MCP servers. Build powerful AI applications with our comprehensive toolkit.
+          
+          <p className="text-base text-muted-foreground mb-6 max-w-xl mx-auto">
+            Sign in to access the MCP client and playground
           </p>
           
           {session ? (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/mcp" className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                <Server className="h-5 w-5" />
+            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+              <Link href="/mcp" className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+                <Server className="h-4 w-4" />
                 Open MCP Client
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3 w-3" />
               </Link>
-              <Link href="/playground" className="border border-border text-foreground px-8 py-3 rounded-lg font-medium hover:bg-accent transition-colors flex items-center justify-center gap-2">
-                <Play className="h-5 w-5" />
+              <Link href="/playground" className="border border-border text-foreground px-6 py-2 rounded-lg font-medium hover:bg-accent transition-colors flex items-center justify-center gap-2">
+                <Play className="h-4 w-4" />
                 Try Playground
               </Link>
             </div>
           ) : (
-            <Link href="/signin" className="bg-primary text-primary-foreground px-8 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Get Started
-              <ArrowRight className="h-4 w-4" />
+            <Link href="/signin" className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors inline-flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Sign In
+              <ArrowRight className="h-3 w-3" />
             </Link>
           )}
+        </div>
 
-          {/* What is MCP Section */}
-          <div className="mt-16 text-left">
-            <h2 className="text-2xl font-bold mb-4 text-center">
-              What is Model Context Protocol (MCP)?
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              MCP is a standardized protocol that enables AI models to securely connect to external data sources and tools. 
-              It provides a unified interface for models to access real-time information, perform actions, and interact with various services.
-            </p>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Key Benefits</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Secure and standardized connections</li>
-                  <li>• Real-time data access and tool integration</li>
-                  <li>• Extensible and developer-friendly</li>
-                  <li>• Cross-platform compatibility</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Use Cases</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• AI assistants with real-time data</li>
-                  <li>• Automated workflow integration</li>
-                  <li>• Custom tool development</li>
-                  <li>• Enterprise AI solutions</li>
-                </ul>
-              </div>
+        {/* Divider */}
+        <div className="flex items-center justify-center mb-12">
+          <div className="flex-1 border-t border-border"></div>
+          <div className="px-4">
+            <div className="p-1 rounded-full bg-muted">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
             </div>
           </div>
-      </div>
+          <div className="flex-1 border-t border-border"></div>
+        </div>
 
-      <CopilotSidebar
-        defaultOpen={true}
-        labels={{
-          title: "MCP Assistant",
-          initial: "Hello! I'm here to help you with MCP server management and tool exploration.",
-        }}
-      />
+        {/* What's Available */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <Server className="h-5 w-5 text-blue-500" />
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">MCP Client</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Manage your MCP servers, view connection status, and explore available tools.
+            </p>
+            <div className="flex flex-wrap gap-1 justify-center">
+              <Badge variant="secondary" className="text-xs">Server Management</Badge>
+              <Badge variant="secondary" className="text-xs">Tool Explorer</Badge>
+              <Badge variant="secondary" className="text-xs">Connection Status</Badge>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="p-2 rounded-lg bg-green-500/10">
+                <MessageSquare className="h-5 w-5 text-green-500" />
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">AI Playground</h3>
+            <p className="text-sm text-muted-foreground mb-3">
+              Chat with an AI assistant that can help you explore your MCP servers and tools.
+            </p>
+            <div className="flex flex-wrap gap-1 justify-center">
+              <Badge variant="secondary" className="text-xs">Interactive Chat</Badge>
+              <Badge variant="secondary" className="text-xs">Mcp based context</Badge>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
