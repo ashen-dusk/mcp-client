@@ -234,7 +234,7 @@ export default function McpClientLayout({
         }}
       />
 
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-full">
         {/* Left Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -244,7 +244,7 @@ export default function McpClientLayout({
               exit="exit"
               variants={sidebarVariants}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="w-80 border-r border-border bg-card flex flex-col fixed h-full z-50"
+              className="w-80 border-r border-border flex flex-col fixed h-full z-50"
             >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -411,7 +411,7 @@ export default function McpClientLayout({
                 className="flex items-center gap-2"
               >
                 <PanelLeftOpen className="h-4 w-4" />
-                Show Sidebar
+                Show Servers
               </Button>
             </div>
           )}
