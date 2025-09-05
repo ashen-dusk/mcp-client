@@ -4,6 +4,7 @@ import { Server, Play, User, Home, Code, ChevronDown, LogOut } from "lucide-reac
 import Link from "next/link";
 import Image from "next/image";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Logo from "@/components/Logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,27 +20,11 @@ export default async function CommonNavigation() {
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="px-6 py-4">
+        {/* Top Section - Logo and Profile */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
-              <Server className="h-6 w-6 text-primary" />
-              MCP Platform
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
-              <Link href="/playground" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                <Code className="h-4 w-4" />
-                Playground
-              </Link>
-              <Link href="/mcp" className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <Server className="h-4 w-4" />
-                MCP Client
-              </Link>
-            </div>
-          </div>
+          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
+            <Logo />
+          </Link>
           
           {/* Profile Section */}
           <div className="flex items-center gap-3">
@@ -83,6 +68,22 @@ export default async function CommonNavigation() {
               </Link>
             )}
           </div>
+        </div>
+        
+        {/* Bottom Section - Navigation Links */}
+        <div className="flex items-center justify-center gap-6">
+          <Link href="/" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Home className="h-4 w-4" />
+            Home
+          </Link>
+          <Link href="/playground" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            <Code className="h-4 w-4" />
+            Playground
+          </Link>
+          <Link href="/mcp" className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Server className="h-4 w-4" />
+            MCP Client
+          </Link>
         </div>
       </div>
     </nav>

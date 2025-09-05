@@ -225,9 +225,11 @@ export default function McpClientLayout({
         toastOptions={{
           duration: 3000,
           style: {
-            background: 'hsl(var(--background))',
-            color: 'hsl(var(--foreground))',
-            border: '1px solid hsl(var(--border))',
+            background: 'rgba(255, 255, 255, 0.95)',
+            color: '#000000',
+            border: '1px solid #e5e7eb',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(8px)',
           },
         }}
       />
