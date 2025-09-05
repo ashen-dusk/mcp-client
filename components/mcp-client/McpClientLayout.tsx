@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, User, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield } from "lucide-react";
+import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, User, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield, Copy } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -285,7 +285,7 @@ export default function McpClientLayout({
               className="w-80 border-r border-border flex flex-col fixed h-screen z-50"
             >
               <div className="p-4 border-b border-border">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-primary" />
                   <span className="font-medium text-sm">Servers</span>
@@ -334,7 +334,7 @@ export default function McpClientLayout({
 
               <div className="flex-1 flex flex-col overflow-hidden">
                 <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'public' | 'user')} className="h-full flex flex-col">
-                  <div className="p-4 border-b border-border flex-shrink-0">
+                  <div className="px-4 pt-4 flex-shrink-0">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="public" className="flex items-center gap-2 text-xs">
                         <Globe className="h-3 w-3" />
@@ -535,14 +535,12 @@ export default function McpClientLayout({
                       ))}
                     </div>
                   ) : (
-                    <Card>
                       <CardContent className="p-6 text-center">
                         <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">
                                 No personal servers found
                         </p>
                       </CardContent>
-                    </Card>
                   )}
                 </div>
                     )}
@@ -666,12 +664,30 @@ export default function McpClientLayout({
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-medium">URL:</span>
                               <code className="bg-muted px-2 py-1 rounded text-xs font-mono max-w-48 truncate">{selectedServer.url}</code>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(selectedServer.url!);
+                                  toast.success("URL copied to clipboard");
+                                }}
+                                className="h-6 w-6 p-0 hover:bg-accent cursor-pointer"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
                             </div>
                           )}
                           {selectedServer.command && (
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-medium">Command:</span>
                               <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.command}</code>
+                            </div>
+                          )}
+                          {(selectedServer.createdAt) && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">Created at:</span>
+                              <span className="text-muted-foreground">{new Date(selectedServer.createdAt || selectedServer.created_at!).toLocaleDateString()}</span>
                             </div>
                           )}
                         </div>
@@ -681,12 +697,6 @@ export default function McpClientLayout({
                     {/* Metadata */}
                     <div className="pt-2 border-t border-border">
                       <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                        {selectedServer.createdAt && (
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>Created: {new Date(selectedServer.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        )}
                         {selectedServer.owner && (
                           <div className="flex items-center gap-1">
                             <UserIcon className="h-3 w-3" />

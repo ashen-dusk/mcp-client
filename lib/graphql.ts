@@ -19,6 +19,9 @@ export const MCP_SERVER_FRAGMENT = `
     connectionStatus
     tools { ...ToolInfoFields }
     updatedAt
+    createdAt
+    owner
+    isPublic
   }
   ${TOOL_INFO_FRAGMENT}
 `;
@@ -156,6 +159,7 @@ export const USER_MCP_SERVERS_QUERY = `
       connectionStatus
       tools { ...ToolInfoFields }
       updatedAt
+      createdAt
       owner
       isPublic
     }

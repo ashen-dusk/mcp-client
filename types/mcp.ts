@@ -8,6 +8,7 @@ export type McpServer = {
   id: string;
   name: string;
   transport: string;
+  owner?: string | null;
   url?: string | null;
   command?: string | null;
   args?: any | null; // JSON type from Strawberry
