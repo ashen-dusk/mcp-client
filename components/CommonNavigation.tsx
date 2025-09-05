@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/SignOutButton";
 
 export default async function CommonNavigation() {
   const session = await getServerSession(authOptions);
@@ -55,10 +56,7 @@ export default async function CommonNavigation() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
                   <DropdownMenuItem asChild>
-                    <Link href="/api/auth/signout" className="flex items-center gap-2 text-red-600">
-                      <LogOut className="h-4 w-4" />
-                      Sign out
-                    </Link>
+                    <SignOutButton />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
