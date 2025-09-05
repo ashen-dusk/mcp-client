@@ -488,7 +488,7 @@ export default function McpClientLayout({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="flex-1 flex items-center justify-center"
+                className="flex-1 flex items-center justify-center min-h-[calc(100vh-120px)]"
               >
                 <div className="text-center">
                   <Wrench className="h-16 w-16 text-muted-foreground mx-auto mb-4" />

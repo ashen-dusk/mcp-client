@@ -50,7 +50,7 @@ export default function SignInPage() {
             <button
               onClick={handleSignIn}
               disabled={isLoading}
-              className="w-full bg-black dark:bg-gradient-to-r dark:from-slate-600 dark:to-slate-700 hover:bg-gray-800 dark:hover:from-slate-700 dark:hover:to-slate-800 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+              className="w-full bg-black dark:text-black dark:bg-gray-100 hover:bg-gray-800 dark:hover:text-white dark:hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <>
