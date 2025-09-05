@@ -6,7 +6,7 @@ import { MCP_SERVERS_QUERY } from "@/lib/graphql";
 export async function GET() {
   const session = await getServerSession(authOptions);
   // console.log("session in mcp route", session);
-  const token = session?.googleAccessToken ?? session?.googleIdToken;
+  const token = session?.googleIdToken;
   if (!token) return NextResponse.json({ errors: [{ message: "Unauthorized" }] }, { status: 401 });
 
   const origin = (process.env.DJANGO_API_URL || process.env.BACKEND_URL)?.replace(/\/$/, "");

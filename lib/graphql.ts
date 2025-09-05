@@ -25,7 +25,10 @@ export const MCP_SERVER_FRAGMENT = `
 
 export const MCP_SERVERS_QUERY = `
   query McpServers {
-    mcpServers { ...McpServerFields }
+    mcpServers(filters: { 
+    isPublic: { exact: true }
+    enabled: { exact: true }
+  }) { ...McpServerFields }
   }
   ${MCP_SERVER_FRAGMENT}
 `;
@@ -89,20 +92,22 @@ export const SAVE_MCP_SERVER_MUTATION = `
     $transport: String!
     $url: String
     $command: String
-    $argsJson: String
-    $headersJson: String
-    $queryParamsJson: String
-    $requiresOauth: Boolean
+    $args: JSON
+    $headers: JSON
+    $queryParams: JSON
+    $requiresOauth2: Boolean
+    $isPublic: Boolean
   ) {
     saveMcpServer(
       name: $name
       transport: $transport
       url: $url
       command: $command
-      argsJson: $argsJson
-      headersJson: $headersJson
-      queryParamsJson: $queryParamsJson
-      requiresOauth: $requiresOauth
+      args: $args
+      headers: $headers
+      queryParams: $queryParams
+      requiresOauth2: $requiresOauth2
+      isPublic: $isPublic
     ) {
       id
       name
@@ -124,4 +129,37 @@ export const REMOVE_MCP_SERVER_MUTATION = `
   }
 `;
 
+export const RESTART_MCP_SERVER_MUTATION = `
+  mutation RestartMcpServer($name: String!) {
+    restartMcpServer(name: $name) {
+      success
+      message
+      tools { ...ToolInfoFields }
+      serverName
+      connectionStatus
+    }
+  }
+  ${TOOL_INFO_FRAGMENT}
+`;
+
+export const USER_MCP_SERVERS_QUERY = `
+  query GetUserMcpServers {
+    getUserMcpServers {
+      id
+      name
+      transport
+      url
+      command
+      args
+      enabled
+      requiresOauth2
+      connectionStatus
+      tools { ...ToolInfoFields }
+      updatedAt
+      owner
+      isPublic
+    }
+  }
+  ${TOOL_INFO_FRAGMENT}
+`;
 

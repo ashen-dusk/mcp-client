@@ -4,8 +4,7 @@ import { authOptions } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  const token = session?.googleAccessToken ?? session?.googleIdToken;
-  
+  const token = session?.googleIdToken;
   if (!token) {
     return NextResponse.json({ errors: [{ message: "Unauthorized" }] }, { status: 401 });
   }

@@ -13,6 +13,7 @@ export type McpServer = {
   args?: any | null; // JSON type from Strawberry
   enabled: boolean;
   requiresOauth2: boolean;
+  isPublic?: boolean;
   connectionStatus?: string | null;
   tools: ToolInfo[];
   updated_at: string; // datetime as ISO string
