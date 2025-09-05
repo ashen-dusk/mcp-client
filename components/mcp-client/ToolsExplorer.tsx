@@ -180,7 +180,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full"
           >
             {filteredTools.map((tool, index) => {
               const category = getToolCategory(tool.name);
@@ -193,20 +193,25 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <Card className="h-full hover:shadow-md transition-shadow duration-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
+                  <Card className="h-full hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                    <CardHeader>
+                      <div className="flex flex-col gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0 w-full">
                           <Wrench className="h-4 w-4 text-primary flex-shrink-0" />
-                          <CardTitle className="text-sm truncate min-w-0 flex-1">{tool.name}</CardTitle>
+                          <CardTitle 
+                            className="text-sm text-truncate min-w-0 flex-1" 
+                            title={tool.name}
+                          >
+                            {tool.name}
+                          </CardTitle>
                         </div>
                         <Badge variant={getCategoryColor(category)} className="text-xs w-fit">
                           {category}
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-xs text-muted-foreground mb-3 line-clamp-3">
+                    <CardContent className="pt-0 min-w-0">
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-3 break-words" title={tool.description}>
                         {tool.description}
                       </p>
                       
@@ -275,10 +280,10 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Wrench className="h-4 w-4 text-primary" />
-                            <h4 className="font-medium">{tool.name}</h4>
-                            <Badge variant={getCategoryColor(category)} className="text-xs">
+                          <div className="flex items-center gap-2 mb-2 min-w-0">
+                            <Wrench className="h-4 w-4 text-primary flex-shrink-0" />
+                            <h4 className="font-medium text-truncate min-w-0 flex-1" title={tool.name}>{tool.name}</h4>
+                            <Badge variant={getCategoryColor(category)} className="text-xs flex-shrink-0">
                               {category}
                             </Badge>
                           </div>
