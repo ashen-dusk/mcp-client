@@ -1,25 +1,59 @@
 "use client";
 import { CopilotChat } from "@copilotkit/react-ui";
+import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
+import { useCoAgent } from "@copilotkit/react-core";
+import { AgentState } from "@/types/mcp";
+import { useTheme } from "next-themes";
 
-export default function PlaygroundPage() {
+const PlaygroundPage = () => {
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
+
+  const lightTheme: CopilotKitCSSProperties = {
+    "--copilot-kit-background-color": "#ffffff",
+    "--copilot-kit-primary-color": "#000000",
+    "--copilot-kit-contrast-color": "#ffffff",
+    "--copilot-kit-secondary-color": "#f7f7f7",
+    "--copilot-kit-secondary-contrast-color": "#000000",
+    "--copilot-kit-separator-color": "#e6e6e6",
+    "--copilot-kit-muted-color": "#6b7280",
+  };
+
+  const darkTheme: CopilotKitCSSProperties = {
+    "--copilot-kit-background-color": "#18181b",
+    "--copilot-kit-primary-color": "#f5f5f5",
+    "--copilot-kit-contrast-color": "#18181b",
+    "--copilot-kit-secondary-color": "#2a2a2a",
+    "--copilot-kit-secondary-contrast-color": "#f5f5f5",
+    "--copilot-kit-separator-color": "#333333",
+    "--copilot-kit-muted-color": "#a0a0a0",
+  };
+
+  
+  const { state, setState } = useCoAgent<AgentState>({
+    name: "mcp-assistant",
+    initialState: {
+      model: "gpt-4o-mini",
+      status: null,
+    },
+  });
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex-1 p-3">
-        <h1 className="text-xl font-bold mb-2">MCP Playground</h1>
-        <p className="text-muted-foreground mb-8">
-          Interact with your MCP servers and explore their capabilities through our AI assistant.
-        </p>
-        
-        <div className="h-[calc(100vh-200px)]">
-          <CopilotChat
-            instructions="You are an MCP (Model Context Protocol) assistant. Help users explore and interact with their MCP servers, understand available tools, and provide guidance on MCP server management."
-            labels={{
-              title: "MCP Assistant",
-              initial: "Hello! I'm here to help you explore your MCP servers and their capabilities. What would you like to know?",
-            }}
-          />
-        </div>
+    <div className="flex flex-col h-full">
+      {/* <h1 className="text-2xl font-bold mb-2">MCP Chat</h1> */}
+      <p className="mb-4 text-gray-500 dark:text-gray-400">
+        Interact with your connected MCP servers using the chat interface below.
+      </p>
+      <div className="flex-grow" style={isDarkMode ? darkTheme : lightTheme}>
+        <CopilotChat
+          labels={{
+            initial: "Hello! I am your MCP assistant. How can I help you today?",
+            title: "MCP Assistant",
+            placeholder: "Ask about your connected servers...",
+          }}
+        />
       </div>
     </div>
   );
-}
+};
+
+export default PlaygroundPage;

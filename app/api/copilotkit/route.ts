@@ -1,23 +1,21 @@
-import { CustomHttpAgent } from "@/app/api/copilotkit/customHttpAgent";
 import { NextRequest } from "next/server";
 import {
   CopilotRuntime,
+  OpenAIAdapter,
+  EmptyAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
-  ExperimentalEmptyAdapter,
 } from "@copilotkit/runtime";
+// import OpenAI from "openai";
 
-const serviceAdapter = new ExperimentalEmptyAdapter();
-
-const BASE_URL = "http://127.0.0.1:8008";
-
-const agenticChatAgent = new CustomHttpAgent({
-  url: `${BASE_URL}/fastagency/awp`,
-});
-
+// const openai = new OpenAI();
+// const serviceAdapter = new OpenAIAdapter({ openai } as any); // dont needed agent switching, agent switching
+const serviceAdapter = new EmptyAdapter();
 const runtime = new CopilotRuntime({
-  agents: {
-    agenticChatAgent,
-  },
+  remoteEndpoints: [
+    {
+      url: process.env.NEXT_PUBLIC_BACKEND_URL + "/api/copilotkit" || "http://localhost:8000/api/copilotkit",
+    },
+  ],
 });
 
 export const POST = async (req: NextRequest) => {

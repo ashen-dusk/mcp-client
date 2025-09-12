@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, User, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield, Copy } from "lucide-react";
+import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield, Copy } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -243,9 +243,9 @@ export default function McpClientLayout({
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">{currentError}</p>
-            <Button 
-              onClick={activeTab === 'public' ? onRefreshPublic : onRefreshUser} 
-              variant="outline" 
+            <Button
+              onClick={activeTab === 'public' ? onRefreshPublic : onRefreshUser}
+              variant="outline"
               className="w-full"
             >
               Try Again
@@ -273,6 +273,7 @@ export default function McpClientLayout({
       />
 
       <div className="flex h-full">
+
         {/* Left Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -282,74 +283,88 @@ export default function McpClientLayout({
               exit="exit"
               variants={sidebarVariants}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="w-80 border-r border-border flex flex-col fixed h-screen z-50"
+              className="w-80 border-r border-border flex flex-col fixed h-screen z-50 bg-background"
             >
-              <div className="p-4 border-b border-border">
+              {/* Header */}
+              <div className="p-4 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-primary" />
-                  <span className="font-medium text-sm">Servers</span>
+                  <div className="flex items-center gap-2">
+                    <Wrench className="h-5 w-5 text-primary" />
+                    <span className="font-medium text-sm">Servers</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSidebarOpen(false)}
+                    className="flex items-center gap-1"
+                  >
+                    <PanelLeftClose className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSidebarOpen(false)}
-                  className="flex items-center gap-1"
-                >
-                  <PanelLeftClose className="h-4 w-4" />
-                </Button>
-              </div>
                 <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleAddServer}
-                    disabled={activeTab === 'user' && !session}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAddServer}
                     className="flex items-center gap-1 flex-1"
-                    >
-                      <Plus className="h-4 w-4" />
+                  >
+                    <Plus className="h-4 w-4" />
                     <span className="text-xs">Add</span>
-                    </Button>
-                    <Button
-                      onClick={() => {
-                      if (activeTab === 'public') {
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (activeTab === "public") {
                         onRefreshPublic();
                         toast.success("Refreshing public servers...");
                       } else {
                         onRefreshUser();
                         toast.success("Refreshing your servers...");
                       }
-                      }}
-                      variant="ghost"
-                      size="sm"
-                    disabled={activeTab === 'public' ? publicLoading : userLoading}
+                    }}
+                    variant="ghost"
+                    size="sm"
+                    disabled={activeTab === "public" ? publicLoading : userLoading}
                     className="flex items-center gap-1 flex-1"
                   >
-                    <RefreshCw className={`h-4 w-4 ${(activeTab === 'public' ? publicLoading : userLoading) ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`h-4 w-4 ${(activeTab === "public" ? publicLoading : userLoading)
+                          ? "animate-spin"
+                          : ""
+                        }`}
+                    />
                     <span className="text-xs">Refresh</span>
-                    </Button>
+                  </Button>
                 </div>
               </div>
 
-
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'public' | 'user')} className="h-full flex flex-col">
-                  <div className="px-4 pt-4 flex-shrink-0">
+              {/* Main Content */}
+              <div className="flex-1 flex flex-col min-h-0">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    setActiveTab(value as "public" | "user")
+                  }
+                  className="flex-1 flex flex-col min-h-0"
+                >
+                  {/* Tabs Header */}
+                  <div className="px-4 flex-shrink-0">
                     <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="public" className="flex items-center gap-2 text-xs">
+                      <TabsTrigger
+                        value="public"
+                        className="flex items-center gap-2 text-xs"
+                      >
                         <Globe className="h-3 w-3" />
                         Public
                         <Badge variant="secondary" className="ml-1 text-xs">
                           {publicServers?.length || 0}
                         </Badge>
                       </TabsTrigger>
-                      <TabsTrigger 
-                        value="user" 
+                      <TabsTrigger
+                        value="user"
                         className="flex items-center gap-2 text-xs"
-                        disabled={!session}
                       >
-                        <Users className="h-3 w-3" />
-                        Your
+                        <UserIcon className="h-3 w-3" />
+                        My Servers
                         <Badge variant="secondary" className="ml-1 text-xs">
                           {userServers?.length || 0}
                         </Badge>
@@ -357,98 +372,88 @@ export default function McpClientLayout({
                     </TabsList>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto scrollbar-hide min-h-0">
-                    <TabsContent value="public" className="p-4 m-0">
-                      <div className="space-y-3">
-
+                  {/* Scrollable Content - Fixed with proper padding */}
+                  <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide py-4">
+                    {/* Public Servers */}
+                    <TabsContent
+                      value="public"
+                      className="px-4 pb-6 m-0 flex flex-col gap-1"
+                    >
                       {publicLoading ? (
-                    <div className="space-y-3">
-                      {[...Array(3)].map((_, i) => (
-                        <Card key={i}>
-                          <CardContent className="p-4">
-                            <div className="space-y-2">
-                              <Skeleton className="h-4 w-3/4" />
-                              <Skeleton className="h-3 w-1/2" />
-                              <Skeleton className="h-3 w-2/3" />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                      ) : publicServers && publicServers.length > 0 ? (
-                    <div className="space-y-2">
-                          {publicServers.map((server) => (
-                        <motion.div
-                          key={server.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="group relative"
-                        >
-                          <Card
-                            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                ? "ring-2 ring-primary"
-                                : ""
-                              }`}
-                            onClick={() => setSelectedServer(server)}
-                          >
-                            <CardContent className="px-3">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() === "CONNECTED"
-                                        ? "bg-green-500 border-green-600 hover:bg-green-600 animate-pulse shadow-green-500/50"
-                                        : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
-                                          ? "bg-yellow-500 border-yellow-600 hover:bg-yellow-600 shadow-yellow-500/50"
-                                          : server.connectionStatus?.toUpperCase() === "FAILED"
-                                            ? "bg-red-500 border-red-600 hover:bg-red-600 animate-pulse shadow-red-500/50"
-                                            : "bg-gray-400 border-gray-500 hover:bg-gray-500"
-                                      }`}
-                                    title={`Status: ${server.connectionStatus || "Unknown"}`}
-                                  />
-                                  <Server className="h-3 w-3 text-muted-foreground" />
-                                  <span className="font-medium text-sm">
-                                    {server.name}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                <div>{server.transport} • {server.tools.length} tools</div>
+                        [...Array(3)].map((_, i) => (
+                          <Card key={i}>
+                            <CardContent className="p-4">
+                              <div className="space-y-2">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-3 w-1/2" />
+                                <Skeleton className="h-3 w-2/3" />
                               </div>
                             </CardContent>
                           </Card>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                      <CardContent className="p-6 text-center">
-                        <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          No public servers found
-                        </p>
-                      </CardContent>
-                  )}
-                </div>
+                        ))
+                      ) : publicServers && publicServers.length > 0 ? (
+                        <>
+                          {publicServers.map((server) => (
+                            <motion.div
+                              key={server.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <Card
+                                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
+                                    ? "ring-2 ring-primary"
+                                    : ""
+                                  }`}
+                                onClick={() => setSelectedServer(server)}
+                              >
+                                <CardContent className="px-3 py-2">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-2">
+                                      <div
+                                        className={`w-3 h-3 rounded-full border-2 shadow-sm transition-all ${server.connectionStatus?.toUpperCase() ===
+                                            "CONNECTED"
+                                            ? "bg-green-500 border-green-600 animate-pulse"
+                                            : server.connectionStatus?.toUpperCase() ===
+                                              "DISCONNECTED"
+                                              ? "bg-yellow-500 border-yellow-600"
+                                              : server.connectionStatus?.toUpperCase() ===
+                                                "FAILED"
+                                                ? "bg-red-500 border-red-600 animate-pulse"
+                                                : "bg-gray-400 border-gray-500"
+                                          }`}
+                                        title={`Status: ${server.connectionStatus || "Unknown"
+                                          }`}
+                                      />
+                                      <Server className="h-3 w-3 text-muted-foreground" />
+                                      <span className="font-medium text-sm">
+                                        {server.name}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {server.transport} • {server.tools.length} tools
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </motion.div>
+                          ))}
+                          {/* Add extra spacing at the bottom to ensure last item is fully visible */}
+                          <div className="h-16" />
+                        </>
+                      ) : (
+                        <div className="p-6 text-center">
+                          <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            No public servers found
+                          </p>
+                        </div>
+                      )}
                     </TabsContent>
-                  
-                    <TabsContent value="user" className="p-4 m-0">
-                    {!session ? (
-                      <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <User className="h-8 w-8 text-muted-foreground mb-3" />
-                        <h3 className="text-sm font-semibold mb-2">Sign in required</h3>
-                        <p className="text-xs text-muted-foreground mb-4">
-                          Sign in to view your personal servers
-                        </p>
-                        <a 
-                          href="/signin" 
-                          className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-3 py-1"
-                        >
-                          Sign In
-                        </a>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
 
+                    {/* User Servers */}
+                    <TabsContent value="user" className="p-4 m-0 h-full">
+                      <div className="space-y-3">
                         {userLoading ? (
                           <div className="space-y-3">
                             {[...Array(3)].map((_, i) => (
@@ -466,86 +471,91 @@ export default function McpClientLayout({
                         ) : userServers && userServers.length > 0 ? (
                           <div className="space-y-2">
                             {userServers.map((server) => (
-                        <motion.div
-                          key={server.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="group relative"
-                        >
-                          {/* Action Buttons - Right Side */}
-                          {!(server.isPublic && server.owner !== session?.user?.email) && (
-                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1 z-10">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditServer(server);
-                                }}
-                                className="h-6 w-6 p-0 bg-background/90 hover:bg-accent shadow-sm cursor-pointer border"
+                              <motion.div
+                                key={server.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="group relative"
                               >
-                                <Edit className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteServer(server.name);
-                                }}
-                                className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-background/90 shadow-sm cursor-pointer border"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          )}
+                                {/* Action Buttons */}
+                                {!(server.isPublic && server.owner !== session?.user?.email) && (
+                                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1 z-10">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditServer(server);
+                                      }}
+                                      className="h-6 w-6 p-0 bg-background/90 hover:bg-accent shadow-sm cursor-pointer border"
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteServer(server.name);
+                                      }}
+                                      className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 bg-background/90 shadow-sm cursor-pointer border"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                )}
 
-                          <Card
-                            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                ? "ring-2 ring-primary"
-                                : ""
-                              }`}
-                            onClick={() => setSelectedServer(server)}
-                          >
-                            <CardContent className="px-3 pr-12">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() === "CONNECTED"
+                                <Card
+                                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
+                                      ? "ring-2 ring-primary"
+                                      : ""
+                                    }`}
+                                  onClick={() => setSelectedServer(server)}
+                                >
+                                  <CardContent className="px-3 pr-12">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() ===
+                                              "CONNECTED"
                                               ? "bg-green-500 hover:bg-green-600 animate-pulse"
-                                        : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
-                                              ? "bg-yellow-500 hover:bg-yellow-600"
-                                          : server.connectionStatus?.toUpperCase() === "FAILED"
-                                              ? "bg-red-500 hover:bg-red-600 animate-pulse"
-                                              : "bg-gray-400 hover:bg-gray-500"
-                                      }`}
-                                    title={`Status: ${server.connectionStatus || "Unknown"}`}
-                                  />
-                                  <Server className="h-3 w-3 text-muted-foreground" />
-                                        <h3 className="font-medium text-sm truncate">{server.name}</h3>
-                                </div>
-                              </div>
+                                              : server.connectionStatus?.toUpperCase() ===
+                                                "DISCONNECTED"
+                                                ? "bg-yellow-500 hover:bg-yellow-600"
+                                                : server.connectionStatus?.toUpperCase() ===
+                                                  "FAILED"
+                                                  ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                                                  : "bg-gray-400 hover:bg-gray-500"
+                                            }`}
+                                          title={`Status: ${server.connectionStatus || "Unknown"
+                                            }`}
+                                        />
+                                        <Server className="h-3 w-3 text-muted-foreground" />
+                                        <h3 className="font-medium text-sm truncate">
+                                          {server.name}
+                                        </h3>
+                                      </div>
+                                    </div>
                                     <div className="space-y-1">
                                       <p className="text-xs text-muted-foreground truncate">
                                         {server.transport} • {server.tools?.length || 0} tools
                                       </p>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      ))}
-                    </div>
-                  ) : (
-                      <CardContent className="p-6 text-center">
-                        <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                                No personal servers found
-                        </p>
-                      </CardContent>
-                  )}
-                </div>
-                    )}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </motion.div>
+                            ))}
+                          </div>
+                        ) : (
+                          <CardContent className="p-6 text-center">
+                            <Server className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              No personal servers found
+                            </p>
+                          </CardContent>
+                        )}
+                      </div>
                     </TabsContent>
                   </div>
                 </Tabs>
@@ -608,14 +618,14 @@ export default function McpClientLayout({
                           </label>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2">
-                                             <ServerManagement
-                           server={selectedServer}
-                           onAction={onServerAction}
-                           onEdit={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleEditServer : undefined}
-                           onDelete={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleDeleteServer : undefined}
-                         />
+                        <ServerManagement
+                          server={selectedServer}
+                          onAction={onServerAction}
+                          onEdit={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleEditServer : undefined}
+                          onDelete={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleDeleteServer : undefined}
+                        />
                       </div>
                     </div>
 
@@ -656,7 +666,7 @@ export default function McpClientLayout({
                       <div className="space-y-3">
                         <h3 className="text-sm font-medium text-muted-foreground">Connection Details</h3>
                         <div className="space-y-2">
-                        {selectedServer.id && (
+                          {selectedServer.id && (
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-medium">ID:</span>
                               <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.id}</code>
@@ -689,7 +699,7 @@ export default function McpClientLayout({
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span className="font-medium">Created at:</span>
-                              <span className="text-muted-foreground">{new Date(selectedServer.createdAt || selectedServer.created_at!).toLocaleDateString()}</span>
+                              <span className="text-muted-foreground">{new Date(selectedServer.createdAt).toLocaleDateString()}</span>
                             </div>
                           )}
                         </div>

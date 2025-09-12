@@ -28,9 +28,7 @@ export const MCP_SERVER_FRAGMENT = `
 
 export const MCP_SERVERS_QUERY = `
   query McpServers {
-    mcpServers(filters: { 
-    isPublic: { exact: true }
-  }) { ...McpServerFields }
+    mcpServers { ...McpServerFields }
   }
   ${MCP_SERVER_FRAGMENT}
 `;

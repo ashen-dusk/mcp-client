@@ -38,3 +38,14 @@ export type ServerHealthInfo = {
   status: string;
   tools: ToolInfo[];
 };
+
+// CopilotKit Agent Types
+export type AgentState = {
+  model: string;
+  status?: string;
+};
+
+export interface Tool {
+  name: string;
+  description: string;
+}

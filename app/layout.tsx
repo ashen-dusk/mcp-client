@@ -38,9 +38,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <CopilotKit
-              agent="agenticChatAgent"
+              agent="mcp-assistant"
               runtimeUrl="/api/copilotkit"
               showDevConsole={false}
+              
             >
               <div className="min-h-screen bg-background">
                 <div className="max-w-5xl mx-auto">
