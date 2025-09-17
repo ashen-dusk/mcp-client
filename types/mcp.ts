@@ -43,6 +43,7 @@ export type ServerHealthInfo = {
 export type AgentState = {
   model: string;
   status?: string;
+  sessionId: string;
 };
 
 export interface Tool {
