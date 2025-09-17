@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 
 async function refreshGoogleToken(token: any) {
   try {
-    const url = "https://www.googleapis.com/oauth2/v4/token";
+    const url = "https://oauth2.googleapis.com/token";
 
     const response = await fetch(url, {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -18,7 +18,6 @@ async function refreshGoogleToken(token: any) {
     });
 
     const refreshedTokens = await response.json();
-
     if (!response.ok) throw refreshedTokens;
 
     return {
