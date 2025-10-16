@@ -19,7 +19,21 @@ export async function POST(request: NextRequest) {
 
     // Add authorization header if session exists and query requires auth
     const requiresAuth = query.includes('getUserMcpServers') || query.includes('restartMcpServer');
-    if (requiresAuth && session?.googleIdToken) {
+
+    if (requiresAuth && !session?.googleIdToken) {
+      // Return authentication error for queries that require auth
+      return NextResponse.json(
+        {
+          errors: [{
+            message: 'Authentication required. Please log in first.',
+            extensions: { code: 'UNAUTHENTICATED' }
+          }]
+        },
+        { status: 401 }
+      );
+    }
+
+    if (session?.googleIdToken) {
       headers['Authorization'] = `Bearer ${session.googleIdToken}`;
     }
 

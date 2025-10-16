@@ -4,7 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
-import CommonNavigation from "@/components/CommonNavigation";
+import Header from "@/components/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
@@ -45,7 +45,7 @@ export default function RootLayout({
             >
               <div className="min-h-screen bg-background">
                 <div className="max-w-5xl mx-auto">
-                  <CommonNavigation />
+                  <Header />
                   <main>
                     {children}
                   </main>
