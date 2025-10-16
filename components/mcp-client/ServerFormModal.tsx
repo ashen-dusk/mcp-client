@@ -63,8 +63,7 @@ export default function ServerFormModal({
     formState: { errors, isSubmitting },
     reset,
     control,
-    watch,
-    setValue
+    watch
   } = useForm<ServerFormData>({
     resolver: zodResolver(serverSchema),
     defaultValues: {

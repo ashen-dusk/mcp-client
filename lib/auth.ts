@@ -1,8 +1,9 @@
 // lib/auth.ts
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { JWT } from "next-auth/jwt";
 
-async function refreshGoogleToken(token: any) {
+async function refreshGoogleToken(token: JWT) {
   try {
     const url = "https://oauth2.googleapis.com/token";
 
@@ -73,8 +74,10 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      (session as any).googleIdToken = token.googleIdToken as string | undefined;
-      return session;
+      return {
+        ...session,
+        googleIdToken: token.googleIdToken as string | undefined,
+      };
     },
   },
   pages: { signIn: "/signin" },

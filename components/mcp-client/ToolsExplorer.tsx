@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Wrench, 
-  Code, 
-  Info, 
+import {
+  Wrench,
   Search,
   Filter,
   Grid3X3,
@@ -16,14 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { McpServer, ToolInfo } from "@/types/mcp";
+import { McpServer } from "@/types/mcp";
 
 interface ToolsExplorerProps {
   server: McpServer;
@@ -57,7 +54,7 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
     setExpandedTool(expandedTool === toolName ? null : toolName);
   };
 
-  const parseSchema = (schema: any) => {
+  const parseSchema = (schema: unknown) => {
     // Schema is already a JSON object from Strawberry GraphQL
     if (typeof schema === 'object' && schema !== null) {
       return schema;

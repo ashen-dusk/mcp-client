@@ -1,4 +1,5 @@
 "use client";
+import { useMemo } from "react";
 import { Session } from "next-auth";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
 import { useMcpServers } from "@/hooks/useMcpServers";
@@ -13,7 +14,6 @@ export default function McpClientWrapper({ session }: McpClientWrapperProps) {
     loading,
     error,
     refresh,
-    restartServer,
     updateServer,
     handleServerAction,
     handleServerAdd,
@@ -21,18 +21,33 @@ export default function McpClientWrapper({ session }: McpClientWrapperProps) {
     handleServerDelete,
   } = useMcpServers(session);
 
+  // Split servers into public and user servers
+  const { publicServers, userServers } = useMemo(() => {
+    if (!servers) return { publicServers: null, userServers: null };
+
+    return {
+      publicServers: servers.filter(s => s.isPublic || s.isShared),
+      userServers: servers.filter(s => !s.isPublic && !s.isShared),
+    };
+  }, [servers]);
+
   return (
     <McpClientLayout
-      servers={servers}
-      loading={loading}
-      error={error}
+      publicServers={publicServers}
+      userServers={userServers}
+      publicLoading={loading}
+      userLoading={loading}
+      publicError={error}
+      userError={error}
       session={session}
-      onRefresh={refresh}
+      onRefreshPublic={refresh}
+      onRefreshUser={refresh}
       onServerAction={handleServerAction}
       onServerAdd={handleServerAdd}
       onServerUpdate={handleServerUpdate}
       onServerDelete={handleServerDelete}
-      onUpdateServer={updateServer}
+      onUpdatePublicServer={updateServer}
+      onUpdateUserServer={updateServer}
     />
   );
 }
