@@ -5,15 +5,14 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  X, 
-  Plus, 
-  Trash2, 
-  ChevronDown, 
-  ChevronUp, 
-  Rss, 
-  Globe, 
-  Terminal 
+import {
+  Plus,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  Rss,
+  Globe,
+  Terminal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

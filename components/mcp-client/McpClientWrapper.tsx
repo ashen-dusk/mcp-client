@@ -26,8 +26,8 @@ export default function McpClientWrapper({ session }: McpClientWrapperProps) {
     if (!servers) return { publicServers: null, userServers: null };
 
     return {
-      publicServers: servers.filter(s => s.isPublic || s.isShared),
-      userServers: servers.filter(s => !s.isPublic && !s.isShared),
+      publicServers: servers.filter(s => s.isPublic),
+      userServers: servers.filter(s => !s.isPublic),
     };
   }, [servers]);
 

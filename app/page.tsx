@@ -1,24 +1,14 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Server, 
-  Play, 
-  Shield, 
-  ArrowRight, 
-  Zap, 
-  Settings, 
-  MessageSquare, 
-  BarChart3, 
-  Users, 
-  Lock, 
-  Globe, 
-  Code, 
-  Database,
-  CheckCircle,
-  Star
+import {
+  Server,
+  Play,
+  Shield,
+  ArrowRight,
+  Zap,
+  MessageSquare
 } from "lucide-react";
 
 export default async function Home() {

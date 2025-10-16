@@ -14,7 +14,7 @@ export default function SignInPage() {
     
     try {
       await signIn("google", { callbackUrl: "/" });
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);

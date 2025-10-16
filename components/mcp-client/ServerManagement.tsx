@@ -36,12 +36,14 @@ export default function ServerManagement({ server, onAction, onEdit, onDelete }:
 
   const handleAction = async (action: 'restart' | 'activate' | 'deactivate') => {
     setLoading(action);
-    
+
     try {
       const result = await onAction(server.name, action);
-      
+
       // Use the actual message from the response data if available
-      const message = result?.message || `Server ${action}d successfully`;
+      const message = (result && typeof result === 'object' && 'message' in result && typeof result.message === 'string')
+        ? result.message
+        : `Server ${action}d successfully`;
       toast.success(message);
     } catch (error) {
       console.error(`Failed to ${action} server:`, error);

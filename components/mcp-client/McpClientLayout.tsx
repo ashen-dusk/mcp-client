@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Settings, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, Users, RefreshCw, MoreVertical, Calendar, Clock, User as UserIcon, Shield, Copy } from "lucide-react";
+import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,15 +20,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
 import ToolsExplorer from "./ToolsExplorer";
@@ -80,7 +73,6 @@ export default function McpClientLayout({
 
   // Get current servers based on active tab
   const currentServers = activeTab === 'public' ? publicServers : userServers;
-  const currentLoading = activeTab === 'public' ? publicLoading : userLoading;
   const currentError = activeTab === 'public' ? publicError : userError;
 
   // Update selected server when servers list changes
@@ -177,7 +169,7 @@ export default function McpClientLayout({
 
       const result = await response.json();
       toast.success(result.message || `Server ${!currentEnabled ? "enabled" : "disabled"} successfully`);
-    } catch (error) {
+    } catch {
       // Revert optimistic updates on error
       if (selectedServer && selectedServer.name === serverName) {
         setSelectedServer(prev => prev ? { ...prev, enabled: currentEnabled } : null);
@@ -204,34 +196,6 @@ export default function McpClientLayout({
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 20 }
-  };
-
-  const getStatusColor = (status: string | null | undefined) => {
-    if (!status) return "outline";
-    switch (status.toUpperCase()) {
-      case "CONNECTED":
-        return "default";
-      case "DISCONNECTED":
-        return "secondary";
-      case "FAILED":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
-  const getStatusIcon = (status: string | null | undefined) => {
-    if (!status) return <Server className="h-3 w-3" />;
-    switch (status.toUpperCase()) {
-      case "CONNECTED":
-        return <Activity className="h-3 w-3" />;
-      case "DISCONNECTED":
-        return <Settings className="h-3 w-3" />;
-      case "FAILED":
-        return <Settings className="h-3 w-3" />;
-      default:
-        return <Server className="h-3 w-3" />;
-    }
   };
 
   if (currentError) {

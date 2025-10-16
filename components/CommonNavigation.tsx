@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { Server, Play, User, Home, Code, ChevronDown, LogOut } from "lucide-react";
+import { Server, User, Home, Code, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -10,7 +10,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";

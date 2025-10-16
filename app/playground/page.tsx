@@ -14,7 +14,7 @@ const PlaygroundPage = () => {
   const isDarkMode = theme === "dark";
 
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { state, setState } = useCoAgent<AgentState>({
+  const { setState } = useCoAgent<AgentState>({
     name: "mcp-assistant",
     initialState: {
       model: "gpt-4o-mini",
@@ -26,7 +26,7 @@ const PlaygroundPage = () => {
   useEffect(() => {
     let id = localStorage.getItem("copilot-kit-session");
     if (!id) {
-      let email = session?.user?.email;
+      const email = session?.user?.email;
       if (email && email.endsWith("@gmail.com")) {
         id = email.replace(/@gmail\.com$/, "");
       } else {
@@ -35,18 +35,22 @@ const PlaygroundPage = () => {
       localStorage.setItem("copilotkit-session", id);
     }
     setSessionId(id);
-    setState((prev: any) => ({
-      ...prev,
+
+    setState((prevState: AgentState | undefined) => ({
+      model: prevState?.model ?? "gpt-4o-mini",
+      status: prevState?.status,
       sessionId: id,
     }));
-  }, [session]);
+   
+  }, [session, setState]);
 
   // Enhanced types for tool calls
   type McpToolCall = {
     name: string;
-    result?: any; // Object, e.g., for tavily_search
+    result?: unknown; // Object, e.g., for tavily_search
     tool_call_id?: string;
     status?: "pending" | "running" | "completed" | "error"; // Optional status for dynamic feel
+    timestamp?: string | number;
   };
   type ExtendedAgentState = AgentState & { tool_calls?: McpToolCall[] };
 
@@ -68,7 +72,7 @@ const PlaygroundPage = () => {
             {state.tool_calls.map((tc, idx) => {
               const resultObj = tc.result ?? {};
               const pretty = JSON.stringify(resultObj, null, 2);
-              const ts = (tc as any)?.timestamp;
+              const ts = tc.timestamp;
               const when = ts ? new Date(ts).toLocaleString() : undefined;
 
               return (
