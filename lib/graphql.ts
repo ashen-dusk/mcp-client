@@ -88,7 +88,19 @@ export const SAVE_MCP_SERVER_MUTATION = `
       requiresOauth2: $requiresOauth2
       isPublic: $isPublic
     ) {
-      ...McpServerFields
+    id
+    name
+    transport
+    url
+    command
+    args
+    enabled
+    requiresOauth2
+    connectionStatus
+    updatedAt
+    createdAt
+    owner
+    isPublic
     }
   }
 `;
