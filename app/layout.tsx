@@ -38,7 +38,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <CopilotKit
-              agent="mcp-assistant"
+              agent="mcpAssistant"
               runtimeUrl="/api/copilotkit"
               showDevConsole={false}
               

@@ -15,7 +15,7 @@ const PlaygroundPage = () => {
 
   const [sessionId, setSessionId] = useState<string | null>(null);
   const { setState } = useCoAgent<AgentState>({
-    name: "mcp-assistant",
+    name: "mcpAssistant",
     initialState: {
       model: "gpt-4o-mini",
       status: null,
@@ -55,7 +55,7 @@ const PlaygroundPage = () => {
   type ExtendedAgentState = AgentState & { tool_calls?: McpToolCall[] };
 
   useCoAgentStateRender<ExtendedAgentState>({
-    name: "mcp-assistant",
+    name: "mcpAssistant",
     nodeName: 'tools',
     render: ({ state }) => {
       console.log("state", state); // Moved inside for cleanliness
