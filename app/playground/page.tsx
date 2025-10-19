@@ -7,6 +7,7 @@ import { AgentState } from "@/types/mcp";
 import { useTheme } from "next-themes";
 import { useSession } from "next-auth/react";
 import { Search } from "lucide-react"; // icon for section title
+import { ToolRenderer } from "@/components/playground/ToolRenderer";
 
 const PlaygroundPage = () => {
   const { data: session } = useSession();
@@ -41,8 +42,8 @@ const PlaygroundPage = () => {
       status: prevState?.status,
       sessionId: id,
     }));
-   
-  }, [session, setState]);
+
+  }, [session]);
 
   // Enhanced types for tool calls
   type McpToolCall = {
@@ -142,6 +143,7 @@ const PlaygroundPage = () => {
 
   return (
     <div className="flex flex-col h-full gap-4">
+      <ToolRenderer />
       <p className="mb-4 text-gray-500 dark:text-gray-400">
         Interact with your connected MCP servers using the chat interface below.
       </p>

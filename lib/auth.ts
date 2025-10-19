@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account }) {
+      // console.log("JWT callback called with token:", token, "and account:", account);
       // Initial sign in
       if (account) {
         return {
@@ -74,6 +75,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
+      // console.log("Session callback called with session:", session, "and token:", token);
       return {
         ...session,
         googleIdToken: token.googleIdToken as string | undefined,

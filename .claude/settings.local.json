@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(timeout 60 npm run build:*)",
+      "Bash(exit 0)",
+      "Bash(mkdir:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(npm view:*)",
+      "mcp__copilotkit-mcp__search-docs"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
