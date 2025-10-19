@@ -8,9 +8,12 @@ import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import "@copilotkit/react-ui/styles.css";
 import ChatInput from "../../components/playground/ChatInput";
 
+interface ChatInputWrapperProps {
+  onSend: (message: string) => void;
+}
+
 const PlaygroundPage = () => {
   const { data: session } = useSession();
-  const [isLoading, setIsLoading] = useState(true);
 
   const [sessionId, setSessionId] = useState<string | null>(null);
 
@@ -18,7 +21,7 @@ const PlaygroundPage = () => {
     name: "mcpAssistant",
     initialState: {
       model: "gpt-4o-mini",
-      status: null,
+      status: undefined,
       sessionId: sessionId ?? "",
     },
   });
@@ -46,8 +49,7 @@ const PlaygroundPage = () => {
   }, [session]);
 
   // Wrapper component that integrates with CopilotKit's input system
-  // setState is stable from useCoAgent, so we only need state in deps
-  const ChatInputWrapper = useCallback((props: any) => {
+  const ChatInputWrapper = useCallback((props: ChatInputWrapperProps) => {
     return (
       <div className="w-full">
         <ChatInput
@@ -57,7 +59,7 @@ const PlaygroundPage = () => {
         />
       </div>
     );
-  }, [state]);
+  }, [state, setState]);
   
   return (
     <div className="max-w-2xl mx-auto py-4">

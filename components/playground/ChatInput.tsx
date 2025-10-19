@@ -7,12 +7,13 @@ import {
   CheckCircle,
   ArrowUp
 } from "lucide-react";
+import { AgentState } from "@/types/mcp";
 
 interface CustomChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
-  state: any;
-  setState: React.Dispatch<React.SetStateAction<any>>;
+  state: AgentState;
+  setState: (newState: AgentState | ((prevState: AgentState | undefined) => AgentState)) => void;
 }
 
 const AVAILABLE_MODELS = [
@@ -43,9 +44,10 @@ export default function ChatInput({ onSendMessage, state, setState }: CustomChat
   const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   const handleModelChange = (modelId: string) => {
-    setState((prevState: any) => ({
-      ...prevState,
+    setState((prevState: AgentState | undefined) => ({
       model: modelId,
+      status: prevState?.status,
+      sessionId: prevState?.sessionId ?? "",
     }));
     setShowModelDropdown(false);
   };

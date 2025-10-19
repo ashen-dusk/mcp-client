@@ -3,11 +3,13 @@
 import { Loader2, CheckCircle2, XCircle, ChevronDown, Copy, Wrench } from "lucide-react";
 import * as React from "react";
 
+type ToolCallData = Record<string, unknown> | string | null | undefined;
+
 interface ToolCallProps {
   status: "complete" | "inProgress" | "executing";
   name?: string;
-  args?: any;
-  result?: any;
+  args?: ToolCallData;
+  result?: ToolCallData;
 }
 
 export default function MCPToolCall({
@@ -19,7 +21,7 @@ export default function MCPToolCall({
   const [isOpen, setIsOpen] = React.useState(false);
 
   // Format content for display
-  const format = (content: any): string => {
+  const format = (content: ToolCallData): string => {
     if (!content) return "";
     const text =
       typeof content === "object"
@@ -35,7 +37,7 @@ export default function MCPToolCall({
   const getStatusConfig = () => {
     if (status === "complete") {
       console.log(result, "MCPToolCall Result");
-      if (result && result.error) {
+      if (result && typeof result === "object" && "error" in result) {
         const errorMessage = JSON.stringify(result.error);
         console.log(errorMessage, "MCPToolCall Error");
         return {
@@ -45,7 +47,8 @@ export default function MCPToolCall({
           textColor: "text-red-700 dark:text-red-400",
         };
       } else {
-        const hasError = result === "" ? false : JSON.parse(result?.content?.[0]?.text || "{}")?.error;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const hasError = result === "" ? false : (typeof result === "object" && result !== null && "content" in result ? JSON.parse((result as any).content?.[0]?.text || "{}")?.error : false);
         if (hasError) {
           return {
             icon: <XCircle className="w-5 h-5 text-red-500" />,

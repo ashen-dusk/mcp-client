@@ -13,7 +13,8 @@ const mcpAssistant = new HttpAgent({
 
 const runtime = new CopilotRuntime({
   agents: {
-    mcpAssistant,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mcpAssistant: mcpAssistant as any,
   },
 });
 
