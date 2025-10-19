@@ -78,10 +78,10 @@ export default function MCPToolCall({
 
   return (
     <div
-      className={`${config.bgColor} ${config.borderColor} border-l-4 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md`}
+      className={`${config.bgColor} ${config.borderColor} border-l-4 rounded overflow-hidden transition-all duration-200`}
     >
       <div
-        className="p-4 flex items-center justify-between cursor-pointer"
+        className="p-3 flex items-center justify-between cursor-pointer hover:bg-opacity-80"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3 flex-1">
@@ -91,26 +91,26 @@ export default function MCPToolCall({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <Wrench className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              <span className={`${config.textColor} font-semibold text-sm truncate`}>
+              <span className={`${config.textColor} font-medium text-sm truncate`}>
                 {name || "MCP Tool Call"}
               </span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {status === "complete" ? "Completed" : "In Progress"}
             </p>
           </div>
         </div>
         <ChevronDown
-          className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </div>
 
       {isOpen && (
-        <div className="px-4 pb-4 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-3">
+        <div className="px-3 pb-3 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-2">
           {args && (
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                   Parameters
                 </div>
                 <button
@@ -124,7 +124,7 @@ export default function MCPToolCall({
                   Copy
                 </button>
               </div>
-              <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-[200px] font-mono">
+              <pre className="text-xs bg-gray-50 dark:bg-gray-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-200 dark:border-gray-700">
                 {format(args)}
               </pre>
             </div>
@@ -132,8 +132,8 @@ export default function MCPToolCall({
 
           {status === "complete" && result && (
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                   Result
                 </div>
                 <button
@@ -147,7 +147,7 @@ export default function MCPToolCall({
                   Copy
                 </button>
               </div>
-              <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded-md overflow-auto max-h-[200px] font-mono">
+              <pre className="text-xs bg-gray-50 dark:bg-gray-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-200 dark:border-gray-700">
                 {format(result)}
               </pre>
             </div>
