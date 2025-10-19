@@ -1,18 +1,20 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCoAgent } from "@copilotkit/react-core";
 import { AgentState } from "@/types/mcp";
 import { useSession } from "next-auth/react";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import "@copilotkit/react-ui/styles.css";
+import ChatInput from "../../components/playground/ChatInput";
 
 const PlaygroundPage = () => {
   const { data: session } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
 
   const [sessionId, setSessionId] = useState<string | null>(null);
 
-  const { setState } = useCoAgent<AgentState>({
+  const { state, setState } = useCoAgent<AgentState>({
     name: "mcpAssistant",
     initialState: {
       model: "gpt-4o-mini",
@@ -40,10 +42,25 @@ const PlaygroundPage = () => {
       sessionId: id,
     }));
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
+  // Wrapper component that integrates with CopilotKit's input system
+  // setState is stable from useCoAgent, so we only need state in deps
+  const ChatInputWrapper = useCallback((props: any) => {
+    return (
+      <div className="w-full">
+        <ChatInput
+          onSendMessage={props.onSend}
+          state={state}
+          setState={setState}
+        />
+      </div>
+    );
+  }, [state]);
+  
   return (
-    <div className="flex flex-col h-full">
+    <div className="max-w-2xl mx-auto py-4">
       <ToolRenderer />
       <CopilotChat
         labels={{
@@ -51,7 +68,9 @@ const PlaygroundPage = () => {
           title: "MCP Playground",
           placeholder: "Ask about your connected servers...",
         }}
-        className="h-full"
+        className="h-[80vh]"
+        Input={ChatInputWrapper}
+
       />
     </div>
   );
