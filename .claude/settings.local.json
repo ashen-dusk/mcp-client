@@ -7,7 +7,12 @@
       "Bash(mkdir:*)",
       "Bash(claude mcp add:*)",
       "Bash(npm view:*)",
-      "mcp__copilotkit-mcp__search-docs"
+      "mcp__copilotkit-mcp__search-docs",
+      "Read(//c/Users/ASUS/Desktop/agent/chrome-extension/src/**)",
+      "Read(//c/Users/ASUS/Desktop/agent/chrome-extension/**)",
+      "Read(//c/Users/ASUS/Desktop/agent/mcp-hub/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
