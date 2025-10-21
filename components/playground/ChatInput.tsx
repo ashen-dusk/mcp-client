@@ -56,7 +56,7 @@ export default function ChatInput({
   const getSessionId = (session: any) => {
     if (typeof window === "undefined") return undefined;
 
-    let sessionId = localStorage.getItem("copilotkit-session");
+    const sessionId = localStorage.getItem("copilotkit-session");
 
     if (session?.user?.email) {
     // Authenticated user
