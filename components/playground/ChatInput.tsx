@@ -5,15 +5,21 @@ import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
   CheckCircle,
-  ArrowUp
+  ArrowUp,
+  Mic,
+  MicOff,
+  Loader2
 } from "lucide-react";
+import { PushToTalkState } from "@/hooks/usePushToTalk";
+import { useCoAgent } from "@copilotkit/react-core";
 import { AgentState } from "@/types/mcp";
+import { useSession } from "next-auth/react";
 
 interface CustomChatInputProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
-  state: AgentState;
-  setState: (newState: AgentState | ((prevState: AgentState | undefined) => AgentState)) => void;
+  pushToTalkState?: PushToTalkState;
+  onPushToTalkStateChange?: (state: PushToTalkState) => void;
 }
 
 const AVAILABLE_MODELS = [
@@ -39,16 +45,40 @@ const AVAILABLE_MODELS = [
   },
 ];
 
-export default function ChatInput({ onSendMessage, state, setState }: CustomChatInputProps) {
+export default function ChatInput({
+  onSendMessage,
+  pushToTalkState = "idle",
+  onPushToTalkStateChange
+}: CustomChatInputProps) {
+  const { data: session } = useSession();
+
+  // Generate sessionId for authenticated or anonymous users
+  const getSessionId = () => {
+    let id = localStorage.getItem("copilotkit-session");
+    if (!id) {
+      const email = session?.user?.email;
+      id = email?.endsWith("@gmail.com")
+        ? email.replace(/@gmail\.com$/, "")
+        : email || crypto.randomUUID();
+      localStorage.setItem("copilotkit-session", id);
+    }
+    return id;
+  };
+
+  const { state, setState } = useCoAgent<AgentState>({
+    name: "mcpAssistant",
+    initialState: {
+      model: "gpt-4o-mini",
+      status: undefined,
+      sessionId: getSessionId(),
+    },
+  });
+
   const [message, setMessage] = useState("");
   const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   const handleModelChange = (modelId: string) => {
-    setState((prevState: AgentState | undefined) => ({
-      model: modelId,
-      status: prevState?.status,
-      sessionId: prevState?.sessionId ?? "",
-    }));
+    setState({...state, model: modelId});
     setShowModelDropdown(false);
   };
 
@@ -66,7 +96,35 @@ export default function ChatInput({ onSendMessage, state, setState }: CustomChat
     }
   };
 
-  const selectedModelData = AVAILABLE_MODELS.find(m => m.id === state.model) || AVAILABLE_MODELS[0];
+  const handleMicrophoneClick = () => {
+    if (!onPushToTalkStateChange) return;
+
+    if (pushToTalkState === "idle") {
+      onPushToTalkStateChange("recording");
+    } else if (pushToTalkState === "recording") {
+      onPushToTalkStateChange("idle");
+    }
+  };
+
+  const selectedModelData = AVAILABLE_MODELS.find(m => m.id === state.model);
+
+  const getMicrophoneIcon = () => {
+    if (pushToTalkState === "recording") {
+      return <MicOff className="w-4 h-4" />;
+    } else if (pushToTalkState === "transcribing") {
+      return <Loader2 className="w-4 h-4 animate-spin" />;
+    }
+    return <Mic className="w-4 h-4" />;
+  };
+
+  const getMicrophoneColor = () => {
+    if (pushToTalkState === "recording") {
+      return "bg-red-600 hover:bg-red-500 animate-pulse";
+    } else if (pushToTalkState === "transcribing") {
+      return "bg-blue-600 hover:bg-blue-500";
+    }
+    return "bg-zinc-600 hover:bg-zinc-500";
+  };
 
   return (
     <div className="w-full px-4 py-3">
@@ -143,11 +201,31 @@ export default function ChatInput({ onSendMessage, state, setState }: CustomChat
             )}
           </div>
 
+          {/* Microphone Button */}
+          {onPushToTalkStateChange && (
+            <Button
+              onClick={handleMicrophoneClick}
+              disabled={pushToTalkState === "transcribing"}
+              className={`${getMicrophoneColor()} disabled:opacity-50
+                       text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
+                       transition-all duration-200 shadow-lg mr-2`}
+              title={
+                pushToTalkState === "recording"
+                  ? "Stop recording"
+                  : pushToTalkState === "transcribing"
+                  ? "Transcribing..."
+                  : "Start voice recording"
+              }
+            >
+              {getMicrophoneIcon()}
+            </Button>
+          )}
+
           {/* Send Button */}
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim()}
-            className="bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:opacity-50 
+            className="bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:opacity-50
                      text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
                      transition-all duration-200 shadow-lg"
           >
