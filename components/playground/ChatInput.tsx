@@ -64,22 +64,18 @@ export default function ChatInput({
     const derivedId = email.endsWith("@gmail.com")
       ? email.replace(/@gmail\.com$/, "")
       : email;
-
-    // If sessionId is missing or different, update it
-    if (sessionId !== derivedId) {
-      localStorage.setItem("copilotkit-session", derivedId);
-      sessionId = derivedId;
-    }
+    localStorage.setItem("copilotkit-session", derivedId);
+    return derivedId;
+  
   } else {
     // Anonymous user
     if (!sessionId) {
       const randomId = crypto.randomUUID();
       localStorage.setItem("copilotkit-session", randomId);
-      sessionId = randomId;
+      return randomId;
     }
+    return sessionId;
   }
-
-  return sessionId;
   };
 
 
