@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
+import ToolsExplorer from "./ToolsExplorer";
 
 interface McpClientLayoutProps {
   publicServers: McpServer[] | null;
@@ -687,6 +688,9 @@ export default function McpClientLayout({
                       </div>
                     </div>
                   </div>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  <ToolsExplorer server={selectedServer} />
                 </div>
               </motion.div>
             ) : (
