@@ -36,7 +36,7 @@ export default function MCPToolCall({
 
   const getStatusConfig = () => {
     if (status === "complete") {
-      console.log(result, "MCPToolCall Result");
+      // console.log(result, "MCPToolCall Result");
       if (result && typeof result === "object" && "error" in result) {
         const errorMessage = JSON.stringify(result.error);
         console.log(errorMessage, "MCPToolCall Error");
