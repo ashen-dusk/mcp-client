@@ -52,8 +52,10 @@ export default function ChatInput({
 }: CustomChatInputProps) {
   const { data: session } = useSession();
 
-  // Generate sessionId for authenticated or anonymous users
+  // Generate sessionId for authenticated or anonymous users (browser only)
   const getSessionId = () => {
+    if (typeof window === 'undefined') return undefined;
+
     let id = localStorage.getItem("copilotkit-session");
     if (!id) {
       const email = session?.user?.email;
