@@ -50,29 +50,45 @@ export default function ChatInput({
   pushToTalkState = "idle",
   onPushToTalkStateChange
 }: CustomChatInputProps) {
-  const { data: session } = useSession();
-
+  
   // Generate sessionId for authenticated or anonymous users (browser only)
-  const getSessionId = () => {
-    if (typeof window === 'undefined') return undefined;
+  const { data: session } = useSession();
+  const getSessionId = (session: any) => {
+    if (typeof window === "undefined") return undefined;
 
-    let id = localStorage.getItem("copilotkit-session");
-    if (!id) {
-      const email = session?.user?.email;
-      id = email?.endsWith("@gmail.com")
-        ? email.replace(/@gmail\.com$/, "")
-        : email || crypto.randomUUID();
-      localStorage.setItem("copilotkit-session", id);
+    let sessionId = localStorage.getItem("copilotkit-session");
+
+    if (session?.user?.email) {
+    // Authenticated user
+    const email = session.user.email;
+    const derivedId = email.endsWith("@gmail.com")
+      ? email.replace(/@gmail\.com$/, "")
+      : email;
+
+    // If sessionId is missing or different, update it
+    if (sessionId !== derivedId) {
+      localStorage.setItem("copilotkit-session", derivedId);
+      sessionId = derivedId;
     }
-    return id;
+  } else {
+    // Anonymous user
+    if (!sessionId) {
+      const randomId = crypto.randomUUID();
+      localStorage.setItem("copilotkit-session", randomId);
+      sessionId = randomId;
+    }
+  }
+
+  return sessionId;
   };
+
 
   const { state, setState } = useCoAgent<AgentState>({
     name: "mcpAssistant",
     initialState: {
       model: "gpt-4o-mini",
       status: undefined,
-      sessionId: getSessionId(),
+      sessionId: getSessionId(session),
     },
   });
 
@@ -210,7 +226,7 @@ export default function ChatInput({
               disabled={pushToTalkState === "transcribing"}
               className={`${getMicrophoneColor()} disabled:opacity-50
                        text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
-                       transition-all duration-200 shadow-lg mr-2`}
+                       transition-all duration-200 shadow-lg mr-2 cursor-pointer disabled:cursor-not-allowed`}
               title={
                 pushToTalkState === "recording"
                   ? "Stop recording"
@@ -229,7 +245,7 @@ export default function ChatInput({
             disabled={!message.trim()}
             className="bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:opacity-50
                      text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
-                     transition-all duration-200 shadow-lg"
+                     transition-all duration-200 shadow-lg cursor-pointer disabled:cursor-not-allowed"
           >
               <ArrowUp className="w-4 h-4" />
           </Button>
