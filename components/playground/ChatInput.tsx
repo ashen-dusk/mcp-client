@@ -14,6 +14,7 @@ import { PushToTalkState } from "@/hooks/usePushToTalk";
 import { useCoAgent } from "@copilotkit/react-core";
 import { AgentState } from "@/types/mcp";
 import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
 interface CustomChatInputProps {
   onSendMessage: (message: string) => void;
@@ -53,7 +54,7 @@ export default function ChatInput({
   
   // Generate sessionId for authenticated or anonymous users (browser only)
   const { data: session } = useSession();
-  const getSessionId = (session: any) => {
+  const getSessionId = (session: Session | null) => {
     if (typeof window === "undefined") return undefined;
 
     const sessionId = localStorage.getItem("copilotkit-session");
