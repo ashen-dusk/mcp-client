@@ -141,16 +141,16 @@ export default function ChatInput({
 
   const getMicrophoneColor = () => {
     if (pushToTalkState === "recording") {
-      return "bg-red-600 hover:bg-red-500 animate-pulse";
+      return "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 animate-pulse";
     } else if (pushToTalkState === "transcribing") {
-      return "bg-blue-600 hover:bg-blue-500";
+      return "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500";
     }
-    return "bg-zinc-600 hover:bg-zinc-500";
+    return "bg-gray-500 hover:bg-gray-600 dark:bg-zinc-600 dark:hover:bg-zinc-500";
   };
 
   return (
     <div className="w-full px-4 py-3">
-      <div className="relative bg-zinc-800 rounded-2xl border border-zinc-800 shadow-xl">
+      <div className="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-blue-200 dark:border-zinc-700 shadow-xl hover:border-blue-300 dark:hover:border-zinc-600 transition-colors">
         <div className="flex items-end p-4">
           {/* Message Input Area */}
           <div className="flex-1 mr-3">
@@ -159,7 +159,7 @@ export default function ChatInput({
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type your prompt..."
-              className="w-full resize-none bg-transparent border-0 outline-none text-gray-100 placeholder-gray-500 text-[15px] leading-relaxed"
+              className="w-full resize-none bg-transparent border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-[15px] leading-relaxed"
               rows={1}
               style={{ 
                 minHeight: '60px',
@@ -178,17 +178,17 @@ export default function ChatInput({
           <div className="relative mr-2">
             <button
               onClick={() => setShowModelDropdown(!showModelDropdown)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 hover:bg-zinc-700/50 rounded transition-all duration-200"
+              className="flex items-center space-x-1.5 px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded transition-all duration-200"
             >
-              <span className="text-xs font-medium text-gray-300">
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
                 {selectedModelData?.name}
               </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${showModelDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${showModelDropdown ? 'rotate-180' : ''}`} />
             </button>
 
             {showModelDropdown && (
               <>
-                <div className="absolute bottom-full mb-2 right-0 bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl z-50 min-w-[280px] max-w-[320px] overflow-hidden">
+                <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl z-50 min-w-[280px] max-w-[320px] overflow-hidden">
                   <div className="py-1">
                     {AVAILABLE_MODELS.map((model) => (
                       <button
@@ -196,19 +196,19 @@ export default function ChatInput({
                         onClick={() => handleModelChange(model.id)}
                         className={`w-full flex flex-col px-4 py-3 text-left transition-all duration-150
                           ${selectedModel === model.id
-                            ? 'bg-blue-600/20 border-l-2 border-blue-400'
-                            : 'text-gray-300 hover:bg-zinc-800 hover:text-white border-l-2 border-transparent'
+                            ? 'bg-blue-50 dark:bg-blue-600/20 border-l-2 border-blue-500 dark:border-blue-400'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white border-l-2 border-transparent'
                           }`}
                       >
                         <div className="flex items-center justify-between w-full mb-1">
-                          <span className={`text-sm font-semibold ${selectedModel === model.id ? 'text-blue-400' : 'text-gray-100'}`}>
+                          <span className={`text-sm font-semibold ${selectedModel === model.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'}`}>
                             {model.name}
                           </span>
                           {selectedModel === model.id && (
-                            <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                            <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                           )}
                         </div>
-                        <span className="text-xs text-gray-400 leading-relaxed">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                           {model.description}
                         </span>
                       </button>
@@ -247,7 +247,7 @@ export default function ChatInput({
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim()}
-            className="bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-700 disabled:opacity-50
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-zinc-600 dark:hover:bg-zinc-500 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:opacity-50
                      text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
                      transition-all duration-200 shadow-lg cursor-pointer disabled:cursor-not-allowed"
           >

@@ -34,7 +34,7 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 
 const PlaygroundPage = () => {
   return (
-    <div className="max-w-2xl mx-auto py-4">
+    <div className="max-w-2xl mx-auto">
       <ToolRenderer />
       <CopilotChat
         labels={{
@@ -42,7 +42,7 @@ const PlaygroundPage = () => {
           title: "MCP Playground",
           placeholder: "Ask about your connected servers...",
         }}
-        className="h-[80vh]"
+        className="h-[80vh] rounded-md"
         Input={ChatInputWrapper}
 
       />
