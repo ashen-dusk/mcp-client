@@ -51,7 +51,7 @@ export default function ChatInput({
   pushToTalkState = "idle",
   onPushToTalkStateChange
 }: CustomChatInputProps) {
-  
+
   // Generate sessionId for authenticated or anonymous users (browser only)
   const { data: session } = useSession();
   const getSessionId = (session: Session | null) => {
@@ -67,7 +67,7 @@ export default function ChatInput({
       : email;
     localStorage.setItem("copilotkit-session", derivedId);
     return derivedId;
-  
+
   } else {
     // Anonymous user
     if (!sessionId) {
@@ -79,20 +79,27 @@ export default function ChatInput({
   }
   };
 
+  // Separate state for model - independent of coagent state
+  const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
 
   const { state, setState } = useCoAgent<AgentState>({
     name: "mcpAssistant",
     initialState: {
-      model: "gpt-4o-mini",
+      model: selectedModel,
       status: undefined,
       sessionId: getSessionId(session),
     },
   });
 
+  console.log("Agent State:", state);
+
   const [message, setMessage] = useState("");
   const [showModelDropdown, setShowModelDropdown] = useState(false);
 
   const handleModelChange = (modelId: string) => {
+    // Update local state
+    setSelectedModel(modelId);
+    // Push to coagent state
     setState({...state, model: modelId});
     setShowModelDropdown(false);
   };
@@ -121,7 +128,7 @@ export default function ChatInput({
     }
   };
 
-  const selectedModelData = AVAILABLE_MODELS.find(m => m.id === state.model);
+  const selectedModelData = AVAILABLE_MODELS.find(m => m.id === selectedModel);
 
   const getMicrophoneIcon = () => {
     if (pushToTalkState === "recording") {
@@ -188,16 +195,16 @@ export default function ChatInput({
                         key={model.id}
                         onClick={() => handleModelChange(model.id)}
                         className={`w-full flex flex-col px-4 py-3 text-left transition-all duration-150
-                          ${state.model === model.id
+                          ${selectedModel === model.id
                             ? 'bg-blue-600/20 border-l-2 border-blue-400'
                             : 'text-gray-300 hover:bg-zinc-800 hover:text-white border-l-2 border-transparent'
                           }`}
                       >
                         <div className="flex items-center justify-between w-full mb-1">
-                          <span className={`text-sm font-semibold ${state.model === model.id ? 'text-blue-400' : 'text-gray-100'}`}>
+                          <span className={`text-sm font-semibold ${selectedModel === model.id ? 'text-blue-400' : 'text-gray-100'}`}>
                             {model.name}
                           </span>
-                          {state.model === model.id && (
+                          {selectedModel === model.id && (
                             <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
                           )}
                         </div>
