@@ -400,7 +400,7 @@ export default function McpClientLayout({
                                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                     <span>{server.transport} • {server.tools.length} tools</span>
                                     {server.requiresOauth2 && (
-                                      <Shield className="h-3 w-3 text-amber-500" title="OAuth2 Required" />
+                                      <Shield className="h-3 w-3 text-amber-500" />
                                     )}
                                   </div>
                                 </CardContent>
@@ -646,7 +646,7 @@ export default function McpClientLayout({
                             <div className="flex items-center gap-2 text-sm">
                               <Shield className="h-4 w-4 text-muted-foreground" />
                               <span className="font-medium">Authentication:</span>
-                              <Badge variant="outline">OAuth2 Required</Badge>
+                              <Badge className="border-amber-500" variant="outline">OAuth2</Badge>
                             </div>
                           )}
                         </div>
