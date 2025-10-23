@@ -1,13 +1,22 @@
-// lib/auth.ts
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
 
+function decodeJwtExpiry(token: string): number | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    return payload.exp ? payload.exp * 1000 : null;
+  } catch (error) {
+    console.error("Error decoding JWT:", error);
+    return null;
+  }
+}
+
 async function refreshGoogleToken(token: JWT) {
   try {
-    const url = "https://oauth2.googleapis.com/token";
-
-    const response = await fetch(url, {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       method: "POST",
       body: new URLSearchParams({
@@ -21,15 +30,20 @@ async function refreshGoogleToken(token: JWT) {
     const refreshedTokens = await response.json();
     if (!response.ok) throw refreshedTokens;
 
+    const idTokenExpiry = refreshedTokens.id_token
+      ? decodeJwtExpiry(refreshedTokens.id_token)
+      : null;
+
     return {
       ...token,
       accessToken: refreshedTokens.access_token,
-      googleIdToken: refreshedTokens.id_token, // 👈 fresh ID token
+      googleIdToken: refreshedTokens.id_token,
+      googleIdTokenExpires: idTokenExpiry,
       accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // keep same if not returned
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
-    console.error("Error refreshing Google token", error);
+    console.error("Error refreshing Google token:", error);
     return { ...token, error: "RefreshAccessTokenError" };
   }
 }
@@ -42,7 +56,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           prompt: "consent",
-          access_type: "offline", // 👈 ensures refresh_token
+          access_type: "offline",
           response_type: "code",
           scope: "openid email profile",
         },
@@ -52,30 +66,33 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account }) {
-      // console.log("JWT callback called with token:", token, "and account:", account);
-      // Initial sign in
       if (account) {
+        const idTokenExpiry = account.id_token
+          ? decodeJwtExpiry(account.id_token)
+          : null;
+
         return {
           ...token,
           accessToken: account.access_token,
           googleIdToken: account.id_token,
-          refreshToken: account.refresh_token, // 👈 store refresh_token
+          googleIdTokenExpires: idTokenExpiry,
+          refreshToken: account.refresh_token,
           accessTokenExpires: Date.now() + (account.expires_at! * 1000),
         };
       }
 
-      // Return previous token if not expired
-      if (Date.now() < (token.accessTokenExpires as number)) {
-        return token;
+      const idTokenExpiry = token.googleIdTokenExpires as number;
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000;
+
+      if (!idTokenExpiry || now >= idTokenExpiry - fiveMinutes) {
+        return await refreshGoogleToken(token);
       }
 
-      // Access token expired, refresh
-      console.log("refreshing google token------------->", token);
-      return await refreshGoogleToken(token);
+      return token;
     },
 
     async session({ session, token }) {
-      // console.log("Session callback called with session:", session, "and token:", token);
       return {
         ...session,
         googleIdToken: token.googleIdToken as string | undefined,
