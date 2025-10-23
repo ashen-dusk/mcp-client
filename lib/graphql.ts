@@ -15,6 +15,7 @@ export const MCP_SERVER_FRAGMENT = `
     command
     args
     enabled
+    description
     requiresOauth2
     connectionStatus
     tools { ...ToolInfoFields }

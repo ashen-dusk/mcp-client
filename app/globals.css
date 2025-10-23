@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -155,5 +156,112 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+@layer components {
+  /* Prose styling for markdown content */
+  .prose {
+    @apply text-foreground;
+  }
+
+  .prose p {
+    @apply my-2 leading-relaxed;
+  }
+
+  .prose p:first-child {
+    @apply mt-0;
+  }
+
+  .prose p:last-child {
+    @apply mb-0;
+  }
+
+  .prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose em {
+    @apply italic;
+  }
+
+  .prose ul, .prose ol {
+    @apply my-2 pl-6 space-y-1;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li {
+    @apply leading-relaxed;
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    @apply font-semibold text-foreground mt-3 mb-1.5;
+  }
+
+  .prose h1:first-child,
+  .prose h2:first-child,
+  .prose h3:first-child,
+  .prose h4:first-child {
+    @apply mt-0;
+  }
+
+  .prose h1 {
+    @apply text-2xl;
+  }
+
+  .prose h2 {
+    @apply text-xl;
+  }
+
+  .prose h3 {
+    @apply text-lg;
+  }
+
+  .prose h4 {
+    @apply text-base;
+  }
+
+  .prose code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto my-3;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-muted-foreground/30 pl-4 italic my-3;
+  }
+
+  .prose a {
+    @apply text-primary hover:underline;
+  }
+
+  .prose hr {
+    @apply border-border my-4;
+  }
+
+  /* Compact prose for smaller spaces */
+  .prose-sm p, .prose-sm ul, .prose-sm ol {
+    @apply my-1;
+  }
+
+  .prose-sm h1, .prose-sm h2, .prose-sm h3, .prose-sm h4 {
+    @apply mt-1.5 mb-0.5;
+  }
+
+  .prose-sm ul, .prose-sm ol {
+    @apply pl-4 space-y-0.5;
   }
 }

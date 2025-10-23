@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import ServerFormModal from "./ServerFormModal";
@@ -395,8 +397,11 @@ export default function McpClientLayout({
                                       </span>
                                     </div>
                                   </div>
-                                  <div className="text-xs text-muted-foreground">
-                                    {server.transport} • {server.tools.length} tools
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <span>{server.transport} • {server.tools.length} tools</span>
+                                    {server.requiresOauth2 && (
+                                      <Shield className="h-3 w-3 text-amber-500" title="OAuth2 Required" />
+                                    )}
                                   </div>
                                 </CardContent>
                               </Card>
@@ -502,9 +507,19 @@ export default function McpClientLayout({
                                       </div>
                                     </div>
                                     <div className="space-y-1">
-                                      <p className="text-xs text-muted-foreground truncate">
-                                        {server.transport} • {server.tools?.length || 0} tools
-                                      </p>
+                                      {server.description && (
+                                        <div className="text-xs line-clamp-2 mb-1 prose prose-sm max-w-none [&>*]:text-muted-foreground [&>p]:text-muted-foreground/90 [&>strong]:font-semibold [&>strong]:text-foreground/70 [&>em]:italic [&>code]:bg-muted/50 [&>code]:px-1 [&>code]:rounded [&>code]:text-xs">
+                                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {server.description}
+                                          </ReactMarkdown>
+                                        </div>
+                                      )}
+                                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                        <span>{server.transport} • {server.tools?.length || 0} tools</span>
+                                        {server.requiresOauth2 && (
+                                          <Shield className="h-3 w-3 text-amber-500 flex-shrink-0" title="OAuth2 Required" />
+                                        )}
+                                      </div>
                                     </div>
                                   </CardContent>
                                 </Card>
@@ -593,8 +608,19 @@ export default function McpClientLayout({
                       </div>
                     </div>
 
+                    {/* Description - Full Width */}
+                    {selectedServer.description && (
+                      <div className="space-y-2">
+                        <div className="text-sm prose prose-sm max-w-none">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {selectedServer.description}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Server Information Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-border">
                       {/* Basic Info */}
                       <div className="space-y-3">
                         <h3 className="text-sm font-medium text-muted-foreground">Basic Information</h3>
@@ -632,14 +658,14 @@ export default function McpClientLayout({
                         <div className="space-y-2">
                           {selectedServer.id && (
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium">ID:</span>
-                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.id}</code>
+                              <span className="font-medium whitespace-nowrap">ID:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono truncate flex-1 min-w-0" title={selectedServer.id}>{selectedServer.id}</code>
                             </div>
                           )}
                           {selectedServer.url && (
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium">URL:</span>
-                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono max-w-48 truncate">{selectedServer.url}</code>
+                              <span className="font-medium whitespace-nowrap">URL:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono truncate flex-1 min-w-0" title={selectedServer.url}>{selectedServer.url}</code>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -647,44 +673,46 @@ export default function McpClientLayout({
                                   navigator.clipboard.writeText(selectedServer.url!);
                                   toast.success("URL copied to clipboard");
                                 }}
-                                className="h-6 w-6 p-0 hover:bg-accent cursor-pointer"
+                                className="h-6 w-6 p-0 hover:bg-accent cursor-pointer flex-shrink-0"
                               >
                                 <Copy className="h-3 w-3" />
                               </Button>
                             </div>
                           )}
                           {selectedServer.command && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium">Command:</span>
-                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{selectedServer.command}</code>
-                            </div>
-                          )}
-                          {(selectedServer.createdAt) && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <Calendar className="h-4 w-4 text-muted-foreground" />
-                              <span className="font-medium">Created at:</span>
-                              <span className="text-muted-foreground">{new Date(selectedServer.createdAt).toLocaleDateString()}</span>
+                            <div className="flex items-start gap-2 text-sm">
+                              <span className="font-medium whitespace-nowrap">Command:</span>
+                              <code className="bg-muted px-2 py-1 rounded text-xs font-mono break-all">{selectedServer.command}</code>
                             </div>
                           )}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Metadata */}
-                    <div className="pt-2 border-t border-border">
-                      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                        {selectedServer.owner && (
-                          <div className="flex items-center gap-1">
-                            <UserIcon className="h-3 w-3" />
-                            <span>Added by: {selectedServer.owner}</span>
-                          </div>
-                        )}
-                        {selectedServer.isPublic !== undefined && (
-                          <div className="flex items-center gap-1">
-                            <Globe className="h-3 w-3" />
-                            <span>{selectedServer.isPublic ? "Public Server" : "Private Server"}</span>
-                          </div>
-                        )}
+                      {/* Metadata */}
+                      <div className="space-y-3">
+                        <h3 className="text-sm font-medium text-muted-foreground">Metadata</h3>
+                        <div className="space-y-2">
+                          {(selectedServer.createdAt) && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">Created:</span>
+                              <span className="text-muted-foreground">{new Date(selectedServer.createdAt).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          {selectedServer.owner && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <UserIcon className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">Added by:</span>
+                              <span className="text-muted-foreground">{selectedServer.owner}</span>
+                            </div>
+                          )}
+                          {selectedServer.isPublic !== undefined && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Globe className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-muted-foreground">{selectedServer.isPublic ? "Public Server" : "Private Server"}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

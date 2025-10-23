@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +25,7 @@ import { toast } from "react-hot-toast";
 
 const serverSchema = z.object({
   name: z.string().min(1, "Server name is required"),
+  description: z.string().optional(),
   transport: z.enum(["sse", "streamable_http", "stdio"]),
   url: z.string().optional(),
   command: z.string().optional(),
@@ -67,6 +69,7 @@ export default function ServerFormModal({
     resolver: zodResolver(serverSchema),
     defaultValues: {
       name: "",
+      description: "",
       transport: "sse",
       url: "",
       command: "",
@@ -93,6 +96,7 @@ export default function ServerFormModal({
       if (mode === 'edit' && server) {
         reset({
           name: server.name,
+          description: server.description || "",
           transport: server.transport as "sse" | "streamable_http" | "stdio",
           url: server.url || "",
           command: server.command || "",
@@ -105,6 +109,7 @@ export default function ServerFormModal({
       } else {
         reset({
           name: "",
+          description: "",
           transport: "sse",
           url: "",
           command: "",
@@ -142,13 +147,26 @@ export default function ServerFormModal({
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-1">
             <Label htmlFor="name" className="text-xs">Server Name</Label>
-            <Input 
-              {...register("name")} 
-              id="name" 
-              placeholder="My MCP Server" 
+            <Input
+              {...register("name")}
+              id="name"
+              placeholder="My MCP Server"
               className="h-9"
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="description" className="text-xs">Description</Label>
+            <Textarea
+              {...register("description")}
+              id="description"
+              placeholder="What does this server do? (optional)"
+              className="min-h-[60px] resize-none"
+            />
+            <p className="text-xs text-muted-foreground">
+              Help others understand what this server is for
+            </p>
           </div>
 
           <div className="space-y-1">
