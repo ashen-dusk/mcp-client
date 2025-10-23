@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
@@ -189,9 +189,16 @@ export default function ServerFormModal({
 
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="requiresOauth" 
-                {...register("requiresOauth")}
+              <Controller
+                name="requiresOauth"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="requiresOauth"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
               />
               <Label htmlFor="requiresOauth" className="text-xs">
                 Requires OAuth2 Authentication
@@ -204,9 +211,16 @@ export default function ServerFormModal({
 
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="isPublic" 
-                {...register("isPublic")}
+              <Controller
+                name="isPublic"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    id="isPublic"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
               />
               <Label htmlFor="isPublic" className="text-xs">
                 Share with other users
