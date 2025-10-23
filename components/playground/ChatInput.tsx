@@ -27,22 +27,114 @@ const AVAILABLE_MODELS = [
   {
     id: "gpt-4o-mini",
     name: "GPT-4o Mini",
-    description: "Fast and affordable for everyday tasks"
+    description: "Fast and affordable for everyday tasks",
+    provider: "OpenAI",
+    tag: "Balanced"
   },
   {
     id: "gpt-4o",
     name: "GPT-4o",
-    description: "Most capable, best for complex reasoning"
+    description: "Most capable, best for complex reasoning",
+    provider: "OpenAI",
+    tag: "Premium"
   },
   {
     id: "gpt-3.5-turbo",
     name: "GPT-3.5 Turbo",
-    description: "Quick responses, good for simple queries"
+    description: "Quick responses, good for simple queries",
+    provider: "OpenAI",
+    tag: "Fast"
   },
   {
     id: "deepseek-chat",
     name: "DeepSeek-V3",
-    description: "Excellent at coding and technical tasks"
+    description: "Excellent at coding and technical tasks",
+    provider: "DeepSeek",
+    tag: "Coding"
+  },
+  {
+    id: "google/gemini-2.0-flash-exp:free",
+    name: "Gemini 2.0 Flash",
+    description: "Google's fast experimental model with multimodal capabilities",
+    provider: "Google",
+    tag: "Multimodal"
+  },
+  {
+    id: "meta-llama/llama-3.3-70b-instruct:free",
+    name: "Llama 3.3 70B",
+    description: "Meta's powerful instruction-tuned model, great for reasoning",
+    provider: "Meta",
+    tag: "Reasoning"
+  },
+  {
+    id: "meta-llama/llama-4-maverick:free",
+    name: "Llama 4 Maverick",
+    description: "Meta's latest experimental Llama 4 variant",
+    provider: "Meta",
+    tag: "Experimental"
+  },
+  {
+    id: "qwen/qwen3-235b-a22b:free",
+    name: "Qwen 3 235B",
+    description: "Massive 235B parameter model with exceptional capabilities",
+    provider: "Qwen",
+    tag: "Large"
+  },
+  {
+    id: "qwen/qwen3-coder:free",
+    name: "Qwen 3 Coder",
+    description: "Specialized coding model, optimized for programming tasks",
+    provider: "Qwen",
+    tag: "Coding"
+  },
+  {
+    id: "deepseek/deepseek-r1:free",
+    name: "DeepSeek R1",
+    description: "Advanced reasoning model for complex problem-solving",
+    provider: "DeepSeek",
+    tag: "Reasoning"
+  },
+  {
+    id: "deepseek/deepseek-r1-0528:free",
+    name: "DeepSeek R1-0528",
+    description: "Enhanced reasoning variant with improved accuracy",
+    provider: "DeepSeek",
+    tag: "Reasoning"
+  },
+  {
+    id: "deepseek/deepseek-chat-v3-0324:free",
+    name: "DeepSeek Chat V3",
+    description: "Latest DeepSeek chat model with improved performance",
+    provider: "DeepSeek",
+    tag: "Chat"
+  },
+  {
+    id: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+    name: "DeepSeek R1 Qwen 8B",
+    description: "Hybrid model combining DeepSeek reasoning with Qwen efficiency",
+    provider: "DeepSeek",
+    tag: "Hybrid"
+  },
+  {
+    id: "tngtech/deepseek-r1t2-chimera:free",
+    name: "DeepSeek R1T2 Chimera",
+    description: "Reasoning-enhanced chimera model with advanced capabilities",
+    provider: "Community",
+    tag: "Reasoning"
+  },
+  {
+    id: "microsoft/mai-ds-r1:free",
+    name: "Microsoft MAI-DS R1",
+    description: "Microsoft's AI reasoning model for analytical tasks",
+    provider: "Microsoft",
+    tag: "Analytical"
+  },
+  {
+    id: "openai/gpt-oss-20b:free",
+    name: "GPT OSS 20B",
+    description: "Open-source GPT model with 20B parameters",
+    provider: "OpenAI",
+    tag: "Open Source"
   },
 ];
 
@@ -91,7 +183,7 @@ export default function ChatInput({
     },
   });
 
-  console.log("Agent State:", state);
+  // console.log("Agent State:", state);
 
   const [message, setMessage] = useState("");
   const [showModelDropdown, setShowModelDropdown] = useState(false);
@@ -132,11 +224,11 @@ export default function ChatInput({
 
   const getMicrophoneIcon = () => {
     if (pushToTalkState === "recording") {
-      return <MicOff className="w-4 h-4" />;
+      return <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />;
     } else if (pushToTalkState === "transcribing") {
-      return <Loader2 className="w-4 h-4 animate-spin" />;
+      return <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />;
     }
-    return <Mic className="w-4 h-4" />;
+    return <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" />;
   };
 
   const getMicrophoneColor = () => {
@@ -149,20 +241,20 @@ export default function ChatInput({
   };
 
   return (
-    <div className="w-full px-4 py-3">
+    <div className="w-full px-2 sm:px-4 py-2 sm:py-3">
       <div className="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-blue-200 dark:border-zinc-700 shadow-xl hover:border-blue-300 dark:hover:border-zinc-600 transition-colors">
-        <div className="flex items-end p-4">
+        <div className="flex items-end p-2 sm:p-4">
           {/* Message Input Area */}
-          <div className="flex-1 mr-3">
+          <div className="flex-1 mr-1.5 sm:mr-3">
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type your prompt..."
-              className="w-full resize-none bg-transparent border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-[15px] leading-relaxed"
+              className="w-full resize-none bg-transparent border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[15px] leading-relaxed"
               rows={1}
-              style={{ 
-                minHeight: '60px',
+              style={{
+                minHeight: '50px',
                 maxHeight: '120px',
                 overflowY: message.split('\n').length > 3 ? 'auto' : 'hidden'
               }}
@@ -175,44 +267,74 @@ export default function ChatInput({
           </div>
 
           {/* Model Selection Dropdown */}
-          <div className="relative mr-2">
+          <div className="relative mr-1 sm:mr-2">
             <button
               onClick={() => setShowModelDropdown(!showModelDropdown)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded transition-all duration-200"
+              className="flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded transition-all duration-200"
             >
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[80px] sm:max-w-none">
                 {selectedModelData?.name}
               </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${showModelDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${showModelDropdown ? 'rotate-180' : ''}`} />
             </button>
 
             {showModelDropdown && (
               <>
-                <div className="absolute bottom-full mb-2 right-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl shadow-2xl z-50 min-w-[280px] max-w-[320px] overflow-hidden">
-                  <div className="py-1">
-                    {AVAILABLE_MODELS.map((model) => (
-                      <button
-                        key={model.id}
-                        onClick={() => handleModelChange(model.id)}
-                        className={`w-full flex flex-col px-4 py-3 text-left transition-all duration-150
-                          ${selectedModel === model.id
-                            ? 'bg-blue-50 dark:bg-blue-600/20 border-l-2 border-blue-500 dark:border-blue-400'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white border-l-2 border-transparent'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between w-full mb-1">
-                          <span className={`text-sm font-semibold ${selectedModel === model.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'}`}>
-                            {model.name}
-                          </span>
-                          {selectedModel === model.id && (
-                            <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                          {model.description}
-                        </span>
-                      </button>
-                    ))}
+                <div className="absolute bottom-full mb-2 right-0 md:right-0 left-0 md:left-auto bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/50 rounded-2xl shadow-2xl backdrop-blur-xl z-50 w-full md:min-w-[340px] md:max-w-[400px] max-h-[70vh] overflow-hidden">
+                  {/* Models List */}
+                  <div className="overflow-y-auto max-h-[70vh] scrollbar-minimal">
+                    <div className="p-2">
+                      {AVAILABLE_MODELS.map((model, index) => (
+                        <button
+                          key={model.id}
+                          onClick={() => handleModelChange(model.id)}
+                          className={`w-full group relative flex flex-col px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-all duration-150
+                            ${selectedModel === model.id
+                              ? 'bg-blue-50 dark:bg-blue-950/20'
+                              : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'
+                            }`}
+                        >
+                          {/* Name & Check Icon */}
+                          <div className="flex items-center justify-between w-full mb-1.5">
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className={`text-[11px] sm:text-xs font-medium ${selectedModel === model.id ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                                {model.name}
+                              </span>
+                              {/* Provider & Tag Badges */}
+                              <div className="flex items-center gap-1 flex-wrap">
+                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold border
+                                  ${model.provider === 'OpenAI' ? 'text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700' :
+                                    model.provider === 'DeepSeek' ? 'text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-700' :
+                                    model.provider === 'Google' ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700' :
+                                    model.provider === 'Meta' ? 'text-pink-700 dark:text-pink-400 border-pink-300 dark:border-pink-700' :
+                                    model.provider === 'Qwen' ? 'text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700' :
+                                    model.provider === 'Microsoft' ? 'text-cyan-700 dark:text-cyan-400 border-cyan-300 dark:border-cyan-700' :
+                                    'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
+                                  }`}>
+                                  {model.provider}
+                                </span>
+                                {model.id.includes(':free') && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700">
+                                    OpenRouter
+                                  </span>
+                                )}
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-medium text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600">
+                                  {model.tag}
+                                </span>
+                              </div>
+                            </div>
+                            {selectedModel === model.id && (
+                              <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
+                            )}
+                          </div>
+
+                          {/* Description */}
+                          <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {model.description}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <div
@@ -229,8 +351,8 @@ export default function ChatInput({
               onClick={handleMicrophoneClick}
               disabled={pushToTalkState === "transcribing"}
               className={`${getMicrophoneColor()} disabled:opacity-50
-                       text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
-                       transition-all duration-200 shadow-lg mr-2 cursor-pointer disabled:cursor-not-allowed`}
+                       text-white rounded-lg p-1.5 sm:p-2 h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center
+                       transition-all duration-200 shadow-lg mr-1 sm:mr-2 cursor-pointer disabled:cursor-not-allowed`}
               title={
                 pushToTalkState === "recording"
                   ? "Stop recording"
@@ -248,10 +370,10 @@ export default function ChatInput({
             onClick={handleSendMessage}
             disabled={!message.trim()}
             className="bg-blue-600 hover:bg-blue-700 dark:bg-zinc-600 dark:hover:bg-zinc-500 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:opacity-50
-                     text-white rounded-lg p-2 h-8 w-8 flex items-center justify-center
+                     text-white rounded-lg p-1.5 sm:p-2 h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center
                      transition-all duration-200 shadow-lg cursor-pointer disabled:cursor-not-allowed"
           >
-              <ArrowUp className="w-4 h-4" />
+              <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
         </div>
       </div>
