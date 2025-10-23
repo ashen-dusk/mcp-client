@@ -508,7 +508,7 @@ export default function McpClientLayout({
                                     </div>
                                     <div className="space-y-1">
                                       {server.description && (
-                                        <div className="text-xs line-clamp-2 mb-1 prose prose-sm max-w-none [&>*]:text-muted-foreground [&>p]:text-muted-foreground/90 [&>strong]:font-semibold [&>strong]:text-foreground/70 [&>em]:italic [&>code]:bg-muted/50 [&>code]:px-1 [&>code]:rounded [&>code]:text-xs">
+                                        <div className="text-xs line-clamp-2 mb-1 prose prose-sm max-w-none [&>*]:text-foreground/80 [&>p]:text-foreground/75 [&>strong]:font-semibold [&>strong]:text-foreground [&>em]:italic [&>em]:text-foreground/80 [&>code]:bg-muted [&>code]:px-1 [&>code]:rounded [&>code]:text-xs [&>code]:text-foreground/90 [&>a]:text-primary [&>a]:underline [&>a]:underline-offset-2 hover:[&>a]:text-primary/80">
                                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                             {server.description}
                                           </ReactMarkdown>
@@ -517,7 +517,9 @@ export default function McpClientLayout({
                                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <span>{server.transport} • {server.tools?.length || 0} tools</span>
                                         {server.requiresOauth2 && (
-                                          <Shield className="h-3 w-3 text-amber-500 flex-shrink-0" title="OAuth2 Required" />
+                                          <span title="OAuth2 Required">
+                                            <Shield className="h-3 w-3 text-amber-500 flex-shrink-0" />
+                                          </span>
                                         )}
                                       </div>
                                     </div>
@@ -611,7 +613,7 @@ export default function McpClientLayout({
                     {/* Description - Full Width */}
                     {selectedServer.description && (
                       <div className="space-y-2">
-                        <div className="text-sm prose prose-sm max-w-none">
+                        <div className="text-sm prose prose-sm max-w-none [&>*]:text-foreground/80 [&>p]:text-foreground/75 [&>strong]:font-semibold [&>strong]:text-foreground [&>em]:italic [&>em]:text-foreground/80 [&>code]:bg-muted [&>code]:px-1.5 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-sm [&>code]:text-foreground/90 [&>a]:text-primary [&>a]:underline [&>a]:underline-offset-2 hover:[&>a]:text-primary/80 [&>ul]:text-foreground/75 [&>ol]:text-foreground/75 [&>li]:text-foreground/75">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {selectedServer.description}
                           </ReactMarkdown>
