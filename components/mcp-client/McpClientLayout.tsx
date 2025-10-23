@@ -443,7 +443,7 @@ export default function McpClientLayout({
                                 className="group relative"
                               >
                                 {/* Action Buttons */}
-                                {!(server.isPublic && server.owner !== session?.user?.email) && (
+                                {!(server.isPublic && server.owner !== session?.user?.email?.split('@')[0]) && (
                                   <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col gap-1 z-10">
                                     <Button
                                       variant="ghost"

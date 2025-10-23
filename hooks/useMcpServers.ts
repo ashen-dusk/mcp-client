@@ -39,6 +39,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
               mcpServers {
                 id
                 name
+                description
                 transport
                 url
                 command

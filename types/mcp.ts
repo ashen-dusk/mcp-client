@@ -7,6 +7,7 @@ export type ToolInfo = {
 export type McpServer = {
   id: string;
   name: string;
+  description?: string | null;
   transport: string;
   owner?: string | null;
   url?: string | null;

@@ -76,6 +76,7 @@ export const SAVE_MCP_SERVER_MUTATION = `
     $queryParams: JSON
     $requiresOauth2: Boolean
     $isPublic: Boolean
+    $description: String
   ) {
     saveMcpServer(
       name: $name
@@ -87,9 +88,11 @@ export const SAVE_MCP_SERVER_MUTATION = `
       queryParams: $queryParams
       requiresOauth2: $requiresOauth2
       isPublic: $isPublic
+      description: $description
     ) {
     id
     name
+    description
     transport
     url
     command
