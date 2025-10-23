@@ -152,6 +152,37 @@
     display: none;  /* Safari and Chrome */
   }
 
+  /* Custom minimal scrollbar - only shows on hover */
+  .scrollbar-minimal {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  .scrollbar-minimal:hover {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.15) transparent;
+  }
+
+  .scrollbar-minimal::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-minimal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-minimal::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+  }
+
+  .scrollbar-minimal:hover::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.15);
+  }
+
+  .scrollbar-minimal::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.25);
+  }
+
   .text-truncate {
     overflow: hidden;
     text-overflow: ellipsis;

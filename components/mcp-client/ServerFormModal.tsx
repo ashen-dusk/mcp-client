@@ -137,14 +137,15 @@ export default function ServerFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl h-[85vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="px-6 pt-6 pb-2 flex-shrink-0">
           <DialogTitle>
-            {mode === 'add' ? 'Add New Server' : 'Edit Server'}
+            {mode === 'add' ? 'Add MCP' : 'Edit MCP'}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-minimal">
           <div className="space-y-1">
             <Label htmlFor="name" className="text-xs">Server Name</Label>
             <Input
@@ -323,8 +324,9 @@ export default function ServerFormModal({
               </AnimatePresence>
             </div>
           )}
+          </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex justify-end gap-2 px-6 py-2 border-t bg-background flex-shrink-0 rounded-b-md">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
