@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import Logo from "@/components/Logo";
 
 export default function SignInPage() {
@@ -50,7 +51,7 @@ export default function SignInPage() {
             <button
               onClick={handleSignIn}
               disabled={isLoading}
-              className="w-full bg-black dark:text-black dark:bg-gray-100 hover:bg-gray-800 dark:hover:text-white dark:hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
+              className="w-full bg-foreground text-background hover:bg-foreground/90 font-medium py-3 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
             >
               {isLoading ? (
                 <>
@@ -69,11 +70,19 @@ export default function SignInPage() {
                 </>
               )}
             </button>
-            
+
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Secure authentication powered by Google
-              </p>
+              <div className="space-y-2 text-center">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Secure authentication powered by Google
+                </p>
+                <Link
+                  href="/privacy"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-block underline"
+                >
+                  Privacy Policy
+                </Link>
+              </div>
             </div>
           </div>
         </div>

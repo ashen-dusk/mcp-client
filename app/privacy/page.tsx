@@ -8,13 +8,13 @@ export default function PrivacyPolicy() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center mb-6">
-              <div className="p-4 rounded-2xl bg-primary/10 ring-1 ring-primary/20">
-                <Shield className="h-12 w-12 text-primary" />
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                <Shield className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Privacy Policy</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">Privacy Policy</h1>
+            <p className="text-sm text-muted-foreground">
               <strong>Last Updated:</strong> October 20, 2025
             </p>
           </div>

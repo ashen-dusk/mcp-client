@@ -26,7 +26,7 @@ export default async function Home() {
         <div className="text-center max-w-4xl mx-auto">
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-4 font-light">
+          <p className="text-xl md:text-2xl mb-4 font-medium">
             Connect to remote MCP servers without the hassle
           </p>
 
@@ -74,69 +74,69 @@ export default async function Home() {
           )}
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground mb-12">
-            <span>No Subscriptions</span>
+          <div className="flex flex-wrap items-center justify-center gap-6 text-sm mb-12">
+            <span className="font-semibold">No Subscriptions</span>
             <span className="text-muted-foreground/40">•</span>
-            <span>No Local Setup</span>
+            <span className="font-semibold">No Local Setup</span>
             <span className="text-muted-foreground/40">•</span>
-            <span>Instant Access</span>
+            <span className="font-semibold">Instant Access</span>
           </div>
 
           {/* Powered By - Hero */}
           <div className="pt-8 border-t border-border/30">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-4">Powered By</p>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-4">Powered By</p>
             <div className="flex flex-wrap items-center justify-center gap-8">
               {/* MCP Logo */}
-              <div className="relative h-8 w-auto">
+              <div className="relative h-8 w-auto hover:scale-110 transition-transform">
                 <Image
                   src="/technologies/mcp-light.webp"
                   alt="Model Context Protocol"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity dark:hidden"
+                  className="h-8 w-auto opacity-95 hover:opacity-100 transition-opacity dark:hidden"
                 />
                 <Image
                   src="/technologies/mcp.webp"
                   alt="Model Context Protocol"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity hidden dark:block"
+                  className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity hidden dark:block"
                 />
               </div>
 
               {/* LangGraph Logo */}
-              <div className="relative h-8 w-auto">
+              <div className="relative h-8 w-auto hover:scale-110 transition-transform">
                 <Image
                   src="/technologies/langgraph-light.webp"
                   alt="LangGraph"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity dark:hidden"
+                  className="h-8 w-auto opacity-95 hover:opacity-100 transition-opacity dark:hidden"
                 />
                 <Image
                   src="/technologies/langgraph.webp"
                   alt="LangGraph"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity hidden dark:block"
+                  className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity hidden dark:block"
                 />
               </div>
 
               {/* AGUI Logo */}
-              <div className="relative h-8 w-auto">
+              <div className="relative h-8 w-auto hover:scale-110 transition-transform">
                 <Image
                   src="/technologies/agui-light.webp"
                   alt="AGUI"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity dark:hidden"
+                  className="h-8 w-auto opacity-95 hover:opacity-100 transition-opacity dark:hidden"
                 />
                 <Image
                   src="/technologies/agui.webp"
                   alt="AGUI"
                   width={100}
                   height={32}
-                  className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity hidden dark:block"
+                  className="h-8 w-auto opacity-90 hover:opacity-100 transition-opacity hidden dark:block"
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@ export default async function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-muted/30 backdrop-blur-sm">
+      <footer className="border-t border-border/50">
         <div className="container mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-sm text-muted-foreground">
@@ -223,15 +223,9 @@ export default async function Home() {
             <div className="flex items-center gap-6">
               <Link
                 href="/privacy"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors underline"
               >
                 Privacy Policy
-              </Link>
-              <Link
-                href="/about"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                About
               </Link>
             </div>
           </div>
