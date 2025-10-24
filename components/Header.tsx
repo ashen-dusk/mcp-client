@@ -14,8 +14,15 @@ export default async function Header() {
       <div className="px-6 py-4">
         {/* Top Section - Logo and Profile */}
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold">
+          <Link href="/" className="flex items-center gap-2">
             <Logo />
+            <span className="text-sm font-semibold text-foreground">MCP Assistant</span>
+            <span
+              className="bg-black/5 text-black/70 border border-black/10 dark:bg-white/10 dark:text-white/70 dark:border-white/20 text-[10px] px-1.5 py-0.5 rounded-lg uppercase font-bold tracking-wide"
+              title="This app is in beta — features may change."
+            >
+              Beta
+            </span>
           </Link>
           
           {/* Profile Section */}

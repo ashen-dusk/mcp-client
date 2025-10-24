@@ -16,6 +16,16 @@ export default async function Home() {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Beta Banner */}
+      <div className="bg-yellow-50 dark:bg-yellow-950/20 border-b border-yellow-200 dark:border-yellow-900/30">
+        <div className="container mx-auto px-6 py-3">
+          <p className="text-center text-sm text-yellow-800 dark:text-yellow-400 flex items-center justify-center gap-2">
+            <span>⚠️</span>
+            <span><strong>Beta Version</strong> — This app is still in development. Features may change or be unstable.</span>
+          </p>
+        </div>
+      </div>
+
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
@@ -24,8 +34,14 @@ export default async function Home() {
             </div>
           </div>
           
-          <h1 className="text-3xl font-bold mb-4">
+          <h1 className="text-3xl font-bold mb-4 flex items-center justify-center gap-3">
             Ready to Get Started?
+            <span
+              className="bg-black/5 text-black/70 border border-black/10 dark:bg-white/10 dark:text-white/70 dark:border-white/20 text-[10px] px-1.5 py-0.5 rounded-lg uppercase font-bold tracking-wide"
+              title="This app is in beta — features may change."
+            >
+              Beta
+            </span>
           </h1>
           
           <p className="text-base text-muted-foreground mb-6 max-w-xl mx-auto">
