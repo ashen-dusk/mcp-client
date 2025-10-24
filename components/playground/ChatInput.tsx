@@ -337,7 +337,7 @@ export default function ChatInput({
                   {/* Models List */}
                   <div className="overflow-y-auto max-h-[55vh] scrollbar-minimal">
                     <div className="p-2">
-                      {AVAILABLE_MODELS.map((model, index) => (
+                      {AVAILABLE_MODELS.map((model) => (
                         <button
                           key={model.id}
                           onClick={() => handleModelChange(model.id)}

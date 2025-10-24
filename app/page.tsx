@@ -8,11 +8,8 @@ import {
   Play,
   Shield,
   ArrowRight,
-  Zap,
   MessageSquare,
-  Workflow,
-  Plug,
-  Lock
+  Plug
 } from "lucide-react";
 
 export default async function Home() {

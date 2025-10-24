@@ -12,8 +12,7 @@ import {
   XCircle,
   Loader2,
   Edit,
-  Trash2,
-  AlertCircle
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,18 +23,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { McpServer } from "@/types/mcp";
-import { Session } from "next-auth";
-import Link from "next/link";
 
 interface ServerManagementProps {
   server: McpServer;
   onAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<unknown>;
   onEdit?: (server: McpServer) => void;
   onDelete?: (serverName: string) => void;
-  session: Session | null;
 }
 
-export default function ServerManagement({ server, onAction, onEdit, onDelete, session }: ServerManagementProps) {
+export default function ServerManagement({ server, onAction, onEdit, onDelete }: ServerManagementProps) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleAction = async (action: 'restart' | 'activate' | 'deactivate') => {

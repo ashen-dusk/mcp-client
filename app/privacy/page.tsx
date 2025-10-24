@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
             <div>
               <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
               <p className="text-muted-foreground">
-                MCP Assistant ("we", "our", or "the service") is a platform that helps users manage MCP (Model Context Protocol) servers and interact with AI assistants. This privacy policy explains how we collect, use, and protect your information.
+                MCP Assistant (&quot;we&quot;, &quot;our&quot;, or &quot;the service&quot;) is a platform that helps users manage MCP (Model Context Protocol) servers and interact with AI assistants. This privacy policy explains how we collect, use, and protect your information.
               </p>
             </div>
 
@@ -105,7 +105,7 @@ export default function PrivacyPolicy() {
               <h3 className="text-xl font-semibold mt-6 mb-3">Google OAuth</h3>
               <p className="text-muted-foreground mb-3">We use Google OAuth for authentication. When you sign in:</p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-                <li>Google's Privacy Policy applies: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://policies.google.com/privacy</a></li>
+                <li>Google&apos;s Privacy Policy applies: <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">https://policies.google.com/privacy</a></li>
                 <li>We receive only the minimum information necessary for authentication</li>
               </ul>
 
@@ -141,7 +141,7 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Children's Privacy</h2>
+              <h2 className="text-2xl font-semibold mb-4">Children&apos;s Privacy</h2>
               <p className="text-muted-foreground">
                 MCP Assistant is not intended for children under 13. We do not knowingly collect information from children under 13.
               </p>
@@ -151,7 +151,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-semibold mb-4">Changes to This Policy</h2>
               <p className="text-muted-foreground mb-3">We may update this privacy policy from time to time. When we do:</p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
-                <li>The "Last Updated" date will be revised</li>
+                <li>The &quot;Last Updated&quot; date will be revised</li>
                 <li>Material changes will be communicated through our website</li>
                 <li>Continued use of the service constitutes acceptance of changes</li>
               </ul>
@@ -161,7 +161,7 @@ export default function PrivacyPolicy() {
               <h2 className="text-2xl font-semibold mb-4">Data Retention</h2>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
                 <li><strong>Account Data:</strong> Stored until you delete your account</li>
-                <li><strong>Authentication Tokens:</strong> Expire according to Google's OAuth token lifetime</li>
+                <li><strong>Authentication Tokens:</strong> Expire according to Google&apos;s OAuth token lifetime</li>
                 <li><strong>Redis Cache:</strong> Automatically expires after 24 hours</li>
                 <li><strong>Session Data:</strong> Cleared when you sign out</li>
               </ul>

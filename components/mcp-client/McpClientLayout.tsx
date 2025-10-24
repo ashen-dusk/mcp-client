@@ -632,7 +632,6 @@ export default function McpClientLayout({
                           onAction={onServerAction}
                           onEdit={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleEditServer : undefined}
                           onDelete={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleDeleteServer : undefined}
-                          session={session}
                         />
                       </div>
                     </div>
