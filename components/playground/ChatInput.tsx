@@ -254,7 +254,7 @@ export default function ChatInput({
 
   const getMicrophoneColor = () => {
     if (pushToTalkState === "recording") {
-      return "bg-gray-800 hover:bg-gray-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 animate-pulse";
+      return "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 animate-pulse";
     } else if (pushToTalkState === "transcribing") {
       return "bg-gray-600 hover:bg-gray-700 dark:bg-zinc-600 dark:hover:bg-zinc-500";
     }
