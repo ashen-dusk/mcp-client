@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, CheckCircle2, XCircle, ChevronDown, Copy, Wrench } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, ChevronDown, Copy } from "lucide-react";
 import * as React from "react";
 
 type ToolCallData = Record<string, unknown> | string | null | undefined;
@@ -41,35 +41,35 @@ export default function MCPToolCall({
         const errorMessage = JSON.stringify(result.error);
         console.log(errorMessage, "MCPToolCall Error");
         return {
-          icon: <XCircle className="w-5 h-5 text-red-500" />,
+          icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
           bgColor: "bg-red-50 dark:bg-red-950/20",
-          borderColor: "border-red-200 dark:border-red-800",
-          textColor: "text-red-700 dark:text-red-400",
+          borderColor: "border-red-300 dark:border-red-800",
+          textColor: "text-red-900 dark:text-red-300",
         };
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hasError = result === "" ? false : (typeof result === "object" && result !== null && "content" in result ? JSON.parse((result as any).content?.[0]?.text || "{}")?.error : false);
         if (hasError) {
           return {
-            icon: <XCircle className="w-5 h-5 text-red-500" />,
+            icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
             bgColor: "bg-red-50 dark:bg-red-950/20",
-            borderColor: "border-red-200 dark:border-red-800",
-            textColor: "text-red-700 dark:text-red-400",
+            borderColor: "border-red-300 dark:border-red-800",
+            textColor: "text-red-900 dark:text-red-300",
           };
         }
         return {
-          icon: <CheckCircle2 className="w-5 h-5 text-green-500" />,
+          icon: <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />,
           bgColor: "bg-green-50 dark:bg-green-950/20",
-          borderColor: "border-green-200 dark:border-green-800",
-          textColor: "text-green-700 dark:text-green-400",
+          borderColor: "border-green-300 dark:border-green-800",
+          textColor: "text-green-900 dark:text-green-300",
         };
       }
     }
     return {
-      icon: <Loader2 className="w-5 h-5 animate-spin text-blue-500" />,
-      bgColor: "bg-blue-50 dark:bg-blue-950/20",
-      borderColor: "border-blue-200 dark:border-blue-800",
-      textColor: "text-blue-700 dark:text-blue-400",
+      icon: <Loader2 className="w-5 h-5 animate-spin text-gray-700 dark:text-gray-300" />,
+      bgColor: "bg-gray-50 dark:bg-zinc-800",
+      borderColor: "border-gray-300 dark:border-zinc-600",
+      textColor: "text-gray-900 dark:text-white",
     };
   };
 
@@ -81,7 +81,7 @@ export default function MCPToolCall({
 
   return (
     <div
-      className={`${config.bgColor} ${config.borderColor} border-l-4 rounded overflow-hidden transition-all duration-200`}
+      className={`${config.bgColor} ${config.borderColor} border-l-4 rounded-md overflow-hidden transition-all duration-200`}
     >
       <div
         className="p-3 flex items-center justify-between cursor-pointer hover:bg-opacity-80"
@@ -92,12 +92,9 @@ export default function MCPToolCall({
             {config.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              <span className={`${config.textColor} font-medium text-sm truncate`}>
-                {name || "MCP Tool Call"}
-              </span>
-            </div>
+            <span className={`${config.textColor} font-medium text-sm truncate block`}>
+              {name || "MCP Tool Call"}
+            </span>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {status === "complete" ? "Completed" : "In Progress"}
             </p>
@@ -109,11 +106,11 @@ export default function MCPToolCall({
       </div>
 
       {isOpen && (
-        <div className="px-3 pb-3 space-y-2 border-t border-gray-200 dark:border-gray-700 pt-2">
+        <div className="px-3 pb-3 space-y-2 border-t border-gray-300 dark:border-zinc-600 pt-2">
           {args && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
                   Parameters
                 </div>
                 <button
@@ -121,13 +118,13 @@ export default function MCPToolCall({
                     e.stopPropagation();
                     handleCopy(format(args));
                   }}
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <Copy className="w-3 h-3" />
                   Copy
                 </button>
               </div>
-              <pre className="text-xs bg-gray-50 dark:bg-gray-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-200 dark:border-gray-700">
+              <pre className="text-xs bg-white dark:bg-zinc-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100">
                 {format(args)}
               </pre>
             </div>
@@ -136,7 +133,7 @@ export default function MCPToolCall({
           {status === "complete" && result && (
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <div className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
                   Result
                 </div>
                 <button
@@ -144,13 +141,13 @@ export default function MCPToolCall({
                     e.stopPropagation();
                     handleCopy(format(result));
                   }}
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <Copy className="w-3 h-3" />
                   Copy
                 </button>
               </div>
-              <pre className="text-xs bg-gray-50 dark:bg-gray-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-200 dark:border-gray-700">
+              <pre className="text-xs bg-white dark:bg-zinc-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100">
                 {format(result)}
               </pre>
             </div>

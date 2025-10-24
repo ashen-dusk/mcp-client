@@ -254,9 +254,9 @@ export default function ChatInput({
 
   const getMicrophoneColor = () => {
     if (pushToTalkState === "recording") {
-      return "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 animate-pulse";
+      return "bg-gray-800 hover:bg-gray-900 dark:bg-zinc-700 dark:hover:bg-zinc-600 animate-pulse";
     } else if (pushToTalkState === "transcribing") {
-      return "bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500";
+      return "bg-gray-600 hover:bg-gray-700 dark:bg-zinc-600 dark:hover:bg-zinc-500";
     }
     return "bg-gray-500 hover:bg-gray-600 dark:bg-zinc-600 dark:hover:bg-zinc-500";
   };
@@ -268,8 +268,8 @@ export default function ChatInput({
         <DialogContent className="sm:max-w-[380px]">
           <DialogHeader>
             <div className="flex items-center gap-2 mb-1">
-              <div className="p-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <div className="p-1.5 rounded-full bg-gray-100 dark:bg-zinc-800">
+                <Lock className="h-4 w-4 text-gray-900 dark:text-white" />
               </div>
               <DialogTitle className="text-base">Sign In Required</DialogTitle>
             </div>
@@ -281,12 +281,12 @@ export default function ChatInput({
             <Button
               variant="outline"
               onClick={() => setShowAuthDialog(false)}
-              className="flex-1"
+              className="flex-1 cursor-pointer"
             >
               Cancel
             </Button>
             <Link href="/api/auth/signin" className="flex-1">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button className="w-full bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black cursor-pointer">
                 Sign In
               </Button>
             </Link>
@@ -294,8 +294,8 @@ export default function ChatInput({
         </DialogContent>
       </Dialog>
 
-      <div className="w-full px-2 sm:px-4 py-2 sm:py-3">
-        <div className="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-blue-200 dark:border-zinc-700 shadow-xl hover:border-blue-300 dark:hover:border-zinc-600 transition-colors">
+      <div className="w-full px-2 sm:px-4">
+        <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border-2 border-gray-400 dark:border-zinc-700 shadow-xl hover:border-gray-500 dark:hover:border-zinc-600 transition-colors">
         <div className="flex items-end p-2 sm:p-4">
           {/* Message Input Area */}
           <div className="flex-1 mr-1.5 sm:mr-3">
@@ -304,10 +304,10 @@ export default function ChatInput({
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type your prompt..."
-              className="w-full resize-none bg-transparent border-0 outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 text-sm sm:text-[15px] leading-relaxed"
+              className="w-full resize-none bg-transparent border-0 outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-[15px] leading-relaxed"
               rows={1}
               style={{
-                minHeight: '50px',
+                minHeight: '60px',
                 maxHeight: '120px',
                 overflowY: message.split('\n').length > 3 ? 'auto' : 'hidden'
               }}
@@ -333,9 +333,9 @@ export default function ChatInput({
 
             {showModelDropdown && (
               <>
-                <div className="absolute bottom-full mb-2 right-0 md:right-0 left-0 md:left-auto bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/50 rounded-2xl shadow-2xl backdrop-blur-xl z-50 w-full md:min-w-[340px] md:max-w-[400px] max-h-[70vh] overflow-hidden">
+                <div className="absolute bottom-full mb-2 right-0 md:right-0 left-0 md:left-auto bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/50 rounded-2xl shadow-2xl backdrop-blur-xl z-50 w-full md:min-w-[340px] md:max-w-[400px] max-h-[55vh] overflow-hidden">
                   {/* Models List */}
-                  <div className="overflow-y-auto max-h-[70vh] scrollbar-minimal">
+                  <div className="overflow-y-auto max-h-[55vh] scrollbar-minimal">
                     <div className="p-2">
                       {AVAILABLE_MODELS.map((model, index) => (
                         <button
@@ -343,31 +343,23 @@ export default function ChatInput({
                           onClick={() => handleModelChange(model.id)}
                           className={`w-full group relative flex flex-col px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-all duration-150
                             ${selectedModel === model.id
-                              ? 'bg-blue-50 dark:bg-blue-950/20'
+                              ? 'bg-gray-100 dark:bg-zinc-800'
                               : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'
                             }`}
                         >
                           {/* Name & Check Icon */}
                           <div className="flex items-center justify-between w-full mb-1.5">
                             <div className="flex items-center gap-2 flex-1">
-                              <span className={`text-[11px] sm:text-xs font-medium ${selectedModel === model.id ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                              <span className={`text-[11px] sm:text-xs font-medium ${selectedModel === model.id ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-gray-100'}`}>
                                 {model.name}
                               </span>
                               {/* Provider & Tag Badges */}
                               <div className="flex items-center gap-1 flex-wrap">
-                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold border
-                                  ${model.provider === 'OpenAI' ? 'text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700' :
-                                    model.provider === 'DeepSeek' ? 'text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-700' :
-                                    model.provider === 'Google' ? 'text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700' :
-                                    model.provider === 'Meta' ? 'text-pink-700 dark:text-pink-400 border-pink-300 dark:border-pink-700' :
-                                    model.provider === 'Qwen' ? 'text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-700' :
-                                    model.provider === 'Microsoft' ? 'text-cyan-700 dark:text-cyan-400 border-cyan-300 dark:border-cyan-700' :
-                                    'text-gray-700 dark:text-gray-400 border-gray-300 dark:border-gray-600'
-                                  }`}>
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold border text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600">
                                   {model.provider}
                                 </span>
                                 {model.id.includes(':free') && (
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-700">
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">
                                     OpenRouter
                                   </span>
                                 )}
@@ -377,7 +369,7 @@ export default function ChatInput({
                               </div>
                             </div>
                             {selectedModel === model.id && (
-                              <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
+                              <CheckCircle className="w-4 h-4 text-gray-900 dark:text-white flex-shrink-0 ml-2" />
                             )}
                           </div>
 
@@ -422,7 +414,7 @@ export default function ChatInput({
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim()}
-            className="bg-blue-600 hover:bg-blue-700 dark:bg-zinc-600 dark:hover:bg-zinc-500 disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:opacity-50
+            className="bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black disabled:bg-gray-300 dark:disabled:bg-zinc-700 disabled:opacity-50
                      text-white rounded-lg p-1.5 sm:p-2 h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center
                      transition-all duration-200 shadow-lg cursor-pointer disabled:cursor-not-allowed"
           >

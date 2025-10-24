@@ -5,6 +5,7 @@ import "@copilotkit/react-ui/styles.css";
 import ChatInput from "../../components/playground/ChatInput";
 import { usePushToTalk } from "@/hooks/usePushToTalk";
 import { Message } from "@copilotkit/shared";
+import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -34,7 +35,14 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 
 const PlaygroundPage = () => {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div
+    className="max-w-2xl mx-auto"
+    style={
+      {
+        "--copilot-kit-background-color": "var(--background)",
+      } as CopilotKitCSSProperties
+    }
+    >
       <ToolRenderer />
       <CopilotChat
         labels={{
