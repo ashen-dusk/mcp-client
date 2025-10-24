@@ -37,34 +37,63 @@ export default function MCPToolCall({
   const getStatusConfig = () => {
     if (status === "complete") {
       // console.log(result, "MCPToolCall Result");
+
+      // Check for explicit error in result
       if (result && typeof result === "object" && "error" in result) {
-        const errorMessage = JSON.stringify(result.error);
-        console.log(errorMessage, "MCPToolCall Error");
+        console.log(JSON.stringify(result.error), "MCPToolCall Error");
         return {
           icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
           bgColor: "bg-red-50 dark:bg-red-950/20",
           borderColor: "border-red-300 dark:border-red-800",
           textColor: "text-red-900 dark:text-red-300",
         };
-      } else {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const hasError = result === "" ? false : (typeof result === "object" && result !== null && "content" in result ? JSON.parse((result as any).content?.[0]?.text || "{}")?.error : false);
-        if (hasError) {
-          return {
-            icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
-            bgColor: "bg-red-50 dark:bg-red-950/20",
-            borderColor: "border-red-300 dark:border-red-800",
-            textColor: "text-red-900 dark:text-red-300",
-          };
+      }
+
+      // Check for error in nested content structure
+      if (result && typeof result === "object" && "content" in result) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const contentText = (result as any).content?.[0]?.text;
+          if (contentText) {
+            const parsed = JSON.parse(contentText);
+            if (parsed.error) {
+              console.log(JSON.stringify(parsed.error), "MCPToolCall Nested Error");
+              return {
+                icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
+                bgColor: "bg-red-50 dark:bg-red-950/20",
+                borderColor: "border-red-300 dark:border-red-800",
+                textColor: "text-red-900 dark:text-red-300",
+              };
+            }
+          }
+        } catch (e) {
+          // If parsing fails, continue to success case
+          console.log("Failed to parse content", e);
         }
+      }
+
+      // Check for error in data.response_data structure
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (result && typeof result === "object" && "data" in result && (result as any).data?.response_data?.error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        console.log(JSON.stringify((result as any).data.response_data.error), "MCPToolCall Response Data Error");
         return {
-          icon: <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />,
-          bgColor: "bg-green-50 dark:bg-green-950/20",
-          borderColor: "border-green-300 dark:border-green-800",
-          textColor: "text-green-900 dark:text-green-300",
+          icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
+          bgColor: "bg-red-50 dark:bg-red-950/20",
+          borderColor: "border-red-300 dark:border-red-800",
+          textColor: "text-red-900 dark:text-red-300",
         };
       }
+
+      // Default to success if no error found
+      return {
+        icon: <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />,
+        bgColor: "bg-green-50 dark:bg-green-950/20",
+        borderColor: "border-green-300 dark:border-green-800",
+        textColor: "text-green-900 dark:text-green-300",
+      };
     }
+
     return {
       icon: <Loader2 className="w-5 h-5 animate-spin text-gray-700 dark:text-gray-300" />,
       bgColor: "bg-gray-50 dark:bg-zinc-800",
