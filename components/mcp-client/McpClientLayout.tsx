@@ -7,6 +7,7 @@ import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import ServerFormModal from "./ServerFormModal";
@@ -260,7 +261,22 @@ export default function McpClientLayout({
               <div className="p-4 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Wrench className="h-5 w-5 text-primary" />
+                    <div className="relative h-5 w-5">
+                      <Image
+                        src="/technologies/mcp-light.webp"
+                        alt="MCP"
+                        width={20}
+                        height={20}
+                        className="dark:hidden"
+                      />
+                      <Image
+                        src="/technologies/mcp.webp"
+                        alt="MCP"
+                        width={20}
+                        height={20}
+                        className="hidden dark:block"
+                      />
+                    </div>
                     <span className="font-medium text-sm">Servers</span>
                   </div>
                   <Button
@@ -743,7 +759,22 @@ export default function McpClientLayout({
                 className="flex-1 flex items-center justify-center min-h-[calc(100vh-120px)]"
               >
                 <div className="text-center">
-                  <Wrench className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <div className="relative h-16 w-16 mx-auto mb-4">
+                    <Image
+                      src="/technologies/mcp-light.webp"
+                      alt="MCP"
+                      width={64}
+                      height={64}
+                      className="dark:hidden opacity-50"
+                    />
+                    <Image
+                      src="/technologies/mcp.webp"
+                      alt="MCP"
+                      width={64}
+                      height={64}
+                      className="hidden dark:block opacity-50"
+                    />
+                  </div>
                   <h3 className="text-lg font-medium mb-2">Select a Server</h3>
                   <p className="text-muted-foreground">
                     Choose a server from the sidebar to view its tools and manage it
