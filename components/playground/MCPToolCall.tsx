@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, CheckCircle2, XCircle, ChevronDown, Copy } from "lucide-react";
+import { Loader2, CheckCircle2, ChevronDown, Copy } from "lucide-react";
 import * as React from "react";
 
 type ToolCallData = Record<string, unknown> | string | null | undefined;
@@ -12,114 +12,65 @@ interface ToolCallProps {
   result?: ToolCallData;
 }
 
-export default function MCPToolCall({
-  status,
-  name = "",
-  args,
-  result,
-}: ToolCallProps) {
+const STATUS_CONFIGS = {
+  success: {
+    icon: <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />,
+    bgColor: "bg-green-50 dark:bg-green-950/20",
+    borderColor: "border-green-300 dark:border-green-800",
+    textColor: "text-green-900 dark:text-green-300",
+  },
+  loading: {
+    icon: <Loader2 className="w-5 h-5 animate-spin text-gray-700 dark:text-gray-300" />,
+    bgColor: "bg-gray-50 dark:bg-zinc-800",
+    borderColor: "border-gray-300 dark:border-zinc-600",
+    textColor: "text-gray-900 dark:text-white",
+  },
+} as const;
+
+const formatContent = (content: ToolCallData): string => {
+  if (!content) return "";
+  const text = typeof content === "object" ? JSON.stringify(content, null, 2) : String(content);
+  const replacements: Record<string, string> = { n: "\n", t: "\t", '"': '"', "\\": "\\" };
+  return text.replace(/\\([nt"\\])/g, (_, char: string) => replacements[char] || char);
+};
+
+const CodeSection = ({ title, content, onCopy }: { title: string; content: string; onCopy: (e: React.MouseEvent) => void }) => (
+  <div>
+    <div className="flex items-center justify-between mb-1.5">
+      <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+        {title}
+      </div>
+      <button
+        onClick={onCopy}
+        className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+      >
+        <Copy className="w-3 h-3" />
+        Copy
+      </button>
+    </div>
+    <pre className="text-xs bg-white dark:bg-zinc-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100">
+      {content}
+    </pre>
+  </div>
+);
+
+export default function MCPToolCall({ status, name = "", args, result }: ToolCallProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  // Format content for display
-  const format = (content: ToolCallData): string => {
-    if (!content) return "";
-    const text =
-      typeof content === "object"
-        ? JSON.stringify(content, null, 2)
-        : String(content);
-    return text
-      .replace(/\\n/g, "\n")
-      .replace(/\\t/g, "\t")
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, "\\");
-  };
-
-  const getStatusConfig = () => {
-    if (status === "complete") {
-      // console.log(result, "MCPToolCall Result");
-
-      // Check for explicit error in result
-      if (result && typeof result === "object" && "error" in result) {
-        console.log(JSON.stringify(result.error), "MCPToolCall Error");
-        return {
-          icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
-          bgColor: "bg-red-50 dark:bg-red-950/20",
-          borderColor: "border-red-300 dark:border-red-800",
-          textColor: "text-red-900 dark:text-red-300",
-        };
-      }
-
-      // Check for error in nested content structure
-      if (result && typeof result === "object" && "content" in result) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const contentText = (result as any).content?.[0]?.text;
-          if (contentText) {
-            const parsed = JSON.parse(contentText);
-            if (parsed.error) {
-              console.log(JSON.stringify(parsed.error), "MCPToolCall Nested Error");
-              return {
-                icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
-                bgColor: "bg-red-50 dark:bg-red-950/20",
-                borderColor: "border-red-300 dark:border-red-800",
-                textColor: "text-red-900 dark:text-red-300",
-              };
-            }
-          }
-        } catch (e) {
-          // If parsing fails, continue to success case
-          console.log("Failed to parse content", e);
-        }
-      }
-
-      // Check for error in data.response_data structure
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (result && typeof result === "object" && "data" in result && (result as any).data?.response_data?.error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        console.log(JSON.stringify((result as any).data.response_data.error), "MCPToolCall Response Data Error");
-        return {
-          icon: <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />,
-          bgColor: "bg-red-50 dark:bg-red-950/20",
-          borderColor: "border-red-300 dark:border-red-800",
-          textColor: "text-red-900 dark:text-red-300",
-        };
-      }
-
-      // Default to success if no error found
-      return {
-        icon: <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />,
-        bgColor: "bg-green-50 dark:bg-green-950/20",
-        borderColor: "border-green-300 dark:border-green-800",
-        textColor: "text-green-900 dark:text-green-300",
-      };
-    }
-
-    return {
-      icon: <Loader2 className="w-5 h-5 animate-spin text-gray-700 dark:text-gray-300" />,
-      bgColor: "bg-gray-50 dark:bg-zinc-800",
-      borderColor: "border-gray-300 dark:border-zinc-600",
-      textColor: "text-gray-900 dark:text-white",
-    };
-  };
-
-  const config = getStatusConfig();
+  const config = status === "complete" ? STATUS_CONFIGS.success : STATUS_CONFIGS.loading;
 
   const handleCopy = (content: string) => {
     navigator.clipboard?.writeText(content);
   };
 
   return (
-    <div
-      className={`${config.bgColor} ${config.borderColor} border-l-4 rounded-md overflow-hidden transition-all duration-200`}
-    >
+    <div className={`${config.bgColor} ${config.borderColor} border-l-4 rounded-md overflow-hidden transition-all duration-200`}>
       <div
         className="p-3 flex items-center justify-between cursor-pointer hover:bg-opacity-80"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center gap-3 flex-1">
-          <div className="flex items-center justify-center">
-            {config.icon}
-          </div>
+          {config.icon}
           <div className="flex-1 min-w-0">
             <span className={`${config.textColor} font-medium text-sm truncate block`}>
               {name || "MCP Tool Call"}
@@ -129,57 +80,30 @@ export default function MCPToolCall({
             </p>
           </div>
         </div>
-        <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </div>
 
       {isOpen && (
         <div className="px-3 pb-3 space-y-2 border-t border-gray-300 dark:border-zinc-600 pt-2">
           {args && (
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                  Parameters
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopy(format(args));
-                  }}
-                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
-                >
-                  <Copy className="w-3 h-3" />
-                  Copy
-                </button>
-              </div>
-              <pre className="text-xs bg-white dark:bg-zinc-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100">
-                {format(args)}
-              </pre>
-            </div>
+            <CodeSection
+              title="Parameters"
+              content={formatContent(args)}
+              onCopy={(e) => {
+                e.stopPropagation();
+                handleCopy(formatContent(args));
+              }}
+            />
           )}
-
           {status === "complete" && result && (
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
-                  Result
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopy(format(result));
-                  }}
-                  className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
-                >
-                  <Copy className="w-3 h-3" />
-                  Copy
-                </button>
-              </div>
-              <pre className="text-xs bg-white dark:bg-zinc-900 p-2.5 rounded overflow-auto max-h-[180px] font-mono border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-gray-100">
-                {format(result)}
-              </pre>
-            </div>
+            <CodeSection
+              title="Result"
+              content={formatContent(result)}
+              onCopy={(e) => {
+                e.stopPropagation();
+                handleCopy(formatContent(result));
+              }}
+            />
           )}
         </div>
       )}
