@@ -12,7 +12,8 @@ import {
   ChevronUp,
   Rss,
   Globe,
-  Terminal
+  Terminal,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +21,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { McpServer } from "@/types/mcp";
 import { toast } from "react-hot-toast";
+import { Session } from "next-auth";
+import Link from "next/link";
 
 const serverSchema = z.object({
   name: z.string().min(1, "Server name is required"),
@@ -46,14 +50,16 @@ interface ServerFormModalProps {
   onSubmit: (data: ServerFormData) => Promise<void>;
   server?: McpServer | null;
   mode: 'add' | 'edit';
+  session: Session | null;
 }
 
-export default function ServerFormModal({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  server, 
-  mode 
+export default function ServerFormModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  server,
+  mode,
+  session
 }: ServerFormModalProps) {
   const [showHeaders, setShowHeaders] = useState(false);
   const [transportType, setTransportType] = useState<"sse" | "streamable_http" | "stdio">("sse");
@@ -125,6 +131,11 @@ export default function ServerFormModal({
   }, [isOpen, mode, server, reset]);
 
   const handleFormSubmit = async (data: ServerFormData) => {
+    if (!session) {
+      toast.error("Please sign in to save server configuration");
+      return;
+    }
+
     try {
       await onSubmit(data);
       onClose();
@@ -146,6 +157,17 @@ export default function ServerFormModal({
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col flex-1 min-h-0">
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-minimal">
+
+          {/* Authentication Warning */}
+          {!session && (
+            <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+              <AlertDescription className="text-sm text-amber-800 dark:text-amber-200">
+                Please <Link href="/api/auth/signin" className="font-semibold underline hover:text-amber-900 dark:hover:text-amber-100">sign in</Link> to save your server configuration.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-1">
             <Label htmlFor="name" className="text-xs">Server Name</Label>
             <Input
@@ -330,8 +352,8 @@ export default function ServerFormModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : mode === 'add' ? 'Add Server' : 'Update Server'}
+            <Button type="submit" disabled={!session || isSubmitting}>
+              {isSubmitting ? "Saving..." : !session ? (mode === 'add' ? "Sign in to Add" : "Sign in to Update") : mode === 'add' ? 'Add Server' : 'Update Server'}
             </Button>
           </div>
         </form>

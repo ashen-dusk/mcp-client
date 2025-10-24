@@ -8,13 +8,23 @@ import {
   ArrowUp,
   Mic,
   MicOff,
-  Loader2
+  Loader2,
+  Lock
 } from "lucide-react";
 import { PushToTalkState } from "@/hooks/usePushToTalk";
 import { useCoAgent } from "@copilotkit/react-core";
 import { AgentState } from "@/types/mcp";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import Link from "next/link";
 
 interface CustomChatInputProps {
   onSendMessage: (message: string) => void;
@@ -187,6 +197,7 @@ export default function ChatInput({
 
   const [message, setMessage] = useState("");
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const handleModelChange = (modelId: string) => {
     // Update local state
@@ -197,6 +208,11 @@ export default function ChatInput({
   };
 
   const handleSendMessage = () => {
+    if (!session) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     if (message.trim()) {
       onSendMessage(message);
       setMessage("");
@@ -211,6 +227,11 @@ export default function ChatInput({
   };
 
   const handleMicrophoneClick = () => {
+    if (!session) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     if (!onPushToTalkStateChange) return;
 
     if (pushToTalkState === "idle") {
@@ -241,8 +262,40 @@ export default function ChatInput({
   };
 
   return (
-    <div className="w-full px-2 sm:px-4 py-2 sm:py-3">
-      <div className="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-blue-200 dark:border-zinc-700 shadow-xl hover:border-blue-300 dark:hover:border-zinc-600 transition-colors">
+    <>
+      {/* Authentication Required Dialog */}
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent className="sm:max-w-[380px]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <DialogTitle className="text-base">Sign In Required</DialogTitle>
+            </div>
+            <DialogDescription className="text-sm leading-relaxed">
+              Sign in to start chatting with the AI assistant.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAuthDialog(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Link href="/api/auth/signin" className="flex-1">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                Sign In
+              </Button>
+            </Link>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="w-full px-2 sm:px-4 py-2 sm:py-3">
+        <div className="relative bg-white dark:bg-zinc-800 rounded-2xl border-2 border-blue-200 dark:border-zinc-700 shadow-xl hover:border-blue-300 dark:hover:border-zinc-600 transition-colors">
         <div className="flex items-end p-2 sm:p-4">
           {/* Message Input Area */}
           <div className="flex-1 mr-1.5 sm:mr-3">
@@ -377,6 +430,7 @@ export default function ChatInput({
           </Button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

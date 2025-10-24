@@ -128,6 +128,11 @@ export default function McpClientLayout({
   };
 
   const handleToggleEnabled = async (serverName: string, currentEnabled: boolean) => {
+    if (!session) {
+      toast.error("Please sign in to control context inclusion");
+      return;
+    }
+
     // Set loading state
     setToggleLoading(serverName);
 
@@ -584,19 +589,24 @@ export default function McpClientLayout({
                       <div className="flex items-center gap-3">
                         <h2 className="text-xl sm:text-2xl font-semibold">{selectedServer.name}</h2>
                         <div className="flex items-center gap-2">
-                          <Switch
-                            checked={selectedServer.enabled}
-                            onCheckedChange={() => handleToggleEnabled(selectedServer.name, selectedServer.enabled)}
-                            disabled={toggleLoading === selectedServer.name}
-                            id="server-enabled"
-                            className="cursor-pointer"
-                          />
-                          {toggleLoading === selectedServer.name && (
-                            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-                          )}
-                          <label htmlFor="server-enabled" className="text-xs text-muted-foreground cursor-pointer">
-                            {toggleLoading === selectedServer.name ? "Updating..." : (selectedServer.enabled ? "Included in context" : "Excluded from context")}
-                          </label>
+                          <div
+                            className="flex items-center gap-2"
+                            title={!session ? "Sign in to control context inclusion" : ""}
+                          >
+                            <Switch
+                              checked={selectedServer.enabled}
+                              onCheckedChange={() => handleToggleEnabled(selectedServer.name, selectedServer.enabled)}
+                              disabled={!session || toggleLoading === selectedServer.name}
+                              id="server-enabled"
+                              className="cursor-pointer"
+                            />
+                            {toggleLoading === selectedServer.name && (
+                              <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                            )}
+                            <label htmlFor="server-enabled" className="text-xs text-muted-foreground cursor-pointer">
+                              {toggleLoading === selectedServer.name ? "Updating..." : (selectedServer.enabled ? "Included in context" : "Excluded from context")}
+                            </label>
+                          </div>
                         </div>
                       </div>
 
@@ -606,6 +616,7 @@ export default function McpClientLayout({
                           onAction={onServerAction}
                           onEdit={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleEditServer : undefined}
                           onDelete={!(selectedServer.isPublic && selectedServer.owner !== session?.user?.email) ? handleDeleteServer : undefined}
+                          session={session}
                         />
                       </div>
                     </div>
@@ -751,6 +762,7 @@ export default function McpClientLayout({
         onSubmit={handleModalSubmit}
         server={editingServer}
         mode={modalMode}
+        session={session}
       />
 
       {/* Delete Confirmation Dialog */}

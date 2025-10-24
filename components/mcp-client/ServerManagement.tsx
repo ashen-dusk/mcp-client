@@ -2,36 +2,40 @@
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { 
-  Power, 
-  RotateCcw, 
-  Play, 
-  Pause, 
+import {
+  Power,
+  RotateCcw,
+  Play,
+  Pause,
   MoreVertical,
   CheckCircle,
   XCircle,
   Loader2,
   Edit,
-  Trash2
+  Trash2,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { McpServer } from "@/types/mcp";
+import { Session } from "next-auth";
+import Link from "next/link";
 
 interface ServerManagementProps {
   server: McpServer;
   onAction: (serverName: string, action: 'restart' | 'activate' | 'deactivate') => Promise<unknown>;
   onEdit?: (server: McpServer) => void;
   onDelete?: (serverName: string) => void;
+  session: Session | null;
 }
 
-export default function ServerManagement({ server, onAction, onEdit, onDelete }: ServerManagementProps) {
+export default function ServerManagement({ server, onAction, onEdit, onDelete, session }: ServerManagementProps) {
   const [loading, setLoading] = useState<string | null>(null);
 
   const handleAction = async (action: 'restart' | 'activate' | 'deactivate') => {
@@ -84,7 +88,7 @@ export default function ServerManagement({ server, onAction, onEdit, onDelete }:
 
   const isActionDisabled = (action: string) => {
     if (loading) return true;
-    
+
     switch (action) {
       case 'activate':
         return server.connectionStatus?.toUpperCase() === "CONNECTED";
@@ -99,30 +103,30 @@ export default function ServerManagement({ server, onAction, onEdit, onDelete }:
 
   return (
     <div className="flex items-center gap-3">
-      {/* Status Badge */}
-      <div className="flex items-center gap-2">
-        <div 
-          className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 ${
-            server.connectionStatus?.toUpperCase() === "CONNECTED"
-              ? "bg-green-500 hover:bg-green-600 animate-pulse"
-              : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
-              ? "bg-yellow-500 hover:bg-yellow-600"
-              : server.connectionStatus?.toUpperCase() === "FAILED"
-              ? "bg-red-500 hover:bg-red-600 animate-pulse"
-              : "bg-gray-400 hover:bg-gray-500"
-          }`}
-          title={`Status: ${server.connectionStatus || "Unknown"}`}
-        />
-        <Badge
-          variant={getStatusColor(server.connectionStatus)}
-          className="flex items-center gap-1"
-        >
-          {getStatusIcon(server.connectionStatus)}
-          <span>
-            {server.connectionStatus || "Unknown"}
-          </span>
-        </Badge>
-      </div>
+        {/* Status Badge */}
+        <div className="flex items-center gap-2">
+          <div
+            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 ${
+              server.connectionStatus?.toUpperCase() === "CONNECTED"
+                ? "bg-green-500 hover:bg-green-600 animate-pulse"
+                : server.connectionStatus?.toUpperCase() === "DISCONNECTED"
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : server.connectionStatus?.toUpperCase() === "FAILED"
+                ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                : "bg-gray-400 hover:bg-gray-500"
+            }`}
+            title={`Status: ${server.connectionStatus || "Unknown"}`}
+          />
+          <Badge
+            variant={getStatusColor(server.connectionStatus)}
+            className="flex items-center gap-1"
+          >
+            {getStatusIcon(server.connectionStatus)}
+            <span>
+              {server.connectionStatus || "Unknown"}
+            </span>
+          </Badge>
+        </div>
 
 
       {/* Action Buttons */}
