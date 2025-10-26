@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { 
+import {
   CONNECT_MCP_SERVER_MUTATION,
   DISCONNECT_MCP_SERVER_MUTATION,
   RESTART_MCP_SERVER_MUTATION,
@@ -70,10 +70,45 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json();
+
+    console.log('[MCP Actions] GraphQL Response:', JSON.stringify(result, null, 2));
+
     if (!response.ok || result.errors) {
       throw new Error(result.errors?.[0]?.message || 'Action failed');
     }
 
+    // Check if OAuth is required for activation or restart
+    if (action === 'activate' && result.data?.connectMcpServer?.requiresAuth) {
+      const connectResult = result.data.connectMcpServer;
+      console.log('[MCP Actions] OAuth required for activation! Returning auth URL:', connectResult.authorizationUrl);
+      return NextResponse.json({
+        data: {
+          connectMcpServer: {
+            ...connectResult,
+            requiresAuth: true,
+            authorizationUrl: connectResult.authorizationUrl,
+            state: connectResult.state
+          }
+        }
+      });
+    }
+
+    if (action === 'restart' && result.data?.restartMcpServer?.requiresAuth) {
+      const restartResult = result.data.restartMcpServer;
+      console.log('[MCP Actions] OAuth required for restart! Returning auth URL:', restartResult.authorizationUrl);
+      return NextResponse.json({
+        data: {
+          restartMcpServer: {
+            ...restartResult,
+            requiresAuth: true,
+            authorizationUrl: restartResult.authorizationUrl,
+            state: restartResult.state
+          }
+        }
+      });
+    }
+
+    console.log('[MCP Actions] No OAuth required, returning normal result');
     // Return the result with the updated server data
     return NextResponse.json(result);
   } catch (error) {

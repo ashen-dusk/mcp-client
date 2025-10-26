@@ -40,6 +40,9 @@ export const CONNECT_MCP_SERVER_MUTATION = `
       success
       message
       connectionStatus
+      requiresAuth
+      authorizationUrl
+      state
       server { ...McpServerFields }
     }
   }
@@ -121,6 +124,9 @@ export const RESTART_MCP_SERVER_MUTATION = `
       success
       message
       connectionStatus
+      requiresAuth
+      authorizationUrl
+      state
       server { ...McpServerFields }
     }
   }

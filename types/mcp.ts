@@ -12,14 +12,14 @@ export type McpServer = {
   owner?: string | null;
   url?: string | null;
   command?: string | null;
-  args?: any | null; // JSON type from Strawberry
+  args?: any | null;
   enabled: boolean;
   requiresOauth2: boolean;
   isPublic?: boolean;
   connectionStatus?: string | null;
   tools: ToolInfo[];
-  updated_at: string; // datetime as ISO string
-  createdAt?: string; // datetime as ISO string
+  updated_at: string; 
+  createdAt?: string; 
 };
 
 export type ConnectionResult = {
@@ -28,6 +28,9 @@ export type ConnectionResult = {
   tools: ToolInfo[];
   server_name: string;
   connectionStatus: string;
+  requiresAuth?: boolean;
+  authorizationUrl?: string | null;
+  state?: string | null;
 };
 
 export type DisconnectResult = {

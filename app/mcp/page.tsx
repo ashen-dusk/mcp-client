@@ -1,12 +1,14 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
 import { McpServer } from "@/types/mcp";
 
 export default function McpPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [publicServers, setPublicServers] = useState<McpServer[] | null>(null);
   const [userServers, setUserServers] = useState<McpServer[] | null>(null);
   const [publicError, setPublicError] = useState<string | null>(null);
@@ -61,20 +63,41 @@ export default function McpPage() {
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action,
           serverName
         }),
       });
 
       const result = await response.json();
+
+      console.log('[page.tsx] Server action result:', JSON.stringify(result, null, 2));
+
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
       }
 
+      // Check if OAuth authorization is required (NEW UNIFIED FLOW)
+      // This applies to both 'activate' and 'restart' actions
+      if (action === 'activate' || action === 'restart') {
+        const actionResult = result.data?.connectMcpServer || result.data?.restartMcpServer;
+
+        console.log('[page.tsx] Checking OAuth requirement...');
+        console.log('[page.tsx] requiresAuth:', actionResult?.requiresAuth);
+        console.log('[page.tsx] authorizationUrl:', actionResult?.authorizationUrl);
+
+        if (actionResult?.requiresAuth && actionResult?.authorizationUrl) {
+          console.log('[page.tsx] OAuth required! Redirecting to:', actionResult.authorizationUrl);
+          toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+          // Redirect to OAuth authorization URL
+          window.location.href = actionResult.authorizationUrl;
+          return actionResult; // Exit early, page will redirect
+        }
+      }
+
       // Get the response data for the specific action
-      const actionResponse = result.data?.connectMcpServer || 
-                            result.data?.disconnectMcpServer || 
+      const actionResponse = result.data?.connectMcpServer ||
+                            result.data?.disconnectMcpServer ||
                             result.data?.restartMcpServer;
       
       // Extract the server data from the response
@@ -237,6 +260,23 @@ export default function McpPage() {
       );
     });
   };
+
+  // Handle OAuth callback success
+  useEffect(() => {
+    const server = searchParams.get('server');
+    const step = searchParams.get('step');
+
+    if (step === 'success' && server) {
+      toast.success(`OAuth completed for ${server}! Server will connect automatically.`);
+      // Refresh servers to get updated status
+      setTimeout(() => {
+        fetchPublicServers();
+        if (session) {
+          fetchUserServers();
+        }
+      }, 1000);
+    }
+  }, [searchParams, session, fetchUserServers]);
 
   useEffect(() => {
     fetchPublicServers();

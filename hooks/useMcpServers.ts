@@ -84,51 +84,46 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
   // Restart server using GraphQL mutation
   const restartServer = useCallback(async (serverName: string) => {
     try {
-      const response = await fetch('/api/graphql', {
+      const response = await fetch('/api/mcp/actions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(session?.googleIdToken && {
-            'Authorization': `Bearer ${session.googleIdToken}`
-          }),
         },
         body: JSON.stringify({
-          query: `
-            mutation RestartMcpServer($name: String!) {
-              restartMcpServer(name: $name) {
-                status
-                message
-                tools {
-                  name
-                  description
-                  schema
-                }
-                serverName
-                connectionStatus
-              }
-            }
-          `,
-          variables: { name: serverName },
+          action: 'restart',
+          serverName
         }),
       });
 
       const result = await response.json();
-      
+
+      console.log('[useMcpServers] Restart result:', JSON.stringify(result, null, 2));
+
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to restart server');
       }
 
+      // Check if OAuth authorization is required
       const restartResult = result.data?.restartMcpServer;
+
+      if (restartResult?.requiresAuth && restartResult?.authorizationUrl) {
+        console.log('[useMcpServers] OAuth required for restart! Redirecting...');
+        toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+        // Redirect to OAuth authorization URL
+        window.location.href = restartResult.authorizationUrl;
+        return;
+      }
+
       if (restartResult) {
         // Update the server in local state
         setServers(prevServers => {
           if (!prevServers) return prevServers;
-          return prevServers.map(server => 
-            server.name === serverName 
+          return prevServers.map(server =>
+            server.name === serverName
               ? {
                   ...server,
-                  connectionStatus: restartResult.connectionStatus,
-                  tools: restartResult.tools || [],
+                  connectionStatus: restartResult.connectionStatus || restartResult.server?.connectionStatus,
+                  tools: restartResult.server?.tools || [],
                   updatedAt: new Date().toISOString(),
                 }
               : server
@@ -142,7 +137,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
       toast.error(errorMessage);
       throw err;
     }
-  }, [session?.googleIdToken]);
+  }, []);
 
   // Update server in local state
   const updateServer = useCallback((serverId: string, updates: Partial<McpServer>) => {
@@ -169,15 +164,42 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action,
           serverName
         }),
       });
 
       const result = await response.json();
+
+      console.log('[useMcpServers] Action result:', JSON.stringify(result, null, 2));
+
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
+      }
+
+      // Check if OAuth authorization is required
+      if (action === 'activate') {
+        const connectResult = result.data?.connectMcpServer;
+        console.log('[useMcpServers] Connect result:', connectResult);
+        console.log('[useMcpServers] Requires auth:', connectResult?.requiresAuth);
+        console.log('[useMcpServers] Auth URL:', connectResult?.authorizationUrl);
+
+        if (connectResult?.requiresAuth) {
+          const authUrl = connectResult.authorizationUrl;
+          if (authUrl) {
+            console.log('[useMcpServers] Redirecting to OAuth URL:', authUrl);
+            toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+            // Redirect to OAuth authorization URL
+            setTimeout(() => {
+              window.location.href = authUrl;
+            }, 500);
+            return;
+          } else {
+            console.error('[useMcpServers] OAuth required but no authorization URL provided');
+            throw new Error('OAuth required but no authorization URL provided');
+          }
+        }
       }
 
       // Update local state
@@ -186,9 +208,9 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
         return prevServers.map(server => {
           if (server.name === serverName) {
             const updatedServer = result.data?.connectMcpServer || result.data?.disconnectMcpServer;
-            const newConnectionStatus = updatedServer?.connectionStatus || 
+            const newConnectionStatus = updatedServer?.connectionStatus ||
               (action === 'activate' ? 'CONNECTED' : 'DISCONNECTED');
-            
+
             return {
               ...server,
               connectionStatus: newConnectionStatus,
