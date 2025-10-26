@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    console.error("TTS error:", error);
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Unknown error",

@@ -116,7 +116,7 @@ export default function McpClientLayout({
       setDeleteDialogOpen(false);
       setServerToDelete(null);
     } catch (error) {
-      console.error('Failed to delete server:', error);
+      // Error handled by toast notification
     }
   };
 

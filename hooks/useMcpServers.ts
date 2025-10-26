@@ -97,8 +97,6 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
 
       const result = await response.json();
 
-      console.log('[useMcpServers] Restart result:', JSON.stringify(result, null, 2));
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to restart server');
       }
@@ -107,7 +105,6 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
       const restartResult = result.data?.restartMcpServer;
 
       if (restartResult?.requiresAuth && restartResult?.authorizationUrl) {
-        console.log('[useMcpServers] OAuth required for restart! Redirecting...');
         toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
         // Redirect to OAuth authorization URL
         window.location.href = restartResult.authorizationUrl;
@@ -172,8 +169,6 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
 
       const result = await response.json();
 
-      console.log('[useMcpServers] Action result:', JSON.stringify(result, null, 2));
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
       }
@@ -181,14 +176,10 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
       // Check if OAuth authorization is required
       if (action === 'activate') {
         const connectResult = result.data?.connectMcpServer;
-        console.log('[useMcpServers] Connect result:', connectResult);
-        console.log('[useMcpServers] Requires auth:', connectResult?.requiresAuth);
-        console.log('[useMcpServers] Auth URL:', connectResult?.authorizationUrl);
 
         if (connectResult?.requiresAuth) {
           const authUrl = connectResult.authorizationUrl;
           if (authUrl) {
-            console.log('[useMcpServers] Redirecting to OAuth URL:', authUrl);
             toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
             // Redirect to OAuth authorization URL
             setTimeout(() => {
@@ -196,7 +187,6 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
             }, 500);
             return;
           } else {
-            console.error('[useMcpServers] OAuth required but no authorization URL provided');
             throw new Error('OAuth required but no authorization URL provided');
           }
         }
@@ -224,7 +214,6 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
 
       toast.success(`Server ${serverName} ${action}d successfully`);
     } catch (error) {
-      console.error(`Failed to ${action} server:`, error);
       toast.error(`Failed to ${action} server`);
       throw error;
     }

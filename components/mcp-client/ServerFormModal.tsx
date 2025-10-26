@@ -141,7 +141,6 @@ export default function ServerFormModal({
       onClose();
       toast.success(`Server ${mode === 'add' ? 'added' : 'updated'} successfully`);
     } catch (error) {
-      console.error('Form submission error:', error);
       toast.error(`Failed to ${mode === 'add' ? 'add' : 'update'} server`);
     }
   };

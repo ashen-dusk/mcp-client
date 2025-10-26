@@ -47,8 +47,7 @@ export async function POST(request: NextRequest) {
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
     if (!contentType?.includes('application/json')) {
-      const text = await response.text();
-      console.error('Non-JSON response from backend:', text);
+      await response.text();
       return NextResponse.json(
         { 
           errors: [{ 
@@ -88,8 +87,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
 
   } catch (error) {
-    console.error('GraphQL API error:', error);
-    
     // Handle specific error types
     if (error instanceof SyntaxError) {
       return NextResponse.json(

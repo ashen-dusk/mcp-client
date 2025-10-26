@@ -46,7 +46,6 @@ export default function ServerManagement({ server, onAction, onEdit, onDelete }:
         : `Server ${action}d successfully`;
       toast.success(message);
     } catch (error) {
-      console.error(`Failed to ${action} server:`, error);
       const errorMessage = error instanceof Error ? error.message : `Failed to ${action} server`;
       toast.error(errorMessage);
     } finally {

@@ -64,14 +64,11 @@ export async function POST(request: NextRequest) {
     // Check if response is JSON
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("Non-JSON response from GraphQL endpoint:", text);
+      await response.text();
       throw new Error("Backend server returned invalid response");
     }
 
     const result = await response.json();
-
-    console.log('[MCP Actions] GraphQL Response:', JSON.stringify(result, null, 2));
 
     if (!response.ok || result.errors) {
       throw new Error(result.errors?.[0]?.message || 'Action failed');
@@ -80,7 +77,6 @@ export async function POST(request: NextRequest) {
     // Check if OAuth is required for activation or restart
     if (action === 'activate' && result.data?.connectMcpServer?.requiresAuth) {
       const connectResult = result.data.connectMcpServer;
-      console.log('[MCP Actions] OAuth required for activation! Returning auth URL:', connectResult.authorizationUrl);
       return NextResponse.json({
         data: {
           connectMcpServer: {
@@ -95,7 +91,6 @@ export async function POST(request: NextRequest) {
 
     if (action === 'restart' && result.data?.restartMcpServer?.requiresAuth) {
       const restartResult = result.data.restartMcpServer;
-      console.log('[MCP Actions] OAuth required for restart! Returning auth URL:', restartResult.authorizationUrl);
       return NextResponse.json({
         data: {
           restartMcpServer: {
@@ -108,11 +103,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    console.log('[MCP Actions] No OAuth required, returning normal result');
     // Return the result with the updated server data
     return NextResponse.json(result);
   } catch (error) {
-    console.error("MCP action error:", error);
     return NextResponse.json(
       { errors: [{ message: error instanceof Error ? error.message : "Internal server error" }] }, 
       { status: 500 }

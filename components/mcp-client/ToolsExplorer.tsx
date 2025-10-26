@@ -32,11 +32,6 @@ export default function ToolsExplorer({ server }: ToolsExplorerProps) {
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'unavailable'>('all');
 
-  // Debug logging
-  console.log('ToolsExplorer - server:', server);
-  console.log('ToolsExplorer - server.tools:', server.tools);
-  console.log('ToolsExplorer - server.connectionStatus:', server.connectionStatus);
-
   // Handle different tools formats
   const tools = Array.isArray(server.tools) ? server.tools : [];
   

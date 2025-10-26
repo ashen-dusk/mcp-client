@@ -9,21 +9,12 @@ function decodeJwtExpiry(token: string): number | null {
     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
     return payload.exp ? payload.exp * 1000 : null;
   } catch (error) {
-    console.error("Error decoding JWT:", error);
     return null;
   }
 }
 
 async function refreshGoogleToken(token: JWT) {
   try {
-    console.log("[Auth] Current time:", new Date().toISOString());
-    console.log(
-      "[Auth] Token expiry:",
-      token.googleIdTokenExpires
-        ? new Date(token.googleIdTokenExpires as number).toISOString()
-        : "unknown"
-    );
-
     const response = await fetch("https://oauth2.googleapis.com/token", {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       method: "POST",
@@ -51,7 +42,6 @@ async function refreshGoogleToken(token: JWT) {
       refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
     };
   } catch (error) {
-    console.error("[Auth] Error refreshing Google token:", error);
     return { ...token, error: "RefreshAccessTokenError" };
   }
 }

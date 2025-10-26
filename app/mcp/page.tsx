@@ -71,8 +71,6 @@ export default function McpPage() {
 
       const result = await response.json();
 
-      console.log('[page.tsx] Server action result:', JSON.stringify(result, null, 2));
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Action failed');
       }
@@ -82,12 +80,7 @@ export default function McpPage() {
       if (action === 'activate' || action === 'restart') {
         const actionResult = result.data?.connectMcpServer || result.data?.restartMcpServer;
 
-        console.log('[page.tsx] Checking OAuth requirement...');
-        console.log('[page.tsx] requiresAuth:', actionResult?.requiresAuth);
-        console.log('[page.tsx] authorizationUrl:', actionResult?.authorizationUrl);
-
         if (actionResult?.requiresAuth && actionResult?.authorizationUrl) {
-          console.log('[page.tsx] OAuth required! Redirecting to:', actionResult.authorizationUrl);
           toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
           // Redirect to OAuth authorization URL
           window.location.href = actionResult.authorizationUrl;
@@ -107,11 +100,7 @@ export default function McpPage() {
       if (actionResponse && actionResponse.success === false) {
         // For failed operations, we still want to update the UI with the failed status
         // Don't throw an error, just mark it as failed
-        console.log('Server action failed:', actionResponse.message);
       }
-
-      // Debug logging
-      console.log('Server action response:', { action, serverName, updatedServer, result });
 
       // Update local state for both public and user servers
       setPublicServers(prevServers => {
@@ -175,7 +164,6 @@ export default function McpPage() {
       // Return the response data so the UI can show the appropriate message
       return actionResponse;
     } catch (error) {
-      console.error(`Failed to ${action} server:`, error);
       throw error;
     }
   };

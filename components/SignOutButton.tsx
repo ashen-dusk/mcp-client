@@ -11,7 +11,7 @@ export function SignOutButton() {
     try {
       await signOut({ callbackUrl: "/" });
     } catch (error) {
-      console.error("Sign out error:", error);
+      // Error handled silently
     } finally {
       setIsLoading(false);
     }

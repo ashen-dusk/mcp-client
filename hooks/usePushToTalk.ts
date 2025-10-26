@@ -13,7 +13,7 @@ export const checkMicrophonePermission = async () => {
       return false;
     }
   } catch (err) {
-    console.error("Error checking microphone permission", err);
+    return false;
   }
 };
 
@@ -24,7 +24,6 @@ export const requestMicAndPlaybackPermission = async () => {
     await audioContext.resume();
     return { stream, audioContext };
   } catch (err) {
-    console.error("Error requesting microphone and playback permissions", err);
     return null;
   }
 };

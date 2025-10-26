@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
     // Check if response is JSON
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("Non-JSON response from GraphQL endpoint:", text);
+      await response.text();
       return NextResponse.json(
         { error: "Backend server returned invalid response" },
         { status: 500 }
@@ -55,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await response.json();
-    
+
     if (!response.ok || result.errors) {
       return NextResponse.json(
         { error: result.errors?.[0]?.message || "Failed to save server" },
@@ -65,7 +64,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: result.data.saveMcpServer });
   } catch (error) {
-    console.error("Error saving server:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -102,8 +100,7 @@ export async function DELETE(request: NextRequest) {
     // Check if response is JSON
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      console.error("Non-JSON response from GraphQL endpoint:", text);
+      await response.text();
       return NextResponse.json(
         { error: "Backend server returned invalid response" },
         { status: 500 }
@@ -111,7 +108,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const result = await response.json();
-    
+
     if (!response.ok || result.errors) {
       return NextResponse.json(
         { error: result.errors?.[0]?.message || "Failed to remove server" },
@@ -121,7 +118,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ data: result.data.removeMcpServer });
   } catch (error) {
-    console.error("Error removing server:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
