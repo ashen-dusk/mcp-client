@@ -41,10 +41,10 @@ export default function ServerManagement({ server, onAction, onEdit, onDelete }:
       const result = await onAction(server.name, action);
 
       // Use the actual message from the response data if available
-      const message = (result && typeof result === 'object' && 'message' in result && typeof result.message === 'string')
-        ? result.message
-        : `Server ${action}d successfully`;
-      toast.success(message);
+      // const message = (result && typeof result === 'object' && 'message' in result && typeof result.message === 'string')
+      //   ? result.message
+      //   : `Server ${action}d successfully`;
+      // toast.success(message);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : `Failed to ${action} server`;
       toast.error(errorMessage);

@@ -68,10 +68,10 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
       }
 
       setServers(result.data?.mcpServers || []);
-      
-      if (result.data?.mcpServers?.length > 0) {
-        toast.success(`Loaded ${result.data.mcpServers.length} MCP servers`);
-      }
+
+      // if (result.data?.mcpServers?.length > 0) {
+      //   toast.success(`Loaded ${result.data.mcpServers.length} MCP servers`);
+      // }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch servers';
       setError(errorMessage);
@@ -105,7 +105,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
       const restartResult = result.data?.restartMcpServer;
 
       if (restartResult?.requiresAuth && restartResult?.authorizationUrl) {
-        toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+        // toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
         // Redirect to OAuth authorization URL
         window.location.href = restartResult.authorizationUrl;
         return;
@@ -127,7 +127,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
           );
         });
 
-        toast.success(`Server ${serverName} restarted successfully`);
+        // toast.success(`Server ${serverName} restarted successfully`);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to restart server';
@@ -180,7 +180,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
         if (connectResult?.requiresAuth) {
           const authUrl = connectResult.authorizationUrl;
           if (authUrl) {
-            toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+            // toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
             // Redirect to OAuth authorization URL
             setTimeout(() => {
               window.location.href = authUrl;
@@ -212,7 +212,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
         });
       });
 
-      toast.success(`Server ${serverName} ${action}d successfully`);
+      // toast.success(`Server ${serverName} ${action}d successfully`);
     } catch (error) {
       toast.error(`Failed to ${action} server`);
       throw error;

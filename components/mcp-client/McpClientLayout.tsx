@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy } from "lucide-react";
+import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy, Check } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import ReactMarkdown from "react-markdown";
@@ -73,6 +73,7 @@ export default function McpClientLayout({
   const [serverToDelete, setServerToDelete] = useState<string | null>(null);
   const [toggleLoading, setToggleLoading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'public' | 'user'>('public');
+  const [urlCopied, setUrlCopied] = useState(false);
 
   // Get current servers based on active tab
   const currentServers = activeTab === 'public' ? publicServers : userServers;
@@ -302,10 +303,10 @@ export default function McpClientLayout({
                     onClick={() => {
                       if (activeTab === "public") {
                         onRefreshPublic();
-                        toast.success("Refreshing public servers...");
+                        // toast.success("Refreshing public servers...");
                       } else {
                         onRefreshUser();
-                        toast.success("Refreshing your servers...");
+                        // toast.success("Refreshing your servers...");
                       }
                     }}
                     variant="ghost"
@@ -699,11 +700,16 @@ export default function McpClientLayout({
                                 size="sm"
                                 onClick={() => {
                                   navigator.clipboard.writeText(selectedServer.url!);
-                                  toast.success("URL copied to clipboard");
+                                  setUrlCopied(true);
+                                  setTimeout(() => setUrlCopied(false), 2000);
                                 }}
                                 className="h-6 w-6 p-0 hover:bg-accent cursor-pointer flex-shrink-0"
                               >
-                                <Copy className="h-3 w-3" />
+                                {urlCopied ? (
+                                  <Check className="h-3 w-3 text-green-500" />
+                                ) : (
+                                  <Copy className="h-3 w-3" />
+                                )}
                               </Button>
                             </div>
                           )}

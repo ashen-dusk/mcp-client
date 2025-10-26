@@ -25,7 +25,7 @@ export default function McpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
       setPublicServers(json?.data?.mcpServers ?? []);
-      toast.success("Public servers loaded successfully");
+      // toast.success("Public servers loaded successfully");
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Failed to load public servers";
       setPublicError(errorMessage);
@@ -46,7 +46,7 @@ export default function McpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
       setUserServers(json?.data?.getUserMcpServers ?? []);
-      toast.success("Your servers loaded successfully");
+      // toast.success("Your servers loaded successfully");
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Failed to load your servers";
       setUserError(errorMessage);
@@ -81,7 +81,7 @@ export default function McpPage() {
         const actionResult = result.data?.connectMcpServer || result.data?.restartMcpServer;
 
         if (actionResult?.requiresAuth && actionResult?.authorizationUrl) {
-          toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
+          // toast.success(`Redirecting to OAuth authorization for ${serverName}...`);
           // Redirect to OAuth authorization URL
           window.location.href = actionResult.authorizationUrl;
           return actionResult; // Exit early, page will redirect
@@ -255,7 +255,7 @@ export default function McpPage() {
     const step = searchParams.get('step');
 
     if (step === 'success' && server) {
-      toast.success(`OAuth completed for ${server}! Server will connect automatically.`);
+      // toast.success(`OAuth completed for ${server}! Server will connect automatically.`);
       // Refresh servers to get updated status
       setTimeout(() => {
         fetchPublicServers();
