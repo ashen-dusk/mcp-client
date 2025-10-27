@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
+import OAuthCallbackHandler from "@/components/mcp-client/OAuthCallbackHandler";
 import { McpServer } from "@/types/mcp";
 
 export default function McpPage() {
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
   const [publicServers, setPublicServers] = useState<McpServer[] | null>(null);
   const [userServers, setUserServers] = useState<McpServer[] | null>(null);
   const [publicError, setPublicError] = useState<string | null>(null);
@@ -249,23 +248,6 @@ export default function McpPage() {
     });
   };
 
-  // Handle OAuth callback success
-  useEffect(() => {
-    const server = searchParams.get('server');
-    const step = searchParams.get('step');
-
-    if (step === 'success' && server) {
-      // toast.success(`OAuth completed for ${server}! Server will connect automatically.`);
-      // Refresh servers to get updated status
-      setTimeout(() => {
-        fetchPublicServers();
-        if (session) {
-          fetchUserServers();
-        }
-      }, 1000);
-    }
-  }, [searchParams, session, fetchUserServers]);
-
   useEffect(() => {
     fetchPublicServers();
   }, []);
@@ -276,23 +258,35 @@ export default function McpPage() {
     }
   }, [session, fetchUserServers]);
 
+  const refreshAllServers = useCallback(async () => {
+    await fetchPublicServers();
+    if (session) {
+      await fetchUserServers();
+    }
+  }, [session, fetchUserServers]);
+
   return (
-    <McpClientLayout
-      publicServers={publicServers}
-      userServers={userServers}
-      publicLoading={publicLoading}
-      userLoading={userLoading}
-      publicError={publicError}
-      userError={userError}
-      session={session}
-      onRefreshPublic={fetchPublicServers}
-      onRefreshUser={fetchUserServers}
-      onServerAction={handleServerAction}
-      onServerAdd={handleServerAdd}
-      onServerUpdate={handleServerUpdate}
-      onServerDelete={handleServerDelete}
-      onUpdatePublicServer={handleUpdatePublicServer}
-      onUpdateUserServer={handleUpdateUserServer}
-    />
+    <>
+      <Suspense fallback={null}>
+        <OAuthCallbackHandler onRefreshServers={refreshAllServers} />
+      </Suspense>
+      <McpClientLayout
+        publicServers={publicServers}
+        userServers={userServers}
+        publicLoading={publicLoading}
+        userLoading={userLoading}
+        publicError={publicError}
+        userError={userError}
+        session={session}
+        onRefreshPublic={fetchPublicServers}
+        onRefreshUser={fetchUserServers}
+        onServerAction={handleServerAction}
+        onServerAdd={handleServerAdd}
+        onServerUpdate={handleServerUpdate}
+        onServerDelete={handleServerDelete}
+        onUpdatePublicServer={handleUpdatePublicServer}
+        onUpdateUserServer={handleUpdateUserServer}
+      />
+    </>
   );
 }
