@@ -8,7 +8,7 @@ import { HttpAgent } from "@ag-ui/client";
 
 const serviceAdapter = new EmptyAdapter();
 const mcpAssistant = new HttpAgent({
-  url: process.env.NEXT_PUBLIC_BACKEND_URL + "/api/langgraph-agent" || "http://localhost:8000/api/langgraph-agent",
+  url: (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000") + "/api/langgraph-agent",
 });
 
 const runtime = new CopilotRuntime({
