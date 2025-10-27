@@ -1,5 +1,5 @@
 "use client";
-import { Home, Server, Code } from "lucide-react";
+import { Home, Server, Code, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -34,6 +34,15 @@ export function NavigationLinks() {
       >
         <Code className="h-4 w-4" />
         Playground
+      </Link>
+      <Link
+        href="/changelog"
+        className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+          pathname === "/changelog" ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        <ScrollText className="h-4 w-4" />
+        Changelog
       </Link>
     </div>
   );
