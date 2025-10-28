@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import { McpServer } from "@/types/mcp";
+import { MCP_SERVERS_QUERY } from "@/lib/graphql";
 
-interface UseMcpServersReturn {
+interface McpServersData {
   servers: McpServer[] | null;
   loading: boolean;
   error: string | null;
@@ -17,7 +18,7 @@ interface UseMcpServersReturn {
   handleServerDelete: (serverName: string) => Promise<void>;
 }
 
-export function useMcpServers(session: Session | null): UseMcpServersReturn {
+export function useMcpServers(session: Session | null): McpServersData {
   const [servers, setServers] = useState<McpServer[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
   const fetchServers = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/graphql', {
         method: 'POST',
@@ -34,44 +35,23 @@ export function useMcpServers(session: Session | null): UseMcpServersReturn {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: `
-            query GetMcpServers {
-              mcpServers {
-                id
-                name
-                description
-                transport
-                url
-                command
-                args
-                enabled
-                requiresOauth2
-                connectionStatus
-                tools {
-                  name
-                  description
-                  schema
-                }
-                updatedAt
-                owner
-                isShared
-              }
-            }
-          `,
+          query: MCP_SERVERS_QUERY,
+          variables: {
+            first: 100, // Get first 100 servers
+          }
         }),
       });
 
       const result = await response.json();
-      
+
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to fetch servers');
       }
 
-      setServers(result.data?.mcpServers || []);
-
-      // if (result.data?.mcpServers?.length > 0) {
-      //   toast.success(`Loaded ${result.data.mcpServers.length} MCP servers`);
-      // }
+      // Extract nodes from edges structure
+      const edges = result.data?.mcpServers?.edges || [];
+      const servers = edges.map((edge: any) => edge.node);
+      setServers(servers);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch servers';
       setError(errorMessage);

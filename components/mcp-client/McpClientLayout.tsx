@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy, Check } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
@@ -45,6 +45,9 @@ interface McpClientLayoutProps {
   onServerDelete: (serverName: string) => Promise<void>;
   onUpdatePublicServer: (serverId: string, updates: Partial<McpServer>) => void;
   onUpdateUserServer: (serverId: string, updates: Partial<McpServer>) => void;
+  hasNextPage: boolean;
+  isLoadingMore: boolean;
+  onLoadMore: () => void;
 }
 
 export default function McpClientLayout({
@@ -62,7 +65,10 @@ export default function McpClientLayout({
   onServerUpdate,
   onServerDelete,
   onUpdatePublicServer,
-  onUpdateUserServer
+  onUpdateUserServer,
+  hasNextPage,
+  isLoadingMore,
+  onLoadMore
 }: McpClientLayoutProps) {
   const [selectedServer, setSelectedServer] = useState<McpServer | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -74,6 +80,7 @@ export default function McpClientLayout({
   const [toggleLoading, setToggleLoading] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'public' | 'user'>('public');
   const [urlCopied, setUrlCopied] = useState(false);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   // Get current servers based on active tab
   const currentServers = activeTab === 'public' ? publicServers : userServers;
@@ -88,6 +95,31 @@ export default function McpClientLayout({
       }
     }
   }, [currentServers, selectedServer]);
+
+  // Infinite scroll observer for public servers
+  useEffect(() => {
+    if (activeTab !== 'public') return; // Only on public tab
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isLoadingMore) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [activeTab, hasNextPage, isLoadingMore, onLoadMore]);
 
   const handleAddServer = () => {
     setModalMode('add');
@@ -429,6 +461,19 @@ export default function McpClientLayout({
                               </Card>
                             </motion.div>
                           ))}
+
+                          {/* Infinite scroll sentinel */}
+                          {hasNextPage && (
+                            <div ref={observerTarget} className="flex justify-center py-4">
+                              {isLoadingMore && (
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                  <span className="text-sm">Loading more servers...</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           {/* Add extra spacing at the bottom to ensure last item is fully visible */}
                           <div className="h-16" />
                         </>

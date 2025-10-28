@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Plug
 } from "lucide-react";
+import RecentMcpServers from "@/components/RecentMcpServers";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -139,6 +140,11 @@ export default async function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Recent MCP Servers Section */}
+      <div className="container mx-auto px-6 py-16">
+        <RecentMcpServers />
       </div>
 
       {/* Feature Highlights Section */}

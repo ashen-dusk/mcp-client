@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, Suspense, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
@@ -15,22 +15,67 @@ export default function McpPage() {
   const [publicLoading, setPublicLoading] = useState(true);
   const [userLoading, setUserLoading] = useState(false);
 
-  const fetchPublicServers = async () => {
-    setPublicLoading(true);
+  // Pagination state
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [endCursor, setEndCursor] = useState<string | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const fetchPublicServers = async (reset = true) => {
+    if (reset) {
+      setPublicLoading(true);
+      setPublicServers(null);
+      setEndCursor(null);
+    }
     setPublicError(null);
-    
+
     try {
-      const res = await fetch(`/api/mcp`, { method: "GET" });
+      const res = await fetch(`/api/mcp?first=10`, { method: "GET" });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
-      setPublicServers(json?.data?.mcpServers ?? []);
-      // toast.success("Public servers loaded successfully");
+
+      // Extract nodes and pagination info from edges structure
+      const edges = json?.data?.mcpServers?.edges || [];
+      const servers = edges.map((edge: any) => edge.node);
+      const pageInfo = json?.data?.mcpServers?.pageInfo;
+
+      setPublicServers(servers);
+      setHasNextPage(pageInfo?.hasNextPage ?? false);
+      setEndCursor(pageInfo?.endCursor ?? null);
     } catch (e: unknown) {
       const errorMessage = e instanceof Error ? e.message : "Failed to load public servers";
       setPublicError(errorMessage);
       toast.error(errorMessage);
     } finally {
       setPublicLoading(false);
+    }
+  };
+
+  const loadMorePublicServers = async () => {
+    if (!hasNextPage || isLoadingMore || !endCursor) return;
+
+    setIsLoadingMore(true);
+
+    try {
+      const res = await fetch(`/api/mcp?first=10&after=${encodeURIComponent(endCursor)}`, {
+        method: "GET"
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.errors?.[0]?.message || res.statusText);
+
+      // Extract nodes and pagination info
+      const edges = json?.data?.mcpServers?.edges || [];
+      const newServers = edges.map((edge: any) => edge.node);
+      const pageInfo = json?.data?.mcpServers?.pageInfo;
+
+      // Append new servers to existing list
+      setPublicServers(prev => prev ? [...prev, ...newServers] : newServers);
+      setHasNextPage(pageInfo?.hasNextPage ?? false);
+      setEndCursor(pageInfo?.endCursor ?? null);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to load more servers";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -286,6 +331,9 @@ export default function McpPage() {
         onServerDelete={handleServerDelete}
         onUpdatePublicServer={handleUpdatePublicServer}
         onUpdateUserServer={handleUpdateUserServer}
+        hasNextPage={hasNextPage}
+        isLoadingMore={isLoadingMore}
+        onLoadMore={loadMorePublicServers}
       />
     </>
   );
