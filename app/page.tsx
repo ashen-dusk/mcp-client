@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import RecentMcpServers from "@/components/RecentMcpServers";
 import Categories from "@/components/Categories";
+import McpArchitecture from "@/components/McpArchitecture";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -143,8 +144,24 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Architecture Visualization Section */}
+      <div className="container mx-auto px-6 py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            How It Works
+          </h2>
+          <p className="text-muted-foreground text-sm md:text-base max-w-3xl mx-auto">
+            A seamless flow from your interface to AI-powered agents with dynamic MCP server connections
+          </p>
+        </div>
+
+        <div className="flex justify-center">
+          <McpArchitecture className="max-w-6xl w-full" />
+        </div>
+      </div>
+
       {/* Categories Section */}
-      <div className="container mx-auto px-6 py-16 bg-muted/10">
+      <div className="container mx-auto px-6 py-16">
         <Categories />
       </div>
 
