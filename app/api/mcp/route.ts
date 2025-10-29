@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   }
 
   // Build variables object for cursor-based pagination
-  const variables: any = {
+  const variables: { first: number; after?: string; order?: Record<string, string> } = {
     first,
   };
 

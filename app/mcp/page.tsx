@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, Suspense, useRef } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import McpClientLayout from "@/components/mcp-client/McpClientLayout";
@@ -35,7 +35,7 @@ export default function McpPage() {
 
       // Extract nodes and pagination info from edges structure
       const edges = json?.data?.mcpServers?.edges || [];
-      const servers = edges.map((edge: any) => edge.node);
+      const servers = edges.map((edge: { node: unknown }) => edge.node);
       const pageInfo = json?.data?.mcpServers?.pageInfo;
 
       setPublicServers(servers);
@@ -64,7 +64,7 @@ export default function McpPage() {
 
       // Extract nodes and pagination info
       const edges = json?.data?.mcpServers?.edges || [];
-      const newServers = edges.map((edge: any) => edge.node);
+      const newServers = edges.map((edge: { node: unknown }) => edge.node);
       const pageInfo = json?.data?.mcpServers?.pageInfo;
 
       // Append new servers to existing list

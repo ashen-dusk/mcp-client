@@ -24,7 +24,11 @@ function CategoryItemSkeleton() {
 
 export default function Categories() {
   // Use Apollo Client to fetch categories directly with GraphQL
-  const { loading, error, data } = useQuery(GET_CATEGORIES, {
+  const { loading, error, data } = useQuery<{
+    categories: {
+      edges: Array<{ node: Category }>;
+    };
+  }>(GET_CATEGORIES, {
     variables: {
       first: 8, // Show first 8 categories
     },
@@ -33,7 +37,7 @@ export default function Categories() {
 
   // Extract nodes from edges structure
   const edges = data?.categories?.edges || [];
-  const categories: Category[] = edges.map((edge: any) => edge.node);
+  const categories: Category[] = edges.map((edge: { node: Category }) => edge.node);
 
   // Handle error state - hide section
   if (error) {

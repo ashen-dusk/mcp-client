@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   ApolloClient,
@@ -30,7 +30,7 @@ export function ApolloProvider({ children }: { children: React.ReactNode }) {
 
     // Auth link to add authorization header
     const authLink = setContext((_, { headers }) => {
-      const token = (session as any)?.googleIdToken;
+      const token = (session as { googleIdToken?: string } | null)?.googleIdToken;
 
       return {
         headers: {
@@ -41,7 +41,12 @@ export function ApolloProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Error link for centralized error handling
-    const errorLink = onError(({ graphQLErrors, networkError }) => {
+    const errorLink = onError((errorResponse) => {
+      const { graphQLErrors, networkError } = errorResponse as {
+        graphQLErrors?: Array<{ message: string; locations?: unknown; path?: unknown }>;
+        networkError?: Error;
+      };
+
       if (graphQLErrors) {
         graphQLErrors.forEach(({ message, locations, path }) => {
           console.error(

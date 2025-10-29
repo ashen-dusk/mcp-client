@@ -27,7 +27,11 @@ function ServerItemSkeleton() {
 
 export default function RecentMcpServers() {
   // Use Apollo Client to fetch recent servers directly with GraphQL
-  const { loading, error, data } = useQuery(GET_RECENT_SERVERS, {
+  const { loading, error, data } = useQuery<{
+    mcpServers: {
+      edges: Array<{ node: McpServer }>;
+    };
+  }>(GET_RECENT_SERVERS, {
     variables: {
       first: 4,
       order: { createdAt: "DESC" }, // Order by creation date descending (newest first)
@@ -37,7 +41,7 @@ export default function RecentMcpServers() {
 
   // Extract nodes from edges structure
   const edges = data?.mcpServers?.edges || [];
-  const servers: McpServer[] = edges.map((edge: any) => edge.node);
+  const servers: McpServer[] = edges.map((edge: { node: McpServer }) => edge.node);
 
   // Handle error state - hide section
   if (error) {
