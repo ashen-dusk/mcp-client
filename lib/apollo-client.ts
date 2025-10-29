@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
@@ -29,23 +29,28 @@ const authLink = setContext(async (_, { headers }) => {
 });
 
 // Error link for centralized error handling
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) => {
+const errorLink = onError((errorResponse: unknown) => {
+  const response = errorResponse as {
+    graphQLErrors?: Array<{ message: string; locations?: unknown; path?: unknown }>;
+    networkError?: Error;
+  };
+
+  if (response.graphQLErrors) {
+    response.graphQLErrors.forEach(({ message, locations, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`
       );
     });
   }
 
-  if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
+  if (response.networkError) {
+    console.error(`[Network error]: ${response.networkError}`);
   }
 });
 
 // Create Apollo Client
 export const apolloClient = new ApolloClient({
-  link: from([errorLink, authLink, httpLink]),
+  link: ApolloLink.from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

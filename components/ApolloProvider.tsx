@@ -41,22 +41,22 @@ export function ApolloProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Error link for centralized error handling
-    const errorLink = onError((errorResponse) => {
-      const { graphQLErrors, networkError } = errorResponse as {
+    const errorLink = onError((errorResponse: unknown) => {
+      const response = errorResponse as {
         graphQLErrors?: Array<{ message: string; locations?: unknown; path?: unknown }>;
         networkError?: Error;
       };
 
-      if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, locations, path }) => {
+      if (response.graphQLErrors) {
+        response.graphQLErrors.forEach(({ message, locations, path }) => {
           console.error(
             `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`
           );
         });
       }
 
-      if (networkError) {
-        console.error(`[Network error]: ${networkError}`);
+      if (response.networkError) {
+        console.error(`[Network error]: ${response.networkError}`);
       }
     });
 

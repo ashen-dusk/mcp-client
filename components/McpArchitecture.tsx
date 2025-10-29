@@ -30,14 +30,14 @@ export default function McpArchitecture({
 }: {
   className?: string;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const userRef = useRef<HTMLDivElement>(null);
-  const aguiRef = useRef<HTMLDivElement>(null);
-  const openaiRef = useRef<HTMLDivElement>(null);
-  const mcpHubRef = useRef<HTMLDivElement>(null);
-  const server1Ref = useRef<HTMLDivElement>(null);
-  const server2Ref = useRef<HTMLDivElement>(null);
-  const server3Ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
+  const userRef = useRef<HTMLElement>(null);
+  const aguiRef = useRef<HTMLElement>(null);
+  const openaiRef = useRef<HTMLElement>(null);
+  const mcpHubRef = useRef<HTMLElement>(null);
+  const server1Ref = useRef<HTMLElement>(null);
+  const server2Ref = useRef<HTMLElement>(null);
+  const server3Ref = useRef<HTMLElement>(null);
 
   return (
     <div
@@ -45,12 +45,12 @@ export default function McpArchitecture({
         "relative flex h-[380px] w-full items-center justify-center overflow-hidden py-4 px-8",
         className,
       )}
-      ref={containerRef}
+      ref={containerRef as React.RefObject<HTMLDivElement>}
     >
       <div className="flex size-full flex-row items-stretch justify-between gap-6 max-w-5xl">
         {/* User */}
         <div className="flex flex-col justify-center items-center gap-3">
-          <Circle ref={userRef} className="size-16">
+          <Circle ref={userRef as React.RefObject<HTMLDivElement>} className="size-16">
             <Icons.user />
           </Circle>
           <div className="text-center">
@@ -63,7 +63,7 @@ export default function McpArchitecture({
 
         {/* AG-UI Protocol */}
         <div className="flex flex-col justify-center items-center gap-3">
-          <Circle ref={aguiRef} className="size-16 p-2">
+          <Circle ref={aguiRef as React.RefObject<HTMLDivElement>} className="size-16 p-2">
             <Icons.agui />
           </Circle>
           <div className="text-center">
@@ -76,7 +76,7 @@ export default function McpArchitecture({
 
         {/* OpenAI */}
         <div className="flex flex-col justify-center items-center gap-3">
-          <Circle ref={openaiRef} className="size-16">
+          <Circle ref={openaiRef as React.RefObject<HTMLDivElement>} className="size-16">
             <Icons.openai />
           </Circle>
           <div className="text-center">
@@ -89,7 +89,7 @@ export default function McpArchitecture({
 
         {/* MCP */}
         <div className="flex flex-col justify-center items-center gap-3">
-          <Circle ref={mcpHubRef} className="size-16 p-2">
+          <Circle ref={mcpHubRef as React.RefObject<HTMLDivElement>} className="size-16 p-2">
             <Icons.mcpHub />
           </Circle>
           <div className="text-center">
@@ -103,13 +103,13 @@ export default function McpArchitecture({
         {/* MCP Servers - Show 3 servers */}
         <div className="flex flex-col justify-center items-center gap-3">
           <div className="flex flex-col gap-4">
-            <Circle ref={server1Ref} className="size-14">
+            <Circle ref={server1Ref as React.RefObject<HTMLDivElement>} className="size-14">
               <Icons.server />
             </Circle>
-            <Circle ref={server2Ref} className="size-14">
+            <Circle ref={server2Ref as React.RefObject<HTMLDivElement>} className="size-14">
               <Icons.server />
             </Circle>
-            <Circle ref={server3Ref} className="size-14">
+            <Circle ref={server3Ref as React.RefObject<HTMLDivElement>} className="size-14">
               <Icons.server />
             </Circle>
           </div>
