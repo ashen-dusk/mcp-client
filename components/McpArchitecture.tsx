@@ -55,8 +55,8 @@ export default function McpArchitecture({
           </Circle>
           <div className="text-center">
             <div className="text-sm font-semibold mb-1">You</div>
-            <p className="text-xs text-muted-foreground leading-tight max-w-[100px]">
-              Browser interface
+            <p className="text-xs text-muted-foreground leading-tight max-w-[110px]">
+              Interact through browser interface
             </p>
           </div>
         </div>
@@ -68,8 +68,8 @@ export default function McpArchitecture({
           </Circle>
           <div className="text-center">
             <div className="text-sm font-semibold mb-1">AG-UI</div>
-            <p className="text-xs text-muted-foreground leading-tight max-w-[100px]">
-              Agent UI protocol
+            <p className="text-xs text-muted-foreground leading-tight max-w-[110px]">
+              Agent UI framework for requests
             </p>
           </div>
         </div>
@@ -81,8 +81,8 @@ export default function McpArchitecture({
           </Circle>
           <div className="text-center">
             <div className="text-sm font-semibold mb-1">OpenAI</div>
-            <p className="text-xs text-muted-foreground leading-tight max-w-[100px]">
-              LLM processing
+            <p className="text-xs text-muted-foreground leading-tight max-w-[110px]">
+              AI model processes and understands
             </p>
           </div>
         </div>
@@ -94,8 +94,8 @@ export default function McpArchitecture({
           </Circle>
           <div className="text-center">
             <div className="text-sm font-semibold mb-1">MCP</div>
-            <p className="text-xs text-muted-foreground leading-tight max-w-[100px]">
-              Connection manager
+            <p className="text-xs text-muted-foreground leading-tight max-w-[110px]">
+              Model Context Protocol manages connections
             </p>
           </div>
         </div>
@@ -115,8 +115,8 @@ export default function McpArchitecture({
           </div>
           <div className="text-center">
             <div className="text-sm font-semibold mb-1">Servers</div>
-            <p className="text-xs text-muted-foreground leading-tight max-w-[100px]">
-              Remote tools & data
+            <p className="text-xs text-muted-foreground leading-tight max-w-[110px]">
+              Remote servers expose tools and data
             </p>
           </div>
         </div>
