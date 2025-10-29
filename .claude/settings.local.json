@@ -12,7 +12,14 @@
       "Read(//c/Users/ASUS/Desktop/agent/chrome-extension/**)",
       "Read(//c/Users/ASUS/Desktop/agent/mcp-hub/**)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Read(//c/Users/ASUS/Desktop/agent/**)",
+      "Bash(uv run python:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uv pip uninstall:*)",
+      "Bash(npm install:*)",
+      "Read(//c/Users/ASUS/Pictures/Screenshots/**)"
     ],
     "deny": [],
     "ask": []

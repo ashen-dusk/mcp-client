@@ -194,4 +194,27 @@ export const USER_MCP_SERVERS_QUERY = `
   ${MCP_SERVER_FRAGMENT}
 `;
 
+export const CATEGORIES_QUERY = `
+  query Categories($first: Int, $after: String) {
+    categories(first: $first, after: $after) {
+      edges {
+        node {
+          id
+          name
+          icon
+          color
+          description
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+`;
+
 

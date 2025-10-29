@@ -12,6 +12,7 @@ import {
   Plug
 } from "lucide-react";
 import RecentMcpServers from "@/components/RecentMcpServers";
+import Categories from "@/components/Categories";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -142,18 +143,23 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Categories Section */}
+      <div className="container mx-auto px-6 py-16 bg-muted/10">
+        <Categories />
+      </div>
+
       {/* Recent MCP Servers Section */}
       <div className="container mx-auto px-6 py-16">
         <RecentMcpServers />
       </div>
 
       {/* Feature Highlights Section */}
-      <div id="features" className="container mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <div id="features" className="container mx-auto px-6 py-12">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
             Direct access to MCP servers, simplified
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
             Skip the client setup and subscription fees. Connect to any remote MCP server instantly through your browser.
           </p>
         </div>
