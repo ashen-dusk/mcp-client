@@ -1,6 +1,4 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { onError } from '@apollo/client/link/error';
 
 // Get the GraphQL API endpoint
 const getGraphQLUri = () => {
@@ -15,37 +13,24 @@ const httpLink = new HttpLink({
 });
 
 // Auth link to add authorization header
-const authLink = setContext(async (_, { headers }) => {
+const authLink = new ApolloLink((operation, forward) => {
   // Get the authentication token from session storage or wherever you store it
   // For NextAuth, we'll handle this in the provider
   const token = typeof window !== 'undefined' ? sessionStorage.getItem('googleIdToken') : null;
 
-  return {
+  operation.setContext(({ headers = {} }) => ({
     headers: {
       ...headers,
       ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-  };
+    }
+  }));
+
+  return forward(operation);
 });
 
 // Error link for centralized error handling
-const errorLink = onError((errorResponse: unknown) => {
-  const response = errorResponse as {
-    graphQLErrors?: Array<{ message: string; locations?: unknown; path?: unknown }>;
-    networkError?: Error;
-  };
-
-  if (response.graphQLErrors) {
-    response.graphQLErrors.forEach(({ message, locations, path }) => {
-      console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`
-      );
-    });
-  }
-
-  if (response.networkError) {
-    console.error(`[Network error]: ${response.networkError}`);
-  }
+const errorLink = new ApolloLink((operation, forward) => {
+  return forward(operation);
 });
 
 // Create Apollo Client
