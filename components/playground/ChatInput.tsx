@@ -85,7 +85,7 @@ export default function ChatInput({
   };
 
   // Fetch assistants
-  const { assistants, activeAssistant, setActiveAssistant, createAssistant, updateAssistant, deleteAssistant } = useAssistants();
+  const { assistants, activeAssistant, setActiveAssistant, createAssistant, updateAssistant, deleteAssistant, loading } = useAssistants();
 
   // Separate state for model - independent of coagent state
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
@@ -337,18 +337,24 @@ export default function ChatInput({
 
           {/* Assistant Selection Dropdown */}
           {session && (
-            <AssistantDropdown
-              session={session}
-              assistants={assistants || []}
-              activeAssistant={activeAssistant}
-              isBusy={isBusy}
-              showAssistantDropdown={dropdownState === "assistant"}
-              setShowAssistantDropdown={(open) => setDropdownState(open ? "assistant" : null)}
-              handleAssistantChange={handleAssistantChange}
-              handleEditClick={handleEditClick}
-              handleDeleteClick={handleDeleteClick}
-              handleCreateAssistantClick={() => setDialogState("create")}
-            />
+            loading ? (
+              <div className="flex items-center h-8 px-4">
+                <Loader2 className="animate-spin text-gray-400 w-4 h-4" />
+              </div>
+            ) : (
+              <AssistantDropdown
+                session={session}
+                assistants={assistants || []}
+                activeAssistant={activeAssistant}
+                isBusy={isBusy}
+                showAssistantDropdown={dropdownState === "assistant"}
+                setShowAssistantDropdown={(open) => setDropdownState(open ? "assistant" : null)}
+                handleAssistantChange={handleAssistantChange}
+                handleEditClick={handleEditClick}
+                handleDeleteClick={handleDeleteClick}
+                handleCreateAssistantClick={() => setDialogState("create")}
+              />
+            )
           )}
 
           {/* Model Selection Dropdown */}
