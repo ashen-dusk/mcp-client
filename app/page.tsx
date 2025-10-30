@@ -11,9 +11,9 @@ import {
   MessageSquare,
   Plug
 } from "lucide-react";
-import RecentMcpServers from "@/components/RecentMcpServers";
-import Categories from "@/components/Categories";
-import McpArchitecture from "@/components/McpArchitecture";
+import RecentMcpServers from "@/components/home/RecentMcpServers";
+import Categories from "@/components/home/Categories";
+import McpArchitecture from "@/components/home/McpArchitecture";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);

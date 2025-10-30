@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { SignOutButton } from "@/components/SignOutButton";
+import { SignOutButton } from "@/components/common/SignOutButton";
 
 interface ProfileDropdownProps {
   user: {
