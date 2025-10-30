@@ -6,6 +6,7 @@ export interface AssistantDropdownProps {
   assistants: any[];
   activeAssistant: any;
   isBusy: boolean;
+  loading?: boolean;
   showAssistantDropdown: boolean;
   setShowAssistantDropdown: (v: boolean) => void;
   handleAssistantChange: (assistantId: string) => void;
@@ -19,6 +20,7 @@ const AssistantDropdown: React.FC<AssistantDropdownProps> = ({
   assistants,
   activeAssistant,
   isBusy,
+  loading,
   showAssistantDropdown,
   setShowAssistantDropdown,
   handleAssistantChange,
@@ -29,6 +31,7 @@ const AssistantDropdown: React.FC<AssistantDropdownProps> = ({
   if (!session) return null;
   return (
     <div className="relative mr-1 sm:mr-2">
+      {loading ? "" : (
       <button
         onClick={() => setShowAssistantDropdown(!showAssistantDropdown)}
         className="flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded transition-all duration-200 cursor-pointer"
@@ -36,10 +39,11 @@ const AssistantDropdown: React.FC<AssistantDropdownProps> = ({
         <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
         {isBusy && <Loader2 className="w-3 h-3.5 ml-1 animate-spin text-gray-500 dark:text-gray-300" />}
         <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[80px] sm:max-w-none">
-          {activeAssistant?.name || "Default"}
+          {(activeAssistant?.name || "Default")}
         </span>
         <ChevronDown className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${showAssistantDropdown ? 'rotate-180' : ''}`} />
       </button>
+      )}
       {showAssistantDropdown && (
         <>
           <div className="absolute bottom-full mb-2 right-0 md:right-0 left-0 md:left-auto bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/50 rounded-2xl shadow-2xl backdrop-blur-xl z-50 w-full md:min-w-[300px] md:max-w-[360px] max-h-[50vh] overflow-hidden">
