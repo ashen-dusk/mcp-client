@@ -102,7 +102,7 @@ export default function Categories() {
                 }}
               >
                 <Image
-                  src={`/categories/${category.icon}.png`}
+                  src={`/categories/${category.icon}`}
                   alt={category.name}
                   width={48}
                   height={48}

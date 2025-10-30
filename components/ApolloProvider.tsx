@@ -6,11 +6,9 @@ import {
   ApolloClient,
   InMemoryCache,
   HttpLink,
-  from,
+  ApolloLink,
 } from '@apollo/client';
 import { ApolloProvider as ApolloProviderBase } from '@apollo/client/react';
-import { setContext } from '@apollo/client/link/context';
-import { onError } from '@apollo/client/link/error';
 
 // Get the GraphQL API endpoint
 const getGraphQLUri = () => {
@@ -29,40 +27,27 @@ export function ApolloProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Auth link to add authorization header
-    const authLink = setContext((_, { headers }) => {
+    const authLink = new ApolloLink((operation, forward) => {
       const token = (session as { googleIdToken?: string } | null)?.googleIdToken;
 
-      return {
+      operation.setContext(({ headers = {} }) => ({
         headers: {
           ...headers,
           ...(token ? { authorization: `Bearer ${token}` } : {}),
-        },
-      };
+        }
+      }));
+
+      return forward(operation);
     });
 
     // Error link for centralized error handling
-    const errorLink = onError((errorResponse: unknown) => {
-      const response = errorResponse as {
-        graphQLErrors?: Array<{ message: string; locations?: unknown; path?: unknown }>;
-        networkError?: Error;
-      };
-
-      if (response.graphQLErrors) {
-        response.graphQLErrors.forEach(({ message, locations, path }) => {
-          console.error(
-            `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`
-          );
-        });
-      }
-
-      if (response.networkError) {
-        console.error(`[Network error]: ${response.networkError}`);
-      }
+    const errorLink = new ApolloLink((operation, forward) => {
+      return forward(operation);
     });
 
     // Create Apollo Client
     return new ApolloClient({
-      link: from([errorLink, authLink, httpLink]),
+      link: ApolloLink.from([errorLink, authLink, httpLink]),
       cache: new InMemoryCache({
         typePolicies: {
           Query: {
