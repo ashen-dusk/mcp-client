@@ -217,4 +217,81 @@ export const CATEGORIES_QUERY = `
   }
 `;
 
+export const MY_ASSISTANTS_QUERY = `
+  query MyAssistants {
+    myAssistants {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_ASSISTANT_MUTATION = `
+  mutation CreateAssistant(
+    $name: String!
+    $instructions: String!
+    $description: String
+    $isActive: Boolean
+    $config: JSON
+  ) {
+    createAssistant(
+      name: $name
+      instructions: $instructions
+      description: $description
+      isActive: $isActive
+      config: $config
+    ) {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_ASSISTANT_MUTATION = `
+  mutation UpdateAssistant(
+    $id: ID!
+    $name: String
+    $description: String
+    $instructions: String
+    $isActive: Boolean
+    $config: JSON
+  ) {
+    updateAssistant(
+      id: $id
+      name: $name
+      description: $description
+      instructions: $instructions
+      isActive: $isActive
+      config: $config
+    ) {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_ASSISTANT_MUTATION = `
+  mutation DeleteAssistant($id: ID!) {
+    deleteAssistant(id: $id)
+  }
+`;
+
 

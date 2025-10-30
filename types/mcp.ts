@@ -54,11 +54,24 @@ export type ServerHealthInfo = {
   tools: ToolInfo[];
 };
 
+// Assistant Types
+export type Assistant = {
+  id: string;
+  name: string;
+  description?: string | null;
+  instructions: string;
+  isActive: boolean;
+  config: any;
+  createdAt: string;
+  updatedAt: string;
+};
+
 // CopilotKit Agent Types
 export type AgentState = {
   model: string;
   status?: string;
   sessionId: string;
+  assistant?: Assistant | null;
 };
 
 export interface Tool {

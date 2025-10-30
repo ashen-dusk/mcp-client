@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ChevronDown,
@@ -9,11 +9,15 @@ import {
   Mic,
   MicOff,
   Loader2,
-  Lock
+  Lock,
+  Bot,
+  Plus,
+  Pencil,
+  X, // <-- add this
 } from "lucide-react";
 import { PushToTalkState } from "@/hooks/usePushToTalk";
 import { useCoAgent } from "@copilotkit/react-core";
-import { AgentState } from "@/types/mcp";
+import { AgentState, Assistant } from "@/types/mcp";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import {
@@ -25,6 +29,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Link from "next/link";
+import { useAssistants } from "@/hooks/useAssistants";
+import { toast } from "react-hot-toast";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface CustomChatInputProps {
   onSendMessage: (message: string) => void;
@@ -181,6 +191,9 @@ export default function ChatInput({
   }
   };
 
+  // Fetch assistants
+  const { assistants, activeAssistant, setActiveAssistant, createAssistant, updateAssistant, deleteAssistant } = useAssistants();
+
   // Separate state for model - independent of coagent state
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
 
@@ -190,14 +203,41 @@ export default function ChatInput({
       model: selectedModel,
       status: undefined,
       sessionId: getSessionId(session),
+      assistant: activeAssistant,
     },
   });
+
+  // Update coagent state when active assistant changes
+  useEffect(() => {
+    if (activeAssistant !== state.assistant) {
+      setState({ ...state, assistant: activeAssistant });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeAssistant, setState]);
 
   // console.log("Agent State:", state);
 
   const [message, setMessage] = useState("");
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [showAssistantDropdown, setShowAssistantDropdown] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showCreateAssistantDialog, setShowCreateAssistantDialog] = useState(false);
+  const [showEditAssistantDialog, setShowEditAssistantDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
+  const [editingAssistant, setEditingAssistant] = useState<Assistant | null>(null);
+  const [deletingAssistant, setDeletingAssistant] = useState<Assistant | null>(null);
+  const [assistantFormData, setAssistantFormData] = useState({
+    name: "",
+    description: "",
+    instructions: "",
+    config: {
+      ask_mode: true,
+      max_tokens: 2000,
+      temperature: 0.7,
+      datetime_context: true,
+    }
+  });
 
   const handleModelChange = (modelId: string) => {
     // Update local state
@@ -205,6 +245,124 @@ export default function ChatInput({
     // Push to coagent state
     setState({...state, model: modelId});
     setShowModelDropdown(false);
+  };
+
+  const handleAssistantChange = async (assistantId: string) => {
+    setIsBusy(true);
+    try {
+      await setActiveAssistant(assistantId);
+      setShowAssistantDropdown(false);
+    } catch (error) {
+      console.error("Failed to set active assistant:", error);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleCreateAssistant = async () => {
+    if (!assistantFormData.name.trim() || !assistantFormData.instructions.trim()) {
+      toast.error("Name and instructions are required");
+      return;
+    }
+    setIsBusy(true);
+    try {
+      await createAssistant({
+        name: assistantFormData.name,
+        instructions: assistantFormData.instructions,
+        description: assistantFormData.description || undefined,
+        isActive: true, // Make new assistant active by default
+        config: assistantFormData.config,
+      });
+      setShowCreateAssistantDialog(false);
+      setAssistantFormData({
+        name: "",
+        description: "",
+        instructions: "",
+        config: {
+          ask_mode: true,
+          max_tokens: 2000,
+          temperature: 0.7,
+          datetime_context: true,
+        }
+      });
+    } catch (error) {
+      console.error("Failed to create assistant:", error);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleEditClick = (assistant: Assistant, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting the assistant
+    setEditingAssistant(assistant);
+    setAssistantFormData({
+      name: assistant.name,
+      description: assistant.description || "",
+      instructions: assistant.instructions,
+      config: assistant.config || {
+        ask_mode: true,
+        max_tokens: 2000,
+        temperature: 0.7,
+        datetime_context: true,
+      }
+    });
+    setShowAssistantDropdown(false);
+    setShowEditAssistantDialog(true);
+  };
+
+  const handleUpdateAssistant = async () => {
+    if (!editingAssistant) return;
+    if (!assistantFormData.name.trim() || !assistantFormData.instructions.trim()) {
+      toast.error("Name and instructions are required");
+      return;
+    }
+    setIsBusy(true);
+    try {
+      await updateAssistant(editingAssistant.id, {
+        name: assistantFormData.name,
+        instructions: assistantFormData.instructions,
+        description: assistantFormData.description || undefined,
+        config: assistantFormData.config,
+      });
+      setShowEditAssistantDialog(false);
+      setEditingAssistant(null);
+      setAssistantFormData({
+        name: "",
+        description: "",
+        instructions: "",
+        config: {
+          ask_mode: true,
+          max_tokens: 2000,
+          temperature: 0.7,
+          datetime_context: true,
+        }
+      });
+    } catch (error) {
+      console.error("Failed to update assistant:", error);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const handleDeleteClick = (assistant: Assistant, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent selecting the assistant
+    setDeletingAssistant(assistant);
+    setShowAssistantDropdown(false);
+    setShowDeleteConfirmDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingAssistant) return;
+    setIsBusy(true);
+    try {
+      await deleteAssistant(deletingAssistant.id);
+      setShowDeleteConfirmDialog(false);
+      setDeletingAssistant(null);
+    } catch (error) {
+      console.error("Failed to delete assistant:", error);
+    } finally {
+      setIsBusy(false);
+    }
   };
 
   const handleSendMessage = () => {
@@ -294,6 +452,379 @@ export default function ChatInput({
         </DialogContent>
       </Dialog>
 
+      {/* Create Assistant Dialog */}
+      <Dialog open={showCreateAssistantDialog} onOpenChange={setShowCreateAssistantDialog}>
+        <DialogContent className="sm:max-w-[550px] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 rounded-full bg-gray-100 dark:bg-zinc-800">
+                <Bot className="h-4 w-4 text-gray-900 dark:text-white" />
+              </div>
+              <DialogTitle className="text-base">Create New Assistant</DialogTitle>
+            </div>
+            <DialogDescription className="text-sm leading-relaxed">
+              Create a custom assistant with specific instructions to personalize your experience.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4 overflow-y-auto flex-1 scrollbar-minimal">
+            <div className="space-y-2">
+              <Label htmlFor="assistant-name">Name *</Label>
+              <Input
+                id="assistant-name"
+                placeholder="My Assistant"
+                value={assistantFormData.name}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assistant-description">Description</Label>
+              <Input
+                id="assistant-description"
+                placeholder="Brief description of the assistant"
+                value={assistantFormData.description}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assistant-instructions">Instructions *</Label>
+              <Textarea
+                id="assistant-instructions"
+                placeholder="You are a helpful assistant that..."
+                value={assistantFormData.instructions}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, instructions: e.target.value })}
+                rows={5}
+              />
+            </div>
+
+            {/* Config Section */}
+            <div className="space-y-3 pt-2 border-t border-gray-200 dark:border-zinc-700">
+              <Label className="text-sm font-semibold">Configuration</Label>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 flex-1 pr-4">
+                  <Label htmlFor="ask-mode" className="text-sm font-normal">Ask Mode</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Agent will ask to approve before executing tools/performing actions</p>
+                </div>
+                <Switch
+                  id="ask-mode"
+                  checked={assistantFormData.config.ask_mode}
+                  onCheckedChange={(checked) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, ask_mode: checked }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="datetime-context" className="text-sm font-normal">DateTime Context</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Include date and time information</p>
+                </div>
+                <Switch
+                  id="datetime-context"
+                  checked={assistantFormData.config.datetime_context}
+                  onCheckedChange={(checked) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, datetime_context: checked }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="max-tokens">Max Tokens</Label>
+                <Input
+                  id="max-tokens"
+                  type="number"
+                  min={100}
+                  max={10000}
+                  step={100}
+                  value={assistantFormData.config.max_tokens}
+                  onChange={(e) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, max_tokens: parseInt(e.target.value) || 2000 }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="temperature">Temperature</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    id="temperature"
+                    type="number"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={assistantFormData.config.temperature}
+                    onChange={(e) =>
+                      setAssistantFormData({
+                        ...assistantFormData,
+                        config: { ...assistantFormData.config, temperature: parseFloat(e.target.value) || 0.7 }
+                      })
+                    }
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[50px]">
+                    {assistantFormData.config.temperature}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateAssistantDialog(false);
+                setAssistantFormData({
+                  name: "",
+                  description: "",
+                  instructions: "",
+                  config: {
+                    ask_mode: true,
+                    max_tokens: 2000,
+                    temperature: 0.7,
+                    datetime_context: true,
+                  }
+                });
+              }}
+              className="flex-1 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateAssistant}
+              disabled={isBusy}
+              className="flex-1 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isBusy ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Assistant"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Assistant Dialog */}
+      <Dialog open={showEditAssistantDialog} onOpenChange={setShowEditAssistantDialog}>
+        <DialogContent className="sm:max-w-[550px] max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 rounded-full bg-gray-100 dark:bg-zinc-800">
+                <Pencil className="h-4 w-4 text-gray-900 dark:text-white" />
+              </div>
+              <DialogTitle className="text-base">Edit Assistant</DialogTitle>
+            </div>
+            <DialogDescription className="text-sm leading-relaxed">
+              Update your assistant's configuration and instructions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4 overflow-y-auto flex-1 scrollbar-minimal">
+            <div className="space-y-2">
+              <Label htmlFor="edit-assistant-name">Name *</Label>
+              <Input
+                id="edit-assistant-name"
+                placeholder="My Assistant"
+                value={assistantFormData.name}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-assistant-description">Description</Label>
+              <Input
+                id="edit-assistant-description"
+                placeholder="Brief description of the assistant"
+                value={assistantFormData.description}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-assistant-instructions">Instructions *</Label>
+              <Textarea
+                id="edit-assistant-instructions"
+                placeholder="You are a helpful assistant that..."
+                value={assistantFormData.instructions}
+                onChange={(e) => setAssistantFormData({ ...assistantFormData, instructions: e.target.value })}
+                rows={5}
+              />
+            </div>
+
+            {/* Config Section */}
+            <div className="space-y-3 pt-2 border-t border-gray-200 dark:border-zinc-700">
+              <Label className="text-sm font-semibold">Configuration</Label>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5 flex-1 pr-4">
+                  <Label htmlFor="edit-ask-mode" className="text-sm font-normal">Ask Mode</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Agent will ask to approve before executing tools/performing actions</p>
+                </div>
+                <Switch
+                  id="edit-ask-mode"
+                  checked={assistantFormData.config.ask_mode}
+                  onCheckedChange={(checked) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, ask_mode: checked }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="edit-datetime-context" className="text-sm font-normal">DateTime Context</Label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Include date and time information</p>
+                </div>
+                <Switch
+                  id="edit-datetime-context"
+                  checked={assistantFormData.config.datetime_context}
+                  onCheckedChange={(checked) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, datetime_context: checked }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-max-tokens">Max Tokens</Label>
+                <Input
+                  id="edit-max-tokens"
+                  type="number"
+                  min={100}
+                  max={10000}
+                  step={100}
+                  value={assistantFormData.config.max_tokens}
+                  onChange={(e) =>
+                    setAssistantFormData({
+                      ...assistantFormData,
+                      config: { ...assistantFormData.config, max_tokens: parseInt(e.target.value) || 2000 }
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-temperature">Temperature</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    id="edit-temperature"
+                    type="number"
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    value={assistantFormData.config.temperature}
+                    onChange={(e) =>
+                      setAssistantFormData({
+                        ...assistantFormData,
+                        config: { ...assistantFormData.config, temperature: parseFloat(e.target.value) || 0.7 }
+                      })
+                    }
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[50px]">
+                    {assistantFormData.config.temperature}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditAssistantDialog(false);
+                setEditingAssistant(null);
+                setAssistantFormData({
+                  name: "",
+                  description: "",
+                  instructions: "",
+                  config: {
+                    ask_mode: true,
+                    max_tokens: 2000,
+                    temperature: 0.7,
+                    datetime_context: true,
+                  }
+                });
+              }}
+              className="flex-1 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateAssistant}
+              disabled={isBusy}
+              className="flex-1 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isBusy ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Assistant"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="p-1.5 rounded-full bg-red-100 dark:bg-red-900/20">
+                <X className="h-4 w-4 text-red-600 dark:text-red-400" />
+              </div>
+              <DialogTitle className="text-base">Delete Assistant</DialogTitle>
+            </div>
+            <DialogDescription className="text-sm leading-relaxed">
+              Are you sure you want to delete <strong>{deletingAssistant?.name}</strong>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteConfirmDialog(false);
+                setDeletingAssistant(null);
+              }}
+              disabled={isBusy}
+              className="flex-1 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              disabled={isBusy}
+              className="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isBusy ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="w-full px-2 sm:px-4">
         <div className="relative bg-white dark:bg-zinc-900 rounded-2xl border-2 border-gray-400 dark:border-zinc-700 shadow-xl hover:border-gray-500 dark:hover:border-zinc-600 transition-colors">
         <div className="flex items-end p-2 sm:p-4">
@@ -318,6 +849,110 @@ export default function ChatInput({
               }}
             />
           </div>
+
+          {/* Assistant Selection Dropdown */}
+          {session && (
+            <div className="relative mr-1 sm:mr-2">
+              <button
+                onClick={() => setShowAssistantDropdown(!showAssistantDropdown)}
+                className="flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-zinc-700/50 rounded transition-all duration-200 cursor-pointer"
+              >
+                <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+                {isBusy && <Loader2 className="w-3 h-3.5 ml-1 animate-spin text-gray-500 dark:text-gray-300" />}
+                <span className="text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 truncate max-w-[80px] sm:max-w-none">
+                  {activeAssistant?.name || "Default"}
+                </span>
+                <ChevronDown className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${showAssistantDropdown ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showAssistantDropdown && (
+                <>
+                  <div className="absolute bottom-full mb-2 right-0 md:right-0 left-0 md:left-auto bg-white dark:bg-zinc-900 border border-gray-200/80 dark:border-zinc-700/50 rounded-2xl shadow-2xl backdrop-blur-xl z-50 w-full md:min-w-[300px] md:max-w-[360px] max-h-[50vh] overflow-hidden">
+                    {/* Assistants List */}
+                    <div className="overflow-y-auto max-h-[calc(50vh-60px)] scrollbar-minimal px-1">
+                      <div className="p-2">
+                        {assistants && assistants.length > 0 ? (
+                          assistants.map((assistant) => (
+                            <button
+                              key={assistant.id}
+                              onClick={() => handleAssistantChange(assistant.id)}
+                              className={`w-full group relative flex flex-col px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-all duration-150 rounded-lg cursor-pointer
+                                ${activeAssistant?.id === assistant.id
+                                  ? 'bg-gray-200 dark:bg-zinc-700 border-2 border-gray-600 dark:border-zinc-400 z-10'
+                                  : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50 border-2 border-transparent'}`}
+                              disabled={isBusy}
+                            >
+                              {/* Name, Actions & Check Icon */}
+                              <div className="flex items-center justify-between w-full mb-1">
+                                <div className="flex items-center gap-2 flex-1">
+                                  <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 text-gray-600 dark:text-gray-400" />
+                                  <span className={`text-[11px] sm:text-xs font-medium ${activeAssistant?.id === assistant.id ? 'text-gray-900 dark:text-white font-semibold' : 'text-gray-900 dark:text-gray-100'}`}>{assistant.name}</span>
+                                </div>
+                                <div className="flex items-center gap-1 ml-2">
+                                  <button
+                                    onClick={(e) => handleEditClick(assistant, e)}
+                                    className="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer"
+                                    title="Edit assistant"
+                                    disabled={isBusy}
+                                  >
+                                    <Pencil className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                                  </button>
+                                  <button
+                                    onClick={(e) => handleDeleteClick(assistant, e)}
+                                    className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors cursor-pointer"
+                                    title="Delete assistant"
+                                    disabled={isBusy}
+                                  >
+                                    <X className="w-3 h-3 text-red-600 dark:text-red-400" />
+                                  </button>
+                                  {/* Remove check/tick icon */}
+                                  {/* {activeAssistant?.id === assistant.id && (
+                                    <CheckCircle className="w-4 h-4 text-gray-900 dark:text-white flex-shrink-0" />
+                                  )} */}
+                                </div>
+                              </div>
+
+                              {/* Description */}
+                              {assistant.description && (
+                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 leading-relaxed ml-5">
+                                  {assistant.description}
+                                </p>
+                              )}
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-3 sm:px-4 py-6 text-center">
+                            <Bot className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-600" />
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              No assistants yet
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Create New Assistant Button */}
+                    <div className="border-t border-gray-200 dark:border-zinc-700 p-2">
+                      <button
+                        onClick={() => {
+                          setShowAssistantDropdown(false);
+                          setShowCreateAssistantDialog(true);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 text-[11px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all duration-150 cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        Create New Assistant
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowAssistantDropdown(false)}
+                  />
+                </>
+              )}
+            </div>
+          )}
 
           {/* Model Selection Dropdown */}
           <div className="relative mr-1 sm:mr-2">
