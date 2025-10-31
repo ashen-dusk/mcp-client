@@ -10,6 +10,7 @@ export type Category = {
   icon?: string | null;
   color?: string | null;
   description?: string | null;
+  slug?: string | null;
   createdAt: string;
   updatedAt: string;
 };

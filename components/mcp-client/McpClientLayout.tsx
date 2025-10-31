@@ -28,6 +28,9 @@ import { Switch } from "@/components/ui/switch";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
 import ToolsExplorer from "./ToolsExplorer";
+import { useSearchParams } from "next/navigation";
+
+
 
 interface McpClientLayoutProps {
   publicServers: McpServer[] | null;
@@ -81,6 +84,8 @@ export default function McpClientLayout({
   const [activeTab, setActiveTab] = useState<'public' | 'user'>('public');
   const [urlCopied, setUrlCopied] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const categorySlug = searchParams.get("category");
 
   // Get current servers based on active tab
   const currentServers = activeTab === 'public' ? publicServers : userServers;
@@ -227,6 +232,10 @@ export default function McpClientLayout({
     }
   };
 
+  const filteredServers = categorySlug
+    ? currentServers?.filter(server => server.category?.slug === categorySlug)
+    : currentServers;
+
   const sidebarVariants = {
     hidden: { x: -320, opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -348,8 +357,8 @@ export default function McpClientLayout({
                   >
                     <RefreshCw
                       className={`h-4 w-4 ${(activeTab === "public" ? publicLoading : userLoading)
-                          ? "animate-spin"
-                          : ""
+                        ? "animate-spin"
+                        : ""
                         }`}
                     />
                     <span className="text-xs">Refresh</span>
@@ -376,7 +385,7 @@ export default function McpClientLayout({
                         <Globe className="h-3 w-3" />
                         Public
                         <Badge variant="secondary" className="ml-1 text-xs">
-                          {publicServers?.length || 0}
+                          {filteredServers?.length || 0}
                         </Badge>
                       </TabsTrigger>
                       <TabsTrigger
@@ -413,7 +422,7 @@ export default function McpClientLayout({
                         ))
                       ) : publicServers && publicServers.length > 0 ? (
                         <>
-                          {publicServers.map((server) => (
+                          {filteredServers?.map((server) => (
                             <motion.div
                               key={server.id}
                               initial={{ opacity: 0, y: 10 }}
@@ -422,8 +431,8 @@ export default function McpClientLayout({
                             >
                               <Card
                                 className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                    ? "ring-2 ring-primary"
-                                    : ""
+                                  ? "ring-2 ring-primary"
+                                  : ""
                                   }`}
                                 onClick={() => setSelectedServer(server)}
                               >
@@ -432,15 +441,15 @@ export default function McpClientLayout({
                                     <div className="flex items-center gap-2">
                                       <div
                                         className={`w-3 h-3 rounded-full border-2 shadow-sm transition-all ${server.connectionStatus?.toUpperCase() ===
-                                            "CONNECTED"
-                                            ? "bg-green-500 border-green-600 animate-pulse"
+                                          "CONNECTED"
+                                          ? "bg-green-500 border-green-600 animate-pulse"
+                                          : server.connectionStatus?.toUpperCase() ===
+                                            "DISCONNECTED"
+                                            ? "bg-yellow-500 border-yellow-600"
                                             : server.connectionStatus?.toUpperCase() ===
-                                              "DISCONNECTED"
-                                              ? "bg-yellow-500 border-yellow-600"
-                                              : server.connectionStatus?.toUpperCase() ===
-                                                "FAILED"
-                                                ? "bg-red-500 border-red-600 animate-pulse"
-                                                : "bg-gray-400 border-gray-500"
+                                              "FAILED"
+                                              ? "bg-red-500 border-red-600 animate-pulse"
+                                              : "bg-gray-400 border-gray-500"
                                           }`}
                                         title={`Status: ${server.connectionStatus || "Unknown"
                                           }`}
@@ -544,8 +553,8 @@ export default function McpClientLayout({
 
                                 <Card
                                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                      ? "ring-2 ring-primary"
-                                      : ""
+                                    ? "ring-2 ring-primary"
+                                    : ""
                                     }`}
                                   onClick={() => setSelectedServer(server)}
                                 >
@@ -554,15 +563,15 @@ export default function McpClientLayout({
                                       <div className="flex items-center gap-2">
                                         <div
                                           className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() ===
-                                              "CONNECTED"
-                                              ? "bg-green-500 hover:bg-green-600 animate-pulse"
+                                            "CONNECTED"
+                                            ? "bg-green-500 hover:bg-green-600 animate-pulse"
+                                            : server.connectionStatus?.toUpperCase() ===
+                                              "DISCONNECTED"
+                                              ? "bg-yellow-500 hover:bg-yellow-600"
                                               : server.connectionStatus?.toUpperCase() ===
-                                                "DISCONNECTED"
-                                                ? "bg-yellow-500 hover:bg-yellow-600"
-                                                : server.connectionStatus?.toUpperCase() ===
-                                                  "FAILED"
-                                                  ? "bg-red-500 hover:bg-red-600 animate-pulse"
-                                                  : "bg-gray-400 hover:bg-gray-500"
+                                                "FAILED"
+                                                ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                                                : "bg-gray-400 hover:bg-gray-500"
                                             }`}
                                           title={`Status: ${server.connectionStatus || "Unknown"
                                             }`}

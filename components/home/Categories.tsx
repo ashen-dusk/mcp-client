@@ -86,7 +86,7 @@ export default function Categories() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {categories.map((category) => (
-          <Link key={category.id} href={`/mcp?category=${encodeURIComponent(category.name)}`}>
+          <Link key={category.id} href={`/mcp?category=${category.slug}`}>
             <div
               className="group flex flex-col items-center gap-3 p-6 rounded-xl border border-border bg-card hover:bg-accent/50 hover:border-primary/50 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-105"
               style={{
