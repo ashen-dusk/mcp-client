@@ -32,9 +32,10 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 };
 
 const PlaygroundPage = () => {
+  
   const { activeAssistant } = usePlayground();
   const askMode = activeAssistant?.config?.ask_mode;
-  console.log("activeAssistant", activeAssistant);
+
   return (
     <div
       className="max-w-2xl mx-auto"
