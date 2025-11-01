@@ -29,7 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import Link from "next/link";
-import { useAssistants } from "@/hooks/useAssistants";
+import { usePlayground } from "@/components/providers/PlaygroundProvider";
 import { toast } from "react-hot-toast";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,8 +84,8 @@ export default function ChatInput({
   }
   };
 
-  // Fetch assistants
-  const { assistants, activeAssistant, setActiveAssistant, createAssistant, updateAssistant, deleteAssistant, loading } = useAssistants();
+  // Fetch assistants from context
+  const { assistants, activeAssistant, setActiveAssistant, createAssistant, updateAssistant, deleteAssistant, loading } = usePlayground();
 
   // Separate state for model - independent of coagent state
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");

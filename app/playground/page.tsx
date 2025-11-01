@@ -7,7 +7,7 @@ import { Message } from "@copilotkit/shared";
 import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
 import HumanInTheLoop from "@/components/playground/HumanInTheLoop";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
-import { useAssistants } from "@/hooks/useAssistants";
+import { usePlayground } from "@/components/providers/PlaygroundProvider";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -32,7 +32,7 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 };
 
 const PlaygroundPage = () => {
-  const { activeAssistant } = useAssistants();
+  const { activeAssistant } = usePlayground();
   const askMode = activeAssistant?.config?.ask_mode;
   console.log("activeAssistant", activeAssistant);
   return (
