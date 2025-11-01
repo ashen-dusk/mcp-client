@@ -12,12 +12,9 @@ interface ChatInputWrapperProps {
 }
 
 const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
-  // Hook for voice input functionality
   const { pushToTalkState, setPushToTalkState } = usePushToTalk({
     sendFunction: async (text: string) => {
-      // Call the onSend prop to send the transcribed message
       onSend(text);
-      // Return a message object (CopilotKit will handle the actual message)
       return { id: Date.now().toString(), content: text, role: "user" } as Message;
     },
   });
@@ -34,16 +31,18 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 };
 
 const PlaygroundPage = () => {
+  
   return (
     <div
-    className="max-w-2xl mx-auto"
-    style={
-      {
-        "--copilot-kit-background-color": "var(--background)",
-      } as CopilotKitCSSProperties
-    }
+      className="max-w-2xl mx-auto"
+      style={
+        {
+          "--copilot-kit-background-color": "var(--background)",
+        } as CopilotKitCSSProperties
+      }
     >
       <ToolRenderer />
+
       <CopilotChat
         labels={{
           initial: "Hello! I am your MCP assistant. How can I help you today?",
@@ -52,7 +51,6 @@ const PlaygroundPage = () => {
         }}
         className="h-[80vh] rounded-md"
         Input={ChatInputWrapper}
-
       />
     </div>
   );
