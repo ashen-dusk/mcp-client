@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { Assistant } from "@/types/mcp";
 import { MY_ASSISTANTS_QUERY, UPDATE_ASSISTANT_MUTATION, CREATE_ASSISTANT_MUTATION, DELETE_ASSISTANT_MUTATION } from "@/lib/graphql";
 
-interface UseAssistantsReturn {
+export interface AssistantsState {
   assistants: Assistant[] | null;
   loading: boolean;
   error: string | null;
@@ -16,7 +16,7 @@ interface UseAssistantsReturn {
   deleteAssistant: (id: string) => Promise<void>;
 }
 
-export function useAssistants(): UseAssistantsReturn {
+export function useAssistants(): AssistantsState {
   const [assistants, setAssistants] = useState<Assistant[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,21 +73,23 @@ export function useAssistants(): UseAssistantsReturn {
           },
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to set active assistant');
       }
-
-      // Refresh assistants list to update all is_active states
-      await fetchAssistants();
+      const updatedAssistant = result.data?.updateAssistant;
+      if (updatedAssistant) {
+        setAssistants(prev => prev?.map(a => a.id === assistantId
+          ? { ...a, ...updatedAssistant, isActive: true }
+          : { ...a, isActive: false }
+        ) || null);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to set active assistant';
       toast.error(errorMessage);
       throw err;
     }
-  }, [fetchAssistants]);
+  }, []);
 
   // Create a new assistant
   const createAssistant = useCallback(async (data: { name: string; instructions: string; description?: string; isActive?: boolean; config?: any }) => {
@@ -108,22 +110,21 @@ export function useAssistants(): UseAssistantsReturn {
           },
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to create assistant');
       }
-
-      // Refresh assistants list
-      await fetchAssistants();
+      const newAssistant = result.data?.createAssistant;
+      if (newAssistant) {
+        setAssistants(prev => prev ? [...prev.map(a => data.isActive ? { ...a, isActive: false } : a), newAssistant] : [newAssistant]);
+      }
       toast.success('Assistant created successfully');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create assistant';
       toast.error(errorMessage);
       throw err;
     }
-  }, [fetchAssistants]);
+  }, []);
 
   // Update an existing assistant
   const updateAssistant = useCallback(async (id: string, data: { name?: string; instructions?: string; description?: string; isActive?: boolean; config?: any }) => {
@@ -141,22 +142,21 @@ export function useAssistants(): UseAssistantsReturn {
           },
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to update assistant');
       }
-
-      // Refresh assistants list
-      await fetchAssistants();
+      const updatedAssistant = result.data?.updateAssistant;
+      if (updatedAssistant) {
+        setAssistants(prev => prev ? prev.map(a => a.id === id ? { ...a, ...updatedAssistant } : a ) : null);
+      }
       toast.success('Assistant updated successfully');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update assistant';
       toast.error(errorMessage);
       throw err;
     }
-  }, [fetchAssistants]);
+  }, []);
 
   // Delete an assistant
   const deleteAssistant = useCallback(async (id: string) => {
@@ -171,22 +171,20 @@ export function useAssistants(): UseAssistantsReturn {
           variables: { id },
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok || result.errors) {
         throw new Error(result.errors?.[0]?.message || 'Failed to delete assistant');
       }
-
-      // Refresh assistants list
-      await fetchAssistants();
+      if (result.data?.deleteAssistant) {
+        setAssistants(prev => prev ? prev.filter(a => a.id !== id) : null);
+      }
       toast.success('Assistant deleted successfully');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete assistant';
       toast.error(errorMessage);
       throw err;
     }
-  }, [fetchAssistants]);
+  }, []);
 
   // Get the currently active assistant
   const activeAssistant = assistants?.find(a => a.isActive) || null;
@@ -194,7 +192,8 @@ export function useAssistants(): UseAssistantsReturn {
   // Load assistants on mount
   useEffect(() => {
     fetchAssistants();
-  }, [fetchAssistants]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     assistants,

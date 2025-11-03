@@ -20,6 +20,11 @@ export const MCP_SERVER_FRAGMENT = `
     transport
     url
     command
+    category {
+    id
+    name
+    slug   
+  }
     args
     enabled
     description
@@ -204,6 +209,7 @@ export const CATEGORIES_QUERY = `
           icon
           color
           description
+          slug
         }
         cursor
       }

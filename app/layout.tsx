@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AuthProvider from "@/components/AuthProvider";
-import { ApolloProvider } from "@/components/ApolloProvider";
+import AuthProvider from "@/components/providers/AuthProvider";
+import { ApolloProvider } from "@/components/providers/ApolloProvider";
 import { CopilotKit } from "@copilotkit/react-core";
 import "@copilotkit/react-ui/styles.css";
-import Header from "@/components/Header";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import Header from "@/components/common/Header";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
