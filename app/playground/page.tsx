@@ -8,6 +8,7 @@ import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
 import HumanInTheLoop from "@/components/playground/HumanInTheLoop";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import { usePlayground } from "@/components/providers/PlaygroundProvider";
+import { PlanStateRenderer } from "@/components/playground/PlanStateRenderer";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -45,6 +46,10 @@ const PlaygroundPage = () => {
         } as CopilotKitCSSProperties
       }
     >
+      {/* Render plan state if agent is using plan-and-execute mode */}
+      <PlanStateRenderer />
+
+      {/* Human-in-the-loop or tool renderer */}
       {askMode ? <HumanInTheLoop /> : <ToolRenderer />}
 
       <CopilotChat
