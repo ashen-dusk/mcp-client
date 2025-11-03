@@ -6,6 +6,8 @@ import ChatInput from "../../components/playground/ChatInput";
 import { usePushToTalk } from "@/hooks/usePushToTalk";
 import { Message } from "@copilotkit/shared";
 import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
+import CustomUserMessage from "@/components/custom/CustomUserMessage";
+import CustomAssistantMessage from "@/components/custom/CustomAssistantMessage";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -18,7 +20,11 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
       // Call the onSend prop to send the transcribed message
       onSend(text);
       // Return a message object (CopilotKit will handle the actual message)
-      return { id: Date.now().toString(), content: text, role: "user" } as Message;
+      return {
+        id: Date.now().toString(),
+        content: text,
+        role: "user",
+      } as Message;
     },
   });
 
@@ -36,12 +42,12 @@ const ChatInputWrapper = ({ onSend }: ChatInputWrapperProps) => {
 const PlaygroundPage = () => {
   return (
     <div
-    className="max-w-2xl mx-auto"
-    style={
-      {
-        "--copilot-kit-background-color": "var(--background)",
-      } as CopilotKitCSSProperties
-    }
+      className="max-w-2xl mx-auto"
+      style={
+        {
+          "--copilot-kit-background-color": "var(--background)",
+        } as CopilotKitCSSProperties
+      }
     >
       <ToolRenderer />
       <CopilotChat
@@ -50,9 +56,10 @@ const PlaygroundPage = () => {
           title: "MCP Playground",
           placeholder: "Ask about your connected servers...",
         }}
-        className="h-[80vh] rounded-md"
+        className="h-[85vh] rounded-md"
         Input={ChatInputWrapper}
-
+        UserMessage={CustomUserMessage}
+        AssistantMessage={CustomAssistantMessage}
       />
     </div>
   );
