@@ -10,7 +10,7 @@ const CustomUserMessage = (props: UserMessageProps) => {
   const { user } = useSession()?.data ?? {};
 
   const wrapperStyles = "flex items-center gap-2 justify-end mb-4";
-  const messageStyles = "items-start";
+ const messageStyles = "items-start [&>div]:max-w-full";
   // const avatarStyles = "bg-blue-500 shadow-sm min-h-10 min-w-10 rounded-full text-white flex items-center justify-center";
 
   return (
