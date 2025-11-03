@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { Assistant } from "@/types/mcp";
 import { MY_ASSISTANTS_QUERY, UPDATE_ASSISTANT_MUTATION, CREATE_ASSISTANT_MUTATION, DELETE_ASSISTANT_MUTATION } from "@/lib/graphql";
 
-interface UseAssistantsReturn {
+export interface AssistantsState {
   assistants: Assistant[] | null;
   loading: boolean;
   error: string | null;
@@ -16,7 +16,7 @@ interface UseAssistantsReturn {
   deleteAssistant: (id: string) => Promise<void>;
 }
 
-export function useAssistants(): UseAssistantsReturn {
+export function useAssistants(): AssistantsState {
   const [assistants, setAssistants] = useState<Assistant[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
