@@ -29,9 +29,9 @@ export default function Categories() {
       edges: Array<{ node: Category }>;
     };
   }>(GET_CATEGORIES, {
-    variables: {
-      first: 8, // Show first 8 categories
-    },
+    // variables: {
+    //   first: 8, // Show first 8 categories
+    // },
     fetchPolicy: "cache-and-network", // Always fetch fresh data while showing cached
   });
 
