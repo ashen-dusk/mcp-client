@@ -47,7 +47,8 @@ const PlaygroundPage = () => {
       }
     >
       {/* Render plan state if agent is using plan-and-execute mode */}
-      <PlanStateRenderer />
+      {/* note MCPToolCall component doesn't get triggered with plan-and-execute */}
+      {/* <PlanStateRenderer /> */}
 
       {/* Human-in-the-loop or tool renderer */}
       {askMode ? <HumanInTheLoop /> : <ToolRenderer />}

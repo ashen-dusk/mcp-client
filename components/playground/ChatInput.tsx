@@ -121,7 +121,7 @@ export default function ChatInput({
     description: "",
     instructions: "",
     config: {
-      ask_mode: true,
+      ask_mode: false,
       max_tokens: 2000,
       temperature: 0.7,
       datetime_context: true,
@@ -168,7 +168,7 @@ export default function ChatInput({
         description: "",
         instructions: "",
         config: {
-          ask_mode: true,
+          ask_mode: false,
           max_tokens: 2000,
           temperature: 0.7,
           datetime_context: true,
@@ -189,7 +189,7 @@ export default function ChatInput({
       description: assistant.description || "",
       instructions: assistant.instructions,
       config: assistant.config || {
-        ask_mode: true,
+        ask_mode: false,
         max_tokens: 2000,
         temperature: 0.7,
         datetime_context: true,
@@ -220,7 +220,7 @@ export default function ChatInput({
         description: "",
         instructions: "",
         config: {
-          ask_mode: true,
+          ask_mode: false,
           max_tokens: 2000,
           temperature: 0.7,
           datetime_context: true,
@@ -285,7 +285,7 @@ export default function ChatInput({
         loading={isBusy}
         handleCancel={() => {
           setDialogState(null);
-          setAssistantFormData({ name: '', description: '', instructions: '', config: { ask_mode: true, max_tokens: 2000, temperature: 0.7, datetime_context: true } });
+          setAssistantFormData({ name: '', description: '', instructions: '', config: { ask_mode: false, max_tokens: 2000, temperature: 0.7, datetime_context: true } });
         }}
       />
       <AssistantEditDialog
@@ -298,7 +298,7 @@ export default function ChatInput({
         handleCancel={() => {
           setDialogState(null);
           setEditingAssistant(null);
-          setAssistantFormData({ name: '', description: '', instructions: '', config: { ask_mode: true, max_tokens: 2000, temperature: 0.7, datetime_context: true } });
+          setAssistantFormData({ name: '', description: '', instructions: '', config: { ask_mode: false, max_tokens: 2000, temperature: 0.7, datetime_context: true } });
         }}
       />
       <AssistantDeleteDialog
