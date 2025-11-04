@@ -6,7 +6,7 @@ import McpClientLayout from "@/components/mcp-client/McpClientLayout";
 import OAuthCallbackHandler from "@/components/mcp-client/OAuthCallbackHandler";
 import { McpServer } from "@/types/mcp";
 
-export default function McpPage() {
+function McpPageContent() {
   const { data: session } = useSession();
   const [publicServers, setPublicServers] = useState<McpServer[] | null>(null);
   const [userServers, setUserServers] = useState<McpServer[] | null>(null);
@@ -312,9 +312,9 @@ export default function McpPage() {
 
   return (
     <>
-      <Suspense fallback={null}>
+      {/* <Suspense fallback={null}> */}
         <OAuthCallbackHandler onRefreshServers={refreshAllServers} />
-      </Suspense>
+      {/* </Suspense> */}
       <McpClientLayout
         publicServers={publicServers}
         userServers={userServers}
@@ -338,3 +338,12 @@ export default function McpPage() {
     </>
   );
 }
+
+export default function McpPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <McpPageContent />
+    </Suspense>
+  );
+}
+
