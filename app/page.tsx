@@ -15,11 +15,11 @@ import RecentMcpServers from "@/components/home/RecentMcpServers";
 import Categories from "@/components/home/Categories";
 import McpArchitecture from "@/components/home/McpArchitecture";
 import Footer from "@/components/home/Footer";
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 // -------------------------------------------------------------------
 // Animation Variants
 // -------------------------------------------------------------------
-const container = {
+const container: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -31,45 +31,45 @@ const container = {
   },
 };
 
-const item = {
+const item: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.25, 0.46, 0.45, 0.94] // Smooth easing
+      ease: [0.25, 0.46, 0.45, 0.94] as const // Smooth easing
     },
   },
 };
 
-const logoHover = {
+const logoHover: Variants = {
   rest: { y: 0, scale: 1 },
   hover: {
     y: -6,
     scale: 1.05,
     transition: {
       duration: 0.3,
-      ease: "easeOut"
+      ease: "easeOut" as const
     }
   },
 };
 
-const fadeInUp = {
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }
+    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] as const }
   }
 };
 
-const scaleIn = {
+const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" }
+    transition: { duration: 0.5, ease: "easeOut" as const }
   }
 };
 
@@ -328,7 +328,7 @@ export default function Home() {
             {[
               {
                 icon: <Server className="h-6 w-6 text-primary" />,
-                title: "MCP Client",
+                title: "MCP",
                 desc: "Instantly connect to remote MCP servers with zero local configuration — just a URL away.",
               },
               {

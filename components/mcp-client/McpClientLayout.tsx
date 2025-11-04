@@ -482,7 +482,7 @@ export default function McpClientLayout({
                           {data?.categories?.edges.map(({ node }) => (
                             <DropdownMenuItem
                               key={node.id}
-                              onClick={() => handleCategorySelect(node?.slug)}
+                              onClick={() => handleCategorySelect(node?.slug || "")}
                             >
                               {node.name}
                             </DropdownMenuItem>

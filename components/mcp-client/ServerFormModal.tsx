@@ -260,7 +260,7 @@ export default function ServerFormModal({
                   {...register("category")}
                   id="category"
                   className="h-9 w-full border rounded-md bg-background text-sm"
-                  defaultValue={server?.category || ""}
+                  defaultValue={typeof server?.category === 'string' ? server.category : server?.category?.id || ""}
                 >
                   <option value="">Select a category</option>
                   {data?.categories?.edges.map(({ node }) => (
