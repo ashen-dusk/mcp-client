@@ -48,6 +48,9 @@ export default function McpClientWrapper({ session }: McpClientWrapperProps) {
       onServerDelete={handleServerDelete}
       onUpdatePublicServer={updateServer}
       onUpdateUserServer={updateServer}
+      hasNextPage={false}
+      isLoadingMore={false}
+      onLoadMore={() => {}}
     />
   );
 }

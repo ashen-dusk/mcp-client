@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import Logo from "@/components/Logo";
-import { ProfileDropdown } from "@/components/ProfileDropdown";
-import { NavigationLinks } from "@/components/NavigationLinks";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
+import Logo from "@/components/common/Logo";
+import { ProfileDropdown } from "@/components/common/ProfileDropdown";
+import { NavigationLinks } from "@/components/common/NavigationLinks";
 
 export default async function Header() {
   const session = await getServerSession(authOptions);

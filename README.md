@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MCP Hub - Frontend
+
+Next.js 15 frontend for the MCP (Model Context Protocol) Hub. Provides a modern web interface for managing and interacting with MCP servers.
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **UI:** React 19, TypeScript, Tailwind CSS
+- **Components:** shadcn/ui (Radix UI primitives)
+- **Authentication:** NextAuth.js with Google OAuth
+- **AI Chat:** CopilotKit integration
+- **State:** React hooks, GraphQL queries
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- Backend API running at `http://localhost:8000`
+- Google OAuth credentials
+
+### Installation
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create `.env.local` file:
+
+```bash
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DJANGO_API_URL=http://localhost:8000
+BACKEND_URL=http://localhost:8000
+```
+
+### Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
+
+## Project Structure
+
+```
+mcp-client/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes (GraphQL proxy, CopilotKit)
+│   ├── page.tsx           # Home page
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   └── AuthProvider.tsx  # NextAuth wrapper
+├── hooks/                # Custom React hooks
+│   └── useMcpServers.ts  # MCP server management
+├── types/                # TypeScript types
+│   └── mcp.ts           # MCP & Category types
+└── lib/                  # Utilities
+```
+
+## Key Features
+
+- **MCP Server Management** - Create, update, delete, and categorize servers
+- **Category System** - Organize servers with icons and colors
+- **Real-time Chat** - AI-powered chat with CopilotKit
+- **Authentication** - Google OAuth integration
+- **GraphQL API** - Type-safe queries and mutations
+- **Responsive UI** - Mobile-friendly design
+
+## API Integration
+
+Frontend communicates with Django backend via:
+- GraphQL endpoint: `/api/graphql`
+- CopilotKit endpoints: `/api/copilotkit`
+
+## TypeScript Types
+
+Types are defined in `types/mcp.ts` and match the Django GraphQL schema:
+- `McpServer` - Server configuration with category
+- `Category` - Category with icon, color, description
+- `ToolInfo` - MCP tool information
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [NextAuth.js](https://next-auth.js.org)
+- [CopilotKit](https://docs.copilotkit.ai)
+- [shadcn/ui](https://ui.shadcn.com)

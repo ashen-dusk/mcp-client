@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000/api/graphql';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+const GRAPHQL_ENDPOINT = `${BACKEND_URL}/api/graphql`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +19,13 @@ export async function POST(request: NextRequest) {
     };
 
     // Add authorization header if session exists and query requires auth
-    const requiresAuth = query.includes('getUserMcpServers') || query.includes('restartMcpServer');
+    const requiresAuth = query.includes('getUserMcpServers') ||
+                        query.includes('restartMcpServer') ||
+                        query.includes('myAssistants') ||
+                        query.includes('myAssistant') ||
+                        query.includes('createAssistant') ||
+                        query.includes('updateAssistant') ||
+                        query.includes('deleteAssistant');
 
     if (requiresAuth && !session?.googleIdToken) {
       // Return authentication error for queries that require auth
@@ -38,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Forward request to backend GraphQL endpoint
-    const response = await fetch(BACKEND_URL, {
+    const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',
       headers,
       body: JSON.stringify({ query, variables }),

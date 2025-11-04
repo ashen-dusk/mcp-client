@@ -6,6 +6,13 @@ export const TOOL_INFO_FRAGMENT = `
   }
 `;
 
+/**
+ * Full MCP Server fragment with all fields including connection status and tools.
+ *
+ * Note: connectionStatus and tools are resolved at the field level from Redis,
+ * so only request them when needed. If you only need basic server info,
+ * create a lighter fragment without these fields for better performance.
+ */
 export const MCP_SERVER_FRAGMENT = `
   fragment McpServerFields on MCPServerType {
     id
@@ -13,6 +20,11 @@ export const MCP_SERVER_FRAGMENT = `
     transport
     url
     command
+    category {
+    id
+    name
+    slug   
+  }
     args
     enabled
     description
@@ -28,10 +40,55 @@ export const MCP_SERVER_FRAGMENT = `
 `;
 
 export const MCP_SERVERS_QUERY = `
-  query McpServers {
-    mcpServers { ...McpServerFields }
+query McpServers($first: Int = 10, $after: String, $order: MCPServerOrder, $filters: MCPServerFilter) {
+  mcpServers(first: $first, after: $after, order: $order, filters: $filters) {
+    totalCount
+    edges {
+      node {
+        ...McpServerFields 
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
   }
-  ${MCP_SERVER_FRAGMENT}
+}
+${MCP_SERVER_FRAGMENT}
+`;
+
+/**
+ * Lightweight query for fetching recent MCP servers without connection state.
+ *
+ * This query deliberately omits connectionStatus and tools fields for better performance,
+ * since those fields trigger Redis lookups. Only request those fields when you need them.
+ * Uses cursor-based pagination (edges structure) like MCP_SERVERS_QUERY.
+ */
+export const RECENT_MCP_SERVERS_QUERY = `
+  query RecentMcpServers($first: Int, $after: String, $order: MCPServerOrder) {
+    mcpServers(first: $first, after: $after, order: $order) {
+      edges {
+        node {
+          id
+          name
+          transport
+          createdAt
+          updatedAt
+          isPublic
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
 `;
 
 export const CONNECT_MCP_SERVER_MUTATION = `
@@ -140,6 +197,107 @@ export const USER_MCP_SERVERS_QUERY = `
     }
   }
   ${MCP_SERVER_FRAGMENT}
+`;
+
+export const CATEGORIES_QUERY = `
+  query Categories($first: Int, $after: String) {
+    categories(first: $first, after: $after) {
+      edges {
+        node {
+          id
+          name
+          icon
+          color
+          description
+          slug
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+`;
+
+export const MY_ASSISTANTS_QUERY = `
+  query MyAssistants {
+    myAssistants {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const CREATE_ASSISTANT_MUTATION = `
+  mutation CreateAssistant(
+    $name: String!
+    $instructions: String!
+    $description: String
+    $isActive: Boolean
+    $config: JSON
+  ) {
+    createAssistant(
+      name: $name
+      instructions: $instructions
+      description: $description
+      isActive: $isActive
+      config: $config
+    ) {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const UPDATE_ASSISTANT_MUTATION = `
+  mutation UpdateAssistant(
+    $id: ID!
+    $name: String
+    $description: String
+    $instructions: String
+    $isActive: Boolean
+    $config: JSON
+  ) {
+    updateAssistant(
+      id: $id
+      name: $name
+      description: $description
+      instructions: $instructions
+      isActive: $isActive
+      config: $config
+    ) {
+      id
+      name
+      description
+      instructions
+      isActive
+      config
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_ASSISTANT_MUTATION = `
+  mutation DeleteAssistant($id: ID!) {
+    deleteAssistant(id: $id)
+  }
 `;
 
 

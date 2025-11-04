@@ -24,7 +24,7 @@ export function NavigationLinks() {
         }`}
       >
         <Server className="h-4 w-4" />
-        MCP Client
+        MCP
       </Link>
       <Link
         href="/playground"

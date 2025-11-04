@@ -4,10 +4,22 @@ export type ToolInfo = {
   schema: any; // JSON type from Strawberry
 };
 
+export type Category = {
+  id: string;
+  name: string;
+  icon?: string | null;
+  color?: string | null;
+  description?: string | null;
+  slug?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type McpServer = {
   id: string;
   name: string;
   description?: string | null;
+  category?: Category | null;
   transport: string;
   owner?: string | null;
   url?: string | null;
@@ -18,8 +30,8 @@ export type McpServer = {
   isPublic?: boolean;
   connectionStatus?: string | null;
   tools: ToolInfo[];
-  updated_at: string; 
-  createdAt?: string; 
+  updated_at: string;
+  createdAt?: string;
 };
 
 export type ConnectionResult = {
@@ -43,11 +55,24 @@ export type ServerHealthInfo = {
   tools: ToolInfo[];
 };
 
+// Assistant Types
+export type Assistant = {
+  id: string;
+  name: string;
+  description?: string | null;
+  instructions: string;
+  isActive: boolean;
+  config: any;
+  createdAt: string;
+  updatedAt: string;
+};
+
 // CopilotKit Agent Types
 export type AgentState = {
   model: string;
   status?: string;
   sessionId: string;
+  assistant?: Assistant | null;
 };
 
 export interface Tool {
