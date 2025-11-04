@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy, Check } from "lucide-react";
+import { Server, Wrench, Activity, PanelLeftClose, PanelLeftOpen, Plus, Edit, Trash2, Loader2, Globe, RefreshCw, Calendar, User as UserIcon, Shield, Copy, Check, Search } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { Session } from "next-auth";
 import ReactMarkdown from "react-markdown";
@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import ServerFormModal from "./ServerFormModal";
+import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,25 @@ import { Switch } from "@/components/ui/switch";
 import { McpServer } from "@/types/mcp";
 import ServerManagement from "./ServerManagement";
 import ToolsExplorer from "./ToolsExplorer";
+import { useSearchParams } from "next/navigation";
+import { Filter } from "lucide-react";
+import { useQuery } from "@apollo/client/react";
+import { CATEGORIES_QUERY } from "@/lib/graphql";
+import { Category } from "@/types/mcp";
+import { gql } from "@apollo/client";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "../ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
+
+
+
 
 interface McpClientLayoutProps {
   publicServers: McpServer[] | null;
@@ -81,10 +101,21 @@ export default function McpClientLayout({
   const [activeTab, setActiveTab] = useState<'public' | 'user'>('public');
   const [urlCopied, setUrlCopied] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
+  const categorySlug = searchParams.get("category");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300); // 300ms delay
+
+  const router = useRouter();
+
+
 
   // Get current servers based on active tab
   const currentServers = activeTab === 'public' ? publicServers : userServers;
   const currentError = activeTab === 'public' ? publicError : userError;
+
+  const GET_CATEGORIES = gql`${CATEGORIES_QUERY}`;
+
 
   // Update selected server when servers list changes
   useEffect(() => {
@@ -95,6 +126,13 @@ export default function McpClientLayout({
       }
     }
   }, [currentServers, selectedServer]);
+
+  useEffect(() => {
+    if (categorySlug) {
+      setSelectedCategory(categorySlug);
+    }
+  }, [categorySlug]);
+
 
   // Infinite scroll observer for public servers
   useEffect(() => {
@@ -227,6 +265,10 @@ export default function McpClientLayout({
     }
   };
 
+  // const filteredServers = categorySlug
+  //   ? currentServers?.filter(server => server.category?.slug === categorySlug)
+  //   : currentServers;
+
   const sidebarVariants = {
     hidden: { x: -320, opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -238,6 +280,55 @@ export default function McpClientLayout({
     visible: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 20 }
   };
+
+  const { loading, error, data } = useQuery<{
+    categories: {
+      edges: Array<{ node: Category }>;
+    };
+  }>(GET_CATEGORIES, {
+    fetchPolicy: "cache-and-network",
+  });
+
+  // Optional: Track selected category
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const handleCategorySelect = (categorySlug: string) => {
+    setSelectedCategory(categorySlug);
+
+    const currentParams = new URLSearchParams(window.location.search);
+
+    if (categorySlug && categorySlug !== "") {
+      currentParams.set("category", categorySlug);
+    } else {
+      currentParams.delete("category");
+    }
+
+    const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+    router.replace(newUrl, { scroll: false }); // Update URL without reload
+  };
+
+  const filteredServers = useMemo(() => {
+    let servers = currentServers || [];
+
+    // Step 1: Filter by selected category (from dropdown or URL)
+    const activeCategory = selectedCategory || categorySlug;
+    if (activeCategory) {
+      servers = servers.filter(server => server.category?.slug === activeCategory);
+    }
+
+    // Step 2: Filter by search query
+    if (debouncedSearch.trim()) {
+      const lower = debouncedSearch.toLowerCase();
+      servers = servers.filter(server => server.name.toLowerCase().includes(lower));
+    }
+
+    return servers;
+  }, [currentServers, selectedCategory, categorySlug, debouncedSearch]);
+
+  const truncateText = (text: string, maxLength = 17) => {
+    return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
+  };
+
 
   if (currentError) {
     return (
@@ -348,12 +439,70 @@ export default function McpClientLayout({
                   >
                     <RefreshCw
                       className={`h-4 w-4 ${(activeTab === "public" ? publicLoading : userLoading)
-                          ? "animate-spin"
-                          : ""
+                        ? "animate-spin"
+                        : ""
                         }`}
                     />
                     <span className="text-xs">Refresh</span>
                   </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-1 flex-1"
+                        disabled={loading}
+                      >
+                        <Filter className="h-4 w-4" />
+                        <span className="text-xs max-w-[120px] truncate">
+                          {selectedCategory
+                            ? truncateText(
+                              data?.categories?.edges.find((c) => c.node.slug === selectedCategory)?.node.name || "Filter",
+                              17
+                            )
+                            : "Filter"}
+                        </span>
+
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+
+                      {loading ? (
+                        <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
+                      ) : error ? (
+                        <DropdownMenuItem disabled>Error loading categories</DropdownMenuItem>
+                      ) : (
+                        <>
+                          <DropdownMenuItem onClick={() => handleCategorySelect("")}>
+                            All Categories
+                          </DropdownMenuItem>
+                          {data?.categories?.edges.map(({ node }) => (
+                            <DropdownMenuItem
+                              key={node.id}
+                              onClick={() => handleCategorySelect(node?.slug)}
+                            >
+                              {node.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                </div>
+                {/* Search bar */}
+                <div className="mt-2 relative">
+                  <Input
+                    type="text"
+                    placeholder="Search servers..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-9 pl-8 text-sm"
+                  />
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 </div>
               </div>
 
@@ -376,7 +525,7 @@ export default function McpClientLayout({
                         <Globe className="h-3 w-3" />
                         Public
                         <Badge variant="secondary" className="ml-1 text-xs">
-                          {publicServers?.length || 0}
+                          {filteredServers?.length || 0}
                         </Badge>
                       </TabsTrigger>
                       <TabsTrigger
@@ -411,9 +560,9 @@ export default function McpClientLayout({
                             </CardContent>
                           </Card>
                         ))
-                      ) : publicServers && publicServers.length > 0 ? (
+                      ) : filteredServers && filteredServers.length > 0 ? (
                         <>
-                          {publicServers.map((server) => (
+                          {filteredServers?.map((server) => (
                             <motion.div
                               key={server.id}
                               initial={{ opacity: 0, y: 10 }}
@@ -422,8 +571,8 @@ export default function McpClientLayout({
                             >
                               <Card
                                 className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                    ? "ring-2 ring-primary"
-                                    : ""
+                                  ? "ring-2 ring-primary"
+                                  : ""
                                   }`}
                                 onClick={() => setSelectedServer(server)}
                               >
@@ -432,15 +581,15 @@ export default function McpClientLayout({
                                     <div className="flex items-center gap-2">
                                       <div
                                         className={`w-3 h-3 rounded-full border-2 shadow-sm transition-all ${server.connectionStatus?.toUpperCase() ===
-                                            "CONNECTED"
-                                            ? "bg-green-500 border-green-600 animate-pulse"
+                                          "CONNECTED"
+                                          ? "bg-green-500 border-green-600 animate-pulse"
+                                          : server.connectionStatus?.toUpperCase() ===
+                                            "DISCONNECTED"
+                                            ? "bg-yellow-500 border-yellow-600"
                                             : server.connectionStatus?.toUpperCase() ===
-                                              "DISCONNECTED"
-                                              ? "bg-yellow-500 border-yellow-600"
-                                              : server.connectionStatus?.toUpperCase() ===
-                                                "FAILED"
-                                                ? "bg-red-500 border-red-600 animate-pulse"
-                                                : "bg-gray-400 border-gray-500"
+                                              "FAILED"
+                                              ? "bg-red-500 border-red-600 animate-pulse"
+                                              : "bg-gray-400 border-gray-500"
                                           }`}
                                         title={`Status: ${server.connectionStatus || "Unknown"
                                           }`}
@@ -544,8 +693,8 @@ export default function McpClientLayout({
 
                                 <Card
                                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${selectedServer?.name === server.name
-                                      ? "ring-2 ring-primary"
-                                      : ""
+                                    ? "ring-2 ring-primary"
+                                    : ""
                                     }`}
                                   onClick={() => setSelectedServer(server)}
                                 >
@@ -554,15 +703,15 @@ export default function McpClientLayout({
                                       <div className="flex items-center gap-2">
                                         <div
                                           className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 hover:scale-125 shadow-sm border-2 ${server.connectionStatus?.toUpperCase() ===
-                                              "CONNECTED"
-                                              ? "bg-green-500 hover:bg-green-600 animate-pulse"
+                                            "CONNECTED"
+                                            ? "bg-green-500 hover:bg-green-600 animate-pulse"
+                                            : server.connectionStatus?.toUpperCase() ===
+                                              "DISCONNECTED"
+                                              ? "bg-yellow-500 hover:bg-yellow-600"
                                               : server.connectionStatus?.toUpperCase() ===
-                                                "DISCONNECTED"
-                                                ? "bg-yellow-500 hover:bg-yellow-600"
-                                                : server.connectionStatus?.toUpperCase() ===
-                                                  "FAILED"
-                                                  ? "bg-red-500 hover:bg-red-600 animate-pulse"
-                                                  : "bg-gray-400 hover:bg-gray-500"
+                                                "FAILED"
+                                                ? "bg-red-500 hover:bg-red-600 animate-pulse"
+                                                : "bg-gray-400 hover:bg-gray-500"
                                             }`}
                                           title={`Status: ${server.connectionStatus || "Unknown"
                                             }`}
