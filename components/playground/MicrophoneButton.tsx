@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import React from "react";
+import { Session } from "next-auth";
 
 export interface MicrophoneButtonProps {
   pushToTalkState: string;
   onPushToTalkStateChange?: (state: string) => void;
-  session?: any;
+  session?: Session | null;
   disabled?: boolean;
   setShowAuthDialog?: (open: boolean) => void;
 }

@@ -47,7 +47,7 @@ const AssistantEditDialog: React.FC<AssistantEditDialogProps> = ({ open, onOpenC
           <DialogTitle className="text-base">Edit Assistant</DialogTitle>
         </div>
         <DialogDescription className="text-sm leading-relaxed">
-          Update your assistant's configuration and instructions.
+          Update your assistant&apos;s configuration and instructions.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 py-4 overflow-y-auto flex-1 scrollbar-minimal">

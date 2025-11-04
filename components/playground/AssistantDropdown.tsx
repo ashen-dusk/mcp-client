@@ -1,17 +1,19 @@
 import { Bot, ChevronDown, Loader2, Plus, Pencil, X } from "lucide-react";
 import React from "react";
+import { Session } from "next-auth";
+import type { Assistant } from "@/types/mcp";
 
 export interface AssistantDropdownProps {
-  session: any;
-  assistants: any[];
-  activeAssistant: any;
+  session: Session | null;
+  assistants: Assistant[];
+  activeAssistant: Assistant | null;
   isBusy: boolean;
   loading?: boolean;
   showAssistantDropdown: boolean;
   setShowAssistantDropdown: (v: boolean) => void;
   handleAssistantChange: (assistantId: string) => void;
-  handleEditClick: (assistant: any, e: React.MouseEvent) => void;
-  handleDeleteClick: (assistant: any, e: React.MouseEvent) => void;
+  handleEditClick: (assistant: Assistant, e: React.MouseEvent) => void;
+  handleDeleteClick: (assistant: Assistant, e: React.MouseEvent) => void;
   handleCreateAssistantClick: () => void;
 }
 

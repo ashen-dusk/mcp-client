@@ -113,9 +113,9 @@ const PlanStepItem = ({ step, showConnector }: { step: PlanStep; showConnector: 
 export const PlanStateRenderer = () => {
   useCoAgentStateRender({
     name: "mcpAssistant",
-    render: ({ state, status }) => {
+    render: ({ state }) => {
       // Extract plan_state from the agent state
-      const planState = (state as any)?.plan_state as PlanState;
+      const planState = (state as { plan_state?: PlanState })?.plan_state;
 
       // Only render if we're in plan mode and have a plan
       if (!planState || planState.mode !== "plan" || !planState.plan) {

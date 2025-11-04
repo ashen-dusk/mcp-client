@@ -4,6 +4,11 @@ import { useLangGraphInterrupt, useCoAgentStateRender } from "@copilotkit/react-
 import { Button } from "@/components/ui/button";
 import MCPToolCall from "./MCPToolCall";
 
+interface ToolData {
+  tool_args?: Record<string, unknown>;
+  message?: string;
+}
+
 export default function HumanInTheLoop() {
   // Render tool call state using useCoAgentStateRender
   // This shows tool execution progress from agent state
@@ -33,10 +38,10 @@ export default function HumanInTheLoop() {
 
   // Human-in-the-Loop interrupt handler
   useLangGraphInterrupt({
-    enabled: ({ eventValue }: { eventValue: any }) =>
+    enabled: ({ eventValue }: { eventValue?: { type?: string } }) =>
       eventValue?.type === "tool_approval_request",
     render: ({ event, resolve }) => {
-      const toolData = event?.value || {};
+      const toolData = (event?.value || {}) as ToolData;
       const toolArgs = toolData?.tool_args;
       const message = toolData?.message;
 

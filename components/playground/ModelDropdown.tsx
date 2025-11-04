@@ -1,11 +1,19 @@
 import { ChevronDown, CheckCircle } from "lucide-react";
 import React from "react";
 
+export interface Model {
+  id: string;
+  name: string;
+  description: string;
+  provider: string;
+  tag: string;
+}
+
 export interface ModelDropdownProps {
   selectedModel: string;
   setShowModelDropdown: (open: boolean) => void;
   showModelDropdown: boolean;
-  AVAILABLE_MODELS: any[];
+  AVAILABLE_MODELS: Model[];
   handleModelChange: (id: string) => void;
 }
 
