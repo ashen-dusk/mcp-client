@@ -8,7 +8,8 @@ import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
 import HumanInTheLoop from "@/components/playground/HumanInTheLoop";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import { usePlayground } from "@/components/providers/PlaygroundProvider";
-import { PlanDisplay } from "@/components/playground/PlanDisplay";
+import { PlanRenderer } from "@/compo@/components/playground/PlanDisplay
+import { AssistantMessage } from "@/components/playground/ChatMessage";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -46,8 +47,8 @@ const PlaygroundPage = () => {
         } as CopilotKitCSSProperties
       }
     >
-      {/* Plan Display - Shows plan progress */}
-      <PlanDisplay />
+      {/* Plan Renderer - Shows plan progress */}
+      <PlanRenderer />
 
       {/* Human-in-the-loop or tool renderer */}
       {askMode ? <HumanInTheLoop /> : <ToolRenderer />}
@@ -60,6 +61,7 @@ const PlaygroundPage = () => {
         }}
         className="h-[80vh] rounded-md"
         Input={ChatInputWrapper}
+        AssistantMessage={AssistantMessage}
       />
     </div>
   );
