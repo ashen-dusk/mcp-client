@@ -8,7 +8,7 @@ import { CopilotKitCSSProperties } from "@copilotkit/react-ui";
 import HumanInTheLoop from "@/components/playground/HumanInTheLoop";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import { usePlayground } from "@/components/providers/PlaygroundProvider";
-import { PlanStateRenderer } from "@/components/playground/PlanStateRenderer";
+import { PlanDisplay } from "@/components/playground/PlanDisplay";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -46,9 +46,8 @@ const PlaygroundPage = () => {
         } as CopilotKitCSSProperties
       }
     >
-      {/* Render plan state if agent is using plan-and-execute mode */}
-      {/* note MCPToolCall component doesn't get triggered with plan-and-execute */}
-      {/* <PlanStateRenderer /> */}
+      {/* Plan Display - Shows plan progress */}
+      <PlanDisplay />
 
       {/* Human-in-the-loop or tool renderer */}
       {askMode ? <HumanInTheLoop /> : <ToolRenderer />}
