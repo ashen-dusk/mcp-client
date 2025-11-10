@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { Clock, Wrench, Bug, Sparkles, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Changelog | MCP Assistant",
-  description: "Latest updates, improvements, and bug fixes for MCP Assistant",
+  title: "Changelog | MCP Hub",
+  description: "Latest updates, improvements, and bug fixes for MCP Hub",
 };
 
 interface Change {
@@ -17,36 +17,101 @@ interface ChangeGroup {
 }
 
 interface ChangelogEntry {
-  version: string;
   date: string;
   groups: ChangeGroup[];
 }
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "1.5.0",
-    date: "October 27, 2025",
+    date: "November 10, 2025",
     groups: [
       {
         category: "improved",
         changes: [
-          { description: "Remove toast notifications for server actions and loading states in MCP components" },
-          { description: "Refactor error handling and logging in API routes" },
-          { description: "Refactor OAuth storage and clean up unused code in backend" },
-          { description: "Refactor logging in OAuth helper functions" },
+          { description: "Update layout title and enhance homepage structure" },
+          { description: "Update agent initialization in AG-UI handler to use the updated graph variable" },
         ]
       },
     ]
   },
   {
-    version: "1.4.0",
-    date: "October 26, 2025",
+    date: "November 5-9, 2025",
+    groups: [
+      {
+        category: "improved",
+        changes: [
+          { description: "Enhance OAuth callback handling to dynamically select frontend URL" },
+          { description: "Refactor MCP page structure for improved readability and organization" },
+          { description: "Add favicon and update layout metadata" },
+        ]
+      },
+      {
+        category: "fixed",
+        changes: [
+          { description: "Fix tool execution rendering after responding graph with cancel response" },
+        ]
+      },
+    ]
+  },
+  {
+    date: "November 1-4, 2025",
+    groups: [
+      {
+        category: "new",
+        changes: [
+          { description: "Add Assistant management components and refactor ChatInput for improved functionality" },
+          { description: "Add available models and assistant selection dialog" },
+          { description: "Add human-in-the-loop approval for tool execution and enhance routing logic" },
+          { description: "Implement useDebounce hook for search functionality" },
+        ]
+      },
+      {
+        category: "improved",
+        changes: [
+          { description: "Add PlaygroundProvider and refactor Playground components for improved state management" },
+          { description: "Enhance homepage layout and animations for improved user engagement" },
+          { description: "Update dependencies and refactor Playground components for improved functionality" },
+          { description: "Refactor category fetching and filtering in McpClientLayout with category selection" },
+          { description: "Refactor animation variants in homepage and update MCP references" },
+          { description: "Enhance tool call management and state handling in agent logic" },
+        ]
+      },
+    ]
+  },
+  {
+    date: "October 29-31, 2025",
+    groups: [
+      {
+        category: "new",
+        changes: [
+          { description: "Add Category model and integrate with MCPServer" },
+          { description: "Add category slug field for URL-friendly filtering" },
+          { description: "Add seed script for populating Category data in MCP Hub" },
+          { description: "Add McpArchitecture component and architecture visualization section" },
+        ]
+      },
+      {
+        category: "improved",
+        changes: [
+          { description: "Revamp Hero and Features sections for enhanced user engagement" },
+          { description: "Refactor Apollo Client setup for improved authentication and error handling" },
+          { description: "Enhance GraphQL API integration with category support" },
+          { description: "Update GraphQL endpoint to conditionally set graphql_ide parameter" },
+          { description: "Enhance Redis connection management in MCPRedisManager" },
+        ]
+      },
+    ]
+  },
+  {
+    date: "October 26-28, 2025",
     groups: [
       {
         category: "new",
         changes: [
           { description: "Add MCP OAuth Implementation Guide documentation" },
           { description: "Add OAuth flow support for MCP servers with SimpleTokenAuth" },
+          { description: "Enhance MCP server GraphQL schema with pagination, filtering, and ordering" },
+          { description: "Add changelog page and update navigation links" },
         ]
       },
       {
@@ -55,12 +120,15 @@ const changelog: ChangelogEntry[] = [
           { description: "Implement OAuth flow for MCP server actions and enhance logging" },
           { description: "Refactor OAuth handling and introduce SimpleTokenAuth" },
           { description: "Refactor MCP server connection and OAuth handling" },
+          { description: "Refactor OAuth storage and clean up unused code in backend" },
+          { description: "Refactor logging in OAuth helper functions" },
+          { description: "Remove toast notifications for server actions and loading states" },
+          { description: "Refactor error handling and logging in API routes" },
         ]
       },
     ]
   },
   {
-    version: "1.3.0",
     date: "October 24-25, 2025",
     groups: [
       {
@@ -69,6 +137,7 @@ const changelog: ChangelogEntry[] = [
           { description: "Implement homepage redesign with improved layout and branding" },
           { description: "Add privacy policy page" },
           { description: "Enhance Header component with branding and beta indication" },
+          { description: "Add support for OpenRouter models in backend" },
         ]
       },
       {
@@ -80,21 +149,22 @@ const changelog: ChangelogEntry[] = [
           { description: "Enhance McpClientLayout with image integration for server icons" },
           { description: "Refactor UI elements and improve accessibility across multiple pages" },
           { description: "Enhance user authentication flow and UI in multiple components" },
-          { description: "Add support for OpenRouter models in backend" },
           { description: "Add comprehensive logging across oauth_storage" },
+          { description: "Update settings.py to add logging configuration" },
         ]
       },
     ]
   },
   {
-    version: "1.2.0",
-    date: "October 23, 2025",
+    date: "October 20-23, 2025",
     groups: [
       {
         category: "new",
         changes: [
           { description: "Add server description field support and UI integration" },
           { description: "Add audio transcription endpoint in backend" },
+          { description: "Implement push-to-talk functionality in ChatInput and PlaygroundPage" },
+          { description: "Add ToolsExplorer component to McpClientLayout for enhanced tool management" },
         ]
       },
       {
@@ -106,62 +176,63 @@ const changelog: ChangelogEntry[] = [
           { description: "Refine OAuth2 indication and badge styling in McpClientLayout" },
           { description: "Enhance server management with description support and UI improvements" },
           { description: "Refactor ServerFormModal to use Controller for checkbox inputs" },
-        ]
-      },
-    ]
-  },
-  {
-    version: "1.1.0",
-    date: "October 21-22, 2025",
-    groups: [
-      {
-        category: "new",
-        changes: [
-          { description: "Add ToolsExplorer component to McpClientLayout for enhanced tool management" },
-        ]
-      },
-      {
-        category: "improved",
-        changes: [
           { description: "Enhance styling and responsiveness in Playground and ChatInput components" },
-          { description: "Refactor model state management in ChatInput for improved clarity" },
           { description: "Refactor sessionId handling in ChatInput for improved clarity and efficiency" },
           { description: "Refactor sessionId generation to improve handling for authenticated and anonymous users" },
-          { description: "Update ChatInput to ensure sessionId generation only occurs in browser environment" },
-          { description: "Refactor AgentState model to enforce explicit model type" },
         ]
       },
       {
         category: "fixed",
         changes: [
           { description: "Fix server-side rendering errors with sessionId generation" },
+          { description: "Remove is_public lookup to allow users to connect to their personal MCP servers" },
+          { description: "Fix Google verification file location" },
         ]
       },
     ]
   },
   {
-    version: "1.0.0",
-    date: "August 18-September 5, 2025",
+    date: "October 16-19, 2025",
+    groups: [
+      {
+        category: "new",
+        changes: [
+          { description: "Add new Header component integrating profile dropdown and navigation links" },
+          { description: "Add health check API route" },
+          { description: "Introduce NavigationLinks and ProfileDropdown components for better modularity" },
+        ]
+      },
+      {
+        category: "improved",
+        changes: [
+          { description: "Enhance PlaygroundPage with ChatInput component for improved user interaction" },
+          { description: "Refactor agent naming in layout and playground components to use camelCase" },
+          { description: "Update Copilot API route to include CORS headers and integrate HttpAgent" },
+          { description: "Refactor McpClientWrapper to separate public and user servers using useMemo" },
+          { description: "Refactor page components to clean up imports and improve state management" },
+          { description: "Simplify error handling in ServerManagement and ServerFormModal components" },
+        ]
+      },
+    ]
+  },
+  {
+    date: "September 5-17, 2025",
     groups: [
       {
         category: "new",
         changes: [
           {
-            description: "Initial release of MCP Assistant platform",
+            description: "Initial release of MCP Hub platform",
             subItems: [
-              "Full-stack MCP Hub with Next.js 15 frontend and Django 5.2 backend",
-              "Google OAuth authentication integration with NextAuth",
-              "Dynamic MCP server connections with multiple transport types (stdio, SSE, WebSocket, HTTP)",
-              "AI-powered chat using LangGraph agents with CopilotKit integration",
-              "GraphQL API with Strawberry Django and advanced filtering",
-              "Redis-based connection state management with 24-hour TTL",
+              "Google OAuth authentication",
+              "Dynamic MCP server connections with multiple transport types",
+              "AI-powered chat using LangGraph agents",
+              "GraphQL API integration",
               "Support for both authenticated and anonymous users",
               "Public and private MCP server configurations",
               "Real-time tool discovery and binding",
-              "Server management UI with add, edit, delete, and enable/disable functionality",
-              "Theme support with next-themes (light/dark mode)",
-              "Responsive design with Tailwind CSS and shadcn/ui components",
-              "Motion animations using Framer Motion"
+              "Server management UI with full CRUD operations",
+              "Theme support (light/dark mode)",
             ]
           },
         ]
@@ -195,20 +266,19 @@ export default function ChangelogPage() {
         {/* Page Header */}
         <div className="mb-16">
           <h1 className="text-4xl font-bold mb-3">Changelog</h1>
-          <p className="text-muted-foreground text-lg">Product updates</p>
+          <p className="text-muted-foreground text-lg">Track our development journey and feature releases</p>
         </div>
 
         {/* Timeline Entries */}
         <div className="space-y-12">
           {changelog.map((entry, idx) => (
-            <div key={entry.version} className="grid grid-cols-[200px_1fr] gap-8">
-              {/* Left Side - Date & Version */}
+            <div key={entry.date} className="grid grid-cols-[200px_1fr] gap-8">
+              {/* Left Side - Date */}
               <div className="pt-1">
-                <div className="flex items-center gap-2 text-primary font-medium mb-1">
+                <div className="flex items-center gap-2 text-primary font-medium">
                   <Clock className="h-4 w-4" />
                   <span>{entry.date}</span>
                 </div>
-                <p className="text-sm text-muted-foreground">v{entry.version}</p>
               </div>
 
               {/* Right Side - Changes */}
