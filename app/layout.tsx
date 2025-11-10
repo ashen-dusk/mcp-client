@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MCP Client",
+  title: "MCP Assistant",
   description: "Web-based MCP (Model Context Protocol) client for managing servers and exploring tools",
   icons: {
     icon: "/images/favicon.svg",

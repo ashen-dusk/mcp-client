@@ -4,12 +4,12 @@ export default function Footer() {
   return (
     <footer className="relative border-t border-border/50 bg-background/50 backdrop-blur-sm">
       <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="space-y-3">
             <h3 className="text-lg font-bold text-foreground">MCP Assistant</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Simplifying Model Context Protocol server connections for everyone.
+              Simplifying MCP server connections for everyone.
             </p>
           </div>
 
@@ -33,6 +33,20 @@ export default function Footer() {
               <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
               </Link>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">Contact</h4>
+            <div className="flex flex-col space-y-2">
+              <p className="text-sm text-muted-foreground">Himanshu Mehta</p>
+              <a
+                href="mailto:himanshu.mehta.sde@gmail.com"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                himanshu.mehta.sde@gmail.com
+              </a>
             </div>
           </div>
         </div>

@@ -224,19 +224,23 @@ export default function Home() {
       </motion.div>
 
       {/* Architecture Visualization Section */}
-      <div
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={container}
         className="container mx-auto px-6 py-10"
       >
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        <motion.div variants={fadeInUp} className="text-center mb-12">
+          <h2 className="text-xl md:text-2xl font-bold mb-6">
             How It Works
           </h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
             A seamless flow from your interface to AI-powered agents with dynamic MCP server connections
           </p>
-        </div>
+        </motion.div>
           <McpArchitecture className="max-w-6xl w-full" />
-      </div>
+      </motion.div>
 
       {/* Categories Section */}
       <div className="container mx-auto px-6 py-16">
