@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Bot, Loader2 } from "lucide-react";
+import { Bot, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import React from "react";
 import type { AssistantFormData } from "./AssistantEditDialog";
