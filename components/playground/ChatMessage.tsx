@@ -1,6 +1,49 @@
+'use client';
+
 import { UserMessageProps, AssistantMessageProps } from "@copilotkit/react-ui";
 import { Markdown } from "@copilotkit/react-ui";
 import { User, Bot } from "lucide-react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
+import { ReactNode, useEffect, useState } from "react";
+
+type MessageLike = {
+  content?: string;
+  text?: string;
+  body?: string;
+  message?: string;
+  generativeUI?: () => ReactNode;
+};
+
+const isMessageLike = (value: unknown): value is MessageLike =>
+  typeof value === "object" && value !== null;
+
+function AssistantAvatar() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const logoSrc = resolvedTheme === "dark" ? "/images/logo-dark.png" : "/images/logo-light.png";
+
+  return (
+    <div className="w-full h-full flex items-center justify-center rounded-full bg-muted">
+      {mounted ? (
+        <Image
+          src={logoSrc}
+          alt="Assistant avatar"
+          width={32}
+          height={32}
+          className="rounded-full object-contain"
+        />
+      ) : (
+        null
+      )}
+    </div>
+  );
+}
 
 export function UserMessage({ message }: UserMessageProps) {
   // Extract message content safely - handle both string and object cases
@@ -9,10 +52,9 @@ export function UserMessage({ message }: UserMessageProps) {
       return message;
     }
 
-    if (message && typeof message === 'object') {
+    if (isMessageLike(message)) {
       // Try multiple possible properties
-      const msg = message as any;
-      return msg.content || msg.text || msg.body || msg.message || '';
+      return message.content || message.text || message.body || message.message || '';
     }
 
     return '';
@@ -42,10 +84,9 @@ export function AssistantMessage({ message, isLoading }: AssistantMessageProps) 
       return message;
     }
 
-    if (message && typeof message === 'object') {
+    if (isMessageLike(message)) {
       // Try multiple possible properties
-      const msg = message as any;
-      return msg.content || msg.text || msg.body || msg.message || '';
+      return message.content || message.text || message.body || message.message || '';
     }
 
     return '';
@@ -54,8 +95,8 @@ export function AssistantMessage({ message, isLoading }: AssistantMessageProps) 
   const messageContent = getMessageContent();
 
   // Extract the generativeUI component (this is where tool renderings appear)
-  const subComponent = message && typeof message === 'object' && 'generativeUI' in message
-    ? (message as any).generativeUI?.()
+  const subComponent = isMessageLike(message) && typeof message.generativeUI === 'function'
+    ? message.generativeUI()
     : null;
 
   console.log(messageContent, "AssistantMessage Content");
@@ -75,9 +116,7 @@ export function AssistantMessage({ message, isLoading }: AssistantMessageProps) 
       {/* Avatar - only shown when there's actual message content */}
       {showAvatar && (
         <div className="shrink-0 w-8 h-8">
-          {/* <div className="w-full h-full flex items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500"> */}
-            <Bot className="w-5 h-5 text-white" />
-          {/* </div> */}
+          <AssistantAvatar />
         </div>
       )}
 

@@ -3,38 +3,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  ChevronDown,
-  CheckCircle,
   ArrowUp,
-  Mic,
-  MicOff,
-  Loader2,
-  Lock,
-  Bot,
-  Plus,
-  Pencil,
-  X, // <-- add this
 } from "lucide-react";
 import { PushToTalkState } from "@/hooks/usePushToTalk";
 import { useCoAgent } from "@copilotkit/react-core";
 import { AgentState, Assistant } from "@/types/mcp";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import Link from "next/link";
 import { usePlayground } from "@/components/providers/PlaygroundProvider";
 import { toast } from "react-hot-toast";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import AssistantDropdown from "./AssistantDropdown";
 import ModelDropdown from "./ModelDropdown";
 import MicrophoneButton from "./MicrophoneButton";
