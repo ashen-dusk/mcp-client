@@ -9,8 +9,7 @@ export default function Footer() {
           <div className="space-y-3">
             <h3 className="text-lg font-bold text-foreground">MCP Assistant</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Simplifying MCP server connections for everyone.
-            </p>
+               Simplifying interaction with any remote MCP            </p>
           </div>
 
           {/* Quick Links */}
