@@ -9,6 +9,7 @@ import HumanInTheLoop from "@/components/playground/HumanInTheLoop";
 import { ToolRenderer } from "@/components/playground/ToolRenderer";
 import { usePlayground } from "@/components/providers/PlaygroundProvider";
 import { PlanStateRenderer } from "@/components/playground/PlanStateRenderer";
+import { AssistantMessage } from "@/components/playground/ChatMessage";
 
 interface ChatInputWrapperProps {
   onSend: (message: string) => void;
@@ -61,6 +62,7 @@ const PlaygroundPage = () => {
         }}
         className="h-[80vh] rounded-md"
         Input={ChatInputWrapper}
+        AssistantMessage={AssistantMessage}
       />
     </div>
   );
