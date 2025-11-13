@@ -1,6 +1,18 @@
 import { UserMessageProps, AssistantMessageProps } from "@copilotkit/react-ui";
 import { Markdown } from "@copilotkit/react-ui";
 import { User, Bot } from "lucide-react";
+import { ReactNode } from "react";
+
+type MessageLike = {
+  content?: string;
+  text?: string;
+  body?: string;
+  message?: string;
+  generativeUI?: () => ReactNode;
+};
+
+const isMessageLike = (value: unknown): value is MessageLike =>
+  typeof value === "object" && value !== null;
 
 export function UserMessage({ message }: UserMessageProps) {
   // Extract message content safely - handle both string and object cases
@@ -9,10 +21,9 @@ export function UserMessage({ message }: UserMessageProps) {
       return message;
     }
 
-    if (message && typeof message === 'object') {
+    if (isMessageLike(message)) {
       // Try multiple possible properties
-      const msg = message as any;
-      return msg.content || msg.text || msg.body || msg.message || '';
+      return message.content || message.text || message.body || message.message || '';
     }
 
     return '';
@@ -42,10 +53,9 @@ export function AssistantMessage({ message, isLoading }: AssistantMessageProps) 
       return message;
     }
 
-    if (message && typeof message === 'object') {
+    if (isMessageLike(message)) {
       // Try multiple possible properties
-      const msg = message as any;
-      return msg.content || msg.text || msg.body || msg.message || '';
+      return message.content || message.text || message.body || message.message || '';
     }
 
     return '';
@@ -54,8 +64,8 @@ export function AssistantMessage({ message, isLoading }: AssistantMessageProps) 
   const messageContent = getMessageContent();
 
   // Extract the generativeUI component (this is where tool renderings appear)
-  const subComponent = message && typeof message === 'object' && 'generativeUI' in message
-    ? (message as any).generativeUI?.()
+  const subComponent = isMessageLike(message) && typeof message.generativeUI === 'function'
+    ? message.generativeUI()
     : null;
 
   console.log(messageContent, "AssistantMessage Content");
